@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
+from .uiconst import *
 from .configdialog import ConfigDialog
 
 class ButtonsFrame(Frame):
@@ -8,17 +9,14 @@ class ButtonsFrame(Frame):
     super().__init__(parent)
     self.parent = parent 
 
-    # grid configuration
-    self.columnconfigure(2, weight=1)
+    self.btn_config = Button(self, text='Config', width=BTNW, command=self.config)
+    self.btn_config.pack(padx=PADX, pady=PADY, side = 'left')
 
-    self.btn_config = Button(self, text='Config', width=10, command=self.config)
-    self.btn_config.grid(row=0, column=0, padx=10, pady=10)
+    self.btn_doc = Button(self, text='Doc', width=BTNW)
+    self.btn_doc.pack(padx=PADX, pady=PADY, side = 'left')
 
-    self.btn_doc = Button(self, text='Doc', width=10)
-    self.btn_doc.grid(row=0, column=1, padx=10, pady=10)
-
-    self.btn_exit = Button(self, text='Exit', width=10, command=parent.destroy)
-    self.btn_exit.grid(row=0, column=2, padx=10, pady=10, sticky=E)
+    self.btn_exit = Button(self, text='Exit', width=BTNW, command=parent.destroy)
+    self.btn_exit.pack(padx=PADX, pady=PADY, side = 'right')
 
 
   def config(self):

@@ -1,19 +1,18 @@
 from tkinter import *
 from tkinter import ttk
 
+from ..uiconst import *
+
 class CdActionsFrame(Frame):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
 
-    # grid configuration
-    self.columnconfigure(1, weight=1)
+    self.btn_ok = Button(self, text='Ok', width=BTNW, command=self.Ok)
+    self.btn_ok.pack(padx=PADX, pady=PADY, side = 'left')
 
-    self.button_ok = Button(self, text='Ok', width=10, command=self.Ok)
-    self.button_ok.grid(row=0, column=0)
-
-    self.button_cancel = Button(self, text='Cancel', width=10, command=self.Cancel)
-    self.button_cancel.grid(row=0, column=1, sticky=E)
+    self.btn_cancel = Button(self, text='Cancel', width=BTNW, command=self.Cancel)
+    self.btn_cancel.pack(padx=PADX, pady=PADY, side = 'right')
 
   def Ok(self):
     self.parent.Ok() 
