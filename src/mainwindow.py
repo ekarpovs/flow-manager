@@ -20,8 +20,6 @@ class MainWindow():
     self.content_frame['height'] = content_height
 
     root.update()
-    print("CH", self.content_frame.winfo_reqheight())
-
 
     # layout all of the main container
     root.rowconfigure(1, weight=1)
