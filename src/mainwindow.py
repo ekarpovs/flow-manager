@@ -1,7 +1,7 @@
 from tkinter import *
 
 from .uiconst import *
-from .buttonsframe import ButtonsFrame
+from .mainactionsframe import MainActionsFrame
 from .contentframe import ContentFrame
 
 class MainWindow():
@@ -11,7 +11,7 @@ class MainWindow():
     # self.PADY = 10
     
     # create all of the main containers
-    self.buttons_frame = ButtonsFrame(self.root)
+    self.buttons_frame = MainActionsFrame(self.root)
 
     # Calculate as reminder
     content_height = self.calculate_content_frame_height()
