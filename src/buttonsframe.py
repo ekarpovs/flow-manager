@@ -3,12 +3,13 @@ from tkinter import ttk
 
 from .configdialog import ConfigDialog
 
-class ButtonsFrame(LabelFrame):
+class ButtonsFrame(Frame):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
-    self['text'] = 'Buttons'
 
+    # grid configuration
+    self.columnconfigure(2, weight=1)
 
     self.btn_config = Button(self, text='Config', width=10, command=self.config)
     self.btn_config.grid(row=0, column=0, padx=10, pady=10)
@@ -18,9 +19,6 @@ class ButtonsFrame(LabelFrame):
 
     self.btn_exit = Button(self, text='Exit', width=10, command=parent.destroy)
     self.btn_exit.grid(row=0, column=2, padx=10, pady=10, sticky=E)
-
-    # grid configuration
-    self.columnconfigure(2, weight=1)
 
 
   def config(self):
