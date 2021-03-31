@@ -1,20 +1,14 @@
 from tkinter import *
 from tkinter import ttk
+
 from src import MainWindow
 
-def run():
+if __name__ == '__main__':
   root = Tk()
+  root.title("Flow Manager")
   root.state('zoomed')
   root.resizable(0, 0) 
 
-  root.title('Flow manager')
+  myapp = MainWindow(root)
 
-  root.columnconfigure(0, weight=1)
-  root.rowconfigure(1, weight=1)
-
-  mw = MainWindow(root)
-
-  root.mainloop() 
-
-if __name__ == '__main__':
-    run() 
+  root.mainloop()

@@ -4,19 +4,25 @@ from tkinter import ttk
 from .uiconst import *
 from .configdialog import ConfigDialog
 
-class MainActionsFrame(Frame):
+class MainActions(Frame):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
 
+    self["bg"] = "green"
+
+    self.grid()
+    self.rowconfigure(0, weight=1)
+    self.columnconfigure(2, weight=1)
+
     self.btn_config = Button(self, text='Config', width=BTNW, command=self.config)
-    self.btn_config.pack(padx=PADX, pady=PADY, side = 'left')
+    self.btn_config.grid(row=0, column=0)
 
     self.btn_doc = Button(self, text='Doc', width=BTNW)
-    self.btn_doc.pack(padx=PADX, pady=PADY, side = 'left')
+    self.btn_doc.grid(row=0, column=1)
 
-    self.btn_exit = Button(self, text='Exit', width=BTNW, command=parent.destroy)
-    self.btn_exit.pack(padx=PADX, pady=PADY, side = 'right')
+    self.btn_exit = Button(self, text='Exit', width=BTNW)
+    self.btn_exit.grid(row=0, column=2, sticky=E)
 
 
   def config(self):
