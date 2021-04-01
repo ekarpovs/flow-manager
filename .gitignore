@@ -1,4 +1,5 @@
 src/__pycache__
 src/configdialog/__pycache__
 src/flow/__pycache__
+src/flow/panels/__pycache__
 .vscode
