@@ -19,13 +19,54 @@ class FlowModel():
  
   
   @classmethod
-  def flows():
+  def get_flow_names():
 
-    return []
+    return ["compare", "contours", "scanner"]
 
-  def flow(idx):
 
-    return {}
+  def get_flow(self, name):
+    # MOCK data
+    flows = {
+      "compare": 
+      {
+        "steps":[
+          "ws-aux.restore",
+          "bsc.fit",
+          "cmp.cmp_mse",
+          "cmp.cmp_ssim",
+          "cmp.cmp_psnr",
+          "cmp.cmp_norm"
+        ]
+      },
+      "contours":
+      {
+        "steps":[
+          "clrs.bgrto",
+          "cntrs.find",
+          "cntrs.sort",
+          "draw.contours"
+        ]
+      },
+      "scanner":
+      {
+        "steps":[
+          "clrs.bgrto",
+          "blur.gaus",
+          "edge.canny",
+          "cntrs.find",
+          "cntrs.sort",
+          "draw.contours",
+          "cntrs.sel_rect",
+          "bsc.transform"
+        ]
+      }                
+    }
+
+    flow  = flows[name]
+
+    return flow['steps']
+    # return ["clr.bgrto", "blur.gaus", "edge.canny", "cntrs.find",
+    #   "cntrs.sort", "draw.contours", "cntrs.sel_rect", "bsc.transform"]
 
 
   def set_operation():
