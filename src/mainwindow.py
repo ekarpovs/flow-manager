@@ -8,7 +8,7 @@ class MainWindow():
   def __init__(self, root):
     self.root = root
    
-    self.main_frame = Frame(self.root)
+    self.main_frame = Frame(self.root, bg='bisque')
     self.main_frame.grid()
 
     # create all of the main containers
@@ -18,8 +18,8 @@ class MainWindow():
     self.fit_flow_frame_size()
     self.flow_controller = FlowController(self.flow_frame)
 
-    self.flow_frame.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=E+W)
-    self.actions_frame.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=E+W)
+    self.flow_frame.grid(row=0, column=0, sticky=E+W)
+    self.actions_frame.grid(row=1, column=0, sticky=E+W)
 
     # Bind to actions panel
     self.actions_frame.btn_exit.bind("<Button>", self.exit)

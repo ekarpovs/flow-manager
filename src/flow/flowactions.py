@@ -10,7 +10,7 @@ class FlowActions(LabelFrame):
 
     self['bd'] = 2
     self['relief'] = RIDGE 
-    self.parent['bg'] = 'cyan'
+    self['bg'] = 'cyan'
 
     print("ACTIONS")
 

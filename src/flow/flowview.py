@@ -12,7 +12,7 @@ class FlowView(LabelFrame):
 
     self['bd'] = 2
     self['relief'] = RIDGE 
-    self.parent['bg'] = 'bisque'
+    self['bg'] = 'pink'
 
     # self.parent.update()
     # h = self.parent.winfo_reqheight()
@@ -27,20 +27,21 @@ class FlowView(LabelFrame):
 
     # self.modules_frame = LabelFrame(self, bg="yellow", text='Modules', height=h-200, width=w)
     self.modules_frame = LabelFrame(self, bg="yellow", text='Modules')
-    self.fit_modules_frame_size()
+    self.fit_frames_size()
 
-    self.modules_frame.grid(row=0, column=0, padx=PADX, pady=PADY)
-    self.actions_frame.grid(row=4, column=0, padx=PADX, pady=PADY)
+    self.modules_frame.grid(row=0, column=0)
+    self.actions_frame.grid(row=4, column=0, sticky=W+S)
 
 
-  def fit_modules_frame_size(self):
+  def fit_frames_size(self):
     self.parent.update()
     h = self.parent.winfo_reqheight()
     w = self.parent.winfo_reqwidth()
     self.actions_frame.update()
-    self.modules_frame['height'] = h - self.actions_frame.winfo_reqheight() - PADY*4
-    self.modules_frame['width'] = w
-    print("FlowView", w, h, self.actions_frame.winfo_reqheight())
+    ha = self.actions_frame.winfo_reqheight()
+    self.modules_frame['height'] = h - ha - PADY*2
+    self.modules_frame['width'] = w - 5
+    self.actions_frame['width'] = w
     # do not resize the flow frame after a widget will be added
     self.modules_frame.grid_propagate(0)
 

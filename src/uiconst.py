@@ -11,5 +11,5 @@ def calculate_reminder_height(parent, frames):
   for f in frames:
     used_height += f.winfo_reqheight() 
 
-  return parent_height - used_height - PADY*4
+  return parent_height - used_height - PADY*2
 
