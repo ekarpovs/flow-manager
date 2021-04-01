@@ -60,22 +60,13 @@ class FlowView(LabelFrame):
     self.images_frame.grid_propagate(0)
 
 
-  def show_modules(self, modules):
+  def show_flow_names(self, names):
+    self.flows_frame.set_flow_names(names)
 
     return
-
-
-  def show_flows(self, flows):
-
-    return
-
 
   def show_flow(self, flow):
     self.flows_frame.set_flow(flow)
 
     return
 
-
-  def show_image():
-
-    return

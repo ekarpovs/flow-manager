@@ -24,8 +24,11 @@ class FlowsPanel(Panel):
     # choicesvar.set(choices)
     self.flow_list_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=S + W + E + N)
 
+  def set_flow_names(self, names):
+    print("FP", names)
 
   def set_flow(self, flow):
     self.choicesvar.set(flow)
     
     return
+

@@ -11,8 +11,17 @@ class FlowController():
     self.model = FlowModel()
     self.view = FlowView(self.parent)
 
+    self.flow_names = []
+
     self.start()
-    
+
+
+  def get_flow_names(self):
+    self.flow_names = self.model.get_flow_names()
+
+  def show_flow_names(self):
+    self.view.show_flow_names(self.flow_names)
+
 
   def get_flow_content(self, flow_name="compare"):
     self.flow = self.model.get_flow(flow_name)
@@ -39,7 +48,8 @@ class FlowController():
   
   def get_all(self):
     self.get_modules()
-    self.get_flows()
+    
+    self.get_flow_names()
     
     self.get_flow_content()
 
@@ -55,17 +65,9 @@ class FlowController():
     return
 
 
-  def get_flows(self):
-    ''' 
-      Get modules & operations
-    '''
-    self.flows = []
-
-    return
-
   def show_all(self):
     self.show_modules()
-    self.show_flows()
+    self.show_flow_names()
     self.show_flow_content()
 
     return

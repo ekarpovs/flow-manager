@@ -19,7 +19,7 @@ class FlowModel():
  
   
   @classmethod
-  def get_flow_names():
+  def get_flow_names(self):
 
     return ["compare", "contours", "scanner"]
 
