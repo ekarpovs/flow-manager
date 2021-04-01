@@ -19,21 +19,38 @@ class ModulesPanel(Panel):
 
     self.tree_view = ttk.Treeview(self)
     # Inserted at the root, program chooses id:
-    self.tree_view['columns'] = ['module', 'operation', 'descr']
+   
+    self.tree_view["columns"] = ("one", "two")
+    self.tree_view.column("one", width=10)
+    self.tree_view.column("two", width=50)
+    self.tree_view.heading("one", text="Operation")
+    self.tree_view.heading("two", text="Description")
 
-    # self.tree_view_scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree_view.yview)
-    # self.tree_view_scrollbar.grid(row=2, column=0, sticky=S + E + N)
+    # self.tree_view_scrollbar = ttk.Scrollbar(self.tree_view, orient="vertical", command=self.tree_view.yview)
+    # self.tree_view_scrollbar.grid(row=2, column=0, sticky=S + W + N)
     # self.tree_view.configure(yscrollcommand=self.tree_view_scrollbar.set)
 
-    self.tree_view.heading('#0', text='Index')
-    self.tree_view.heading("module", text='Module')
-    self.tree_view.heading("operation", text='Operation')
-    self.tree_view.heading("descr", text='Description')
 
-    self.tree_view.column("#0", width=5)
-    self.tree_view.column("module", width=25)
-    self.tree_view.column("operation", width=25)
-    self.tree_view.column("descr", width=75)
-    # self.tree_view.bind("<<tree_viewSelect>>", self.on_row_click) 
-    
+    # Temporary
+
+    # insert sub-item, method 1 by index
+    id1 = self.tree_view.insert("", "end", "bsc", text="Base operations")
+    self.tree_view.insert(id1, "end", values=("bsc.crop", "Crops an image."))
+    self.tree_view.insert(id1, "end", values=("bsc.flip", "Flips an image."))
+    #  insert sub-item, method 2 by name
+    self.tree_view.insert("", "end", "blur", text="Bluring operations")
+    self.tree_view.insert("blur", "end", values=("blur.avg", "Performs average bluring."))
+    self.tree_view.insert("blur", "end", values=("blur.gaus", "Performs Gausian blurring"))
+ 
+    self.tree_view.insert("", "end", "cnts", text="Contours operations")
+    self.tree_view.insert("cnts", "end", values=("cnts.find", "Finds contours of an image."))
+    self.tree_view.insert("cnts", "end", values=("cnts.sort", "Sorts contours."))
+
+    # Temporary
+
+
     self.tree_view.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=S + W + E + N)
+
+
+  def set_modules(self, modules):
+    print("MD", modules)
