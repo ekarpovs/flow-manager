@@ -1,10 +1,18 @@
 from tkinter import *
+from tkinter import font
 from tkinter import ttk
 
 from src import MainWindow
 
 if __name__ == '__main__':
   root = Tk()
+
+  # # Creating a Font object of "TkDefaultFont"
+  # root.defaultFont = font.nametofont("TkDefaultFont")
+  # # Overriding default-font with custom settings
+  # # i.e changing font-family, size and weight
+  # root.defaultFont.configure(size=12)
+
   root.title("Flow Manager")
   # root.state('zoomed')
   sw = root.winfo_screenwidth ()
