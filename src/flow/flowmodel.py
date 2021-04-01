@@ -2,10 +2,90 @@ class FlowModel():
   def __init__(self):
       print("MODEL")
 
-  @classmethod
-  def get_modules():
 
-    return []
+  def get_modules(self):
+    # modules = {
+    #   "name": "blur",
+    #   "descr": "Bluring operations",
+    #   "opers": {
+    #       {
+    #         "name": "avg",
+    #         "descr": "Performs average bluring."
+    #       },
+    #       {
+    #         "name": "gaus",
+    #         "descr": "Performs Gausian bluring."
+    #       }
+    #   },
+    #   "name": "bsc",
+    #   "descr": "Basic operations",
+    #   "opers": {
+    #     {
+    #       "name": "crop",
+    #       "descr": "Crops an image."
+    #     },
+    #     {
+    #       "name": "flip",
+    #       "descr": "Flips an image."
+    #     }
+    #   },
+    #   "name": "cnts",
+    #   "descr": "Contours operations",
+    #   "opers": {
+    #     {
+    #       "name": "find",
+    #       "descr": "Finds contours of an image."
+    #     },
+    #     {
+    #       "name": "sort",
+    #       "descr": "Sorts contours."
+    #     }
+    #   }
+    # }
+
+    modules = {
+      "blur": {
+      "descr": "Bluring operations",
+      "opers": [
+          {
+            "name": "avg",
+            "descr": "Performs average bluring."
+          },
+          {
+            "name": "gaus",
+            "descr": "Performs Gausian bluring."
+          }
+        ]
+      },
+      "bsc": {
+      "descr": "Basic operations",
+      "opers": [
+          {
+            "name": "crop",
+            "descr": "Crops an image."
+          },
+          {
+            "name": "flip",
+            "descr": "Flips an image."
+          }
+        ]
+      },
+      "cntrs": {
+      "descr": "Contours operations",
+      "opers": [
+          {
+            "name": "find",
+            "descr": "Finds contours of an image."
+          },
+          {
+            "name": "sort",
+            "descr": "Sorts contours."
+          }
+        ]
+      }
+    }
+
+    return modules
 
 
   def get_module(name):
@@ -18,7 +98,6 @@ class FlowModel():
     return 
  
   
-  @classmethod
   def get_flow_names(self):
 
     return ["compare", "contours", "scanner"]
@@ -27,8 +106,7 @@ class FlowModel():
   def get_flow(self, name):
     # MOCK data
     flows = {
-      "compare": 
-      {
+      "compare": {
         "steps":[
           "ws-aux.restore",
           "bsc.fit",
@@ -38,8 +116,7 @@ class FlowModel():
           "cmp.cmp_norm"
         ]
       },
-      "contours":
-      {
+      "contours": {
         "steps":[
           "clrs.bgrto",
           "cntrs.find",
@@ -47,8 +124,7 @@ class FlowModel():
           "draw.contours"
         ]
       },
-      "scanner":
-      {
+      "scanner": {
         "steps":[
           "clrs.bgrto",
           "blur.gaus",
