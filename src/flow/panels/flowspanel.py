@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 
 from ...uiconst import *
 from .panel import Panel
@@ -12,23 +13,27 @@ class FlowsPanel(Panel):
     self['text'] = 'Flows panel'
 
     self.grid()
-    self.rowconfigure(0, weight=1)
+    # self.rowconfigure(0, weight=1)
     self.rowconfigure(1, weight=1)
     self.columnconfigure(0, weight=1)
 
+    self.namesvar = StringVar()
+    self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar)
+
     self.flow = []
-    self.choicesvar = StringVar(value=self.flow)
-    self.flow_list_box = Listbox(self, height=10, listvariable=self.choicesvar)
+    self.modulesvar = StringVar(value=self.flow)
+    self.flow_list_box = Listbox(self, height=10, listvariable=self.modulesvar)
 
     # choices.append("peach")
     # choicesvar.set(choices)
-    self.flow_list_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=S + W + E + N)
+    self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + E + N)
+    self.flow_list_box.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + N)
 
   def set_flow_names(self, names):
-    print("FP", names)
+    self.names_combo_box['values'] = names
 
   def set_flow(self, flow):
-    self.choicesvar.set(flow)
+    self.modulesvar.set(flow)
     
     return
 
