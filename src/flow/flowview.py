@@ -11,6 +11,8 @@ class FlowView(LabelFrame):
     super().__init__(parent)
     self.parent = parent
 
+    print("VIEW")
+
     self['bd'] = 2
     self['relief'] = RIDGE 
     self['bg'] = 'pink'
@@ -29,7 +31,7 @@ class FlowView(LabelFrame):
 
     self.flows_frame = FlowsPanel(self)
 
-    self.images_frame = ImagesPanel(self)
+    self.images_frame = OutputPanel(self)
 
     self.divide_view()
 
@@ -38,7 +40,6 @@ class FlowView(LabelFrame):
     self.images_frame.grid(row=0, column=2)
     self.actions_frame.grid(row=1, column=0, sticky=W+S)
 
-    self.show_flow([])
 
   def divide_view(self):
     self.parent.update()
@@ -60,13 +61,18 @@ class FlowView(LabelFrame):
     self.images_frame.grid_propagate(0)
 
 
-  def show_flow_names(self, names):
-    self.flows_frame.set_flow_names(names)
+# Show Meta data
+  def show_modules_meta(self, modules_meta):
+    self.modules_frame.set_modules_meta(modules_meta)
+
+
+  def show_work_sheet_names(self, work_sheet_names):
+    self.flows_frame.set_work_sheet_names(work_sheet_names)
 
     return
 
-  def show_flow(self, flow):
-    self.flows_frame.set_flow(flow)
+  def show_work_sheet(self, work_sheet):
+    self.flows_frame.set_work_sheet(work_sheet)
 
     return
 

@@ -14,9 +14,16 @@ class FlowActions(LabelFrame):
 
     print("ACTIONS")
 
-    self.btn_run = Button(self, text='Run', width=BTNW)
+    self.btn_run = Button(self, text='Run', width=BTNW, command=self.run)
     self.btn_run.pack(padx=PADX, pady=PADY, side = 'left')
 
     self.btn_step = Button(self, text='Step', width=BTNW)
     self.btn_step.pack(padx=PADX, pady=PADY, side = 'left')
 
+
+  def run(self):
+    print("Run")
+
+
+  def step(self):
+    print("Step")

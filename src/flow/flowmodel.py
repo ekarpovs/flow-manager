@@ -3,46 +3,8 @@ class FlowModel():
       print("MODEL")
 
 
-  def get_modules(self):
-    # modules = {
-    #   "name": "blur",
-    #   "descr": "Bluring operations",
-    #   "opers": {
-    #       {
-    #         "name": "avg",
-    #         "descr": "Performs average bluring."
-    #       },
-    #       {
-    #         "name": "gaus",
-    #         "descr": "Performs Gausian bluring."
-    #       }
-    #   },
-    #   "name": "bsc",
-    #   "descr": "Basic operations",
-    #   "opers": {
-    #     {
-    #       "name": "crop",
-    #       "descr": "Crops an image."
-    #     },
-    #     {
-    #       "name": "flip",
-    #       "descr": "Flips an image."
-    #     }
-    #   },
-    #   "name": "cnts",
-    #   "descr": "Contours operations",
-    #   "opers": {
-    #     {
-    #       "name": "find",
-    #       "descr": "Finds contours of an image."
-    #     },
-    #     {
-    #       "name": "sort",
-    #       "descr": "Sorts contours."
-    #     }
-    #   }
-    # }
-
+# Meta data
+  def get_modules_meta(self):
     modules = {
       "blur": {
       "descr": "Bluring operations",
@@ -87,25 +49,15 @@ class FlowModel():
 
     return modules
 
-
-  def get_module(name):
-    
-    return [] 
-
-
-  def get_operation(name):
-    
-    return 
- 
   
-  def get_flow_names(self):
+  def get_work_sheet_names(self):
 
     return ["compare", "contours", "scanner"]
 
 
-  def get_flow(self, name):
+  def get_work_sheet(self, work_sheet_name):
     # MOCK data
-    flows = {
+    work_sheets = {
       "compare": {
         "steps":[
           "ws-aux.restore",
@@ -138,12 +90,11 @@ class FlowModel():
       }                
     }
 
-    flow  = flows[name]
+    work_sheet  = work_sheets[work_sheet_name]
+    return work_sheet
 
-    return flow['steps']
-    # return ["clr.bgrto", "blur.gaus", "edge.canny", "cntrs.find",
-    #   "cntrs.sort", "draw.contours", "cntrs.sel_rect", "bsc.transform"]
 
+# Real objects
 
   def set_operation():
     
@@ -154,3 +105,11 @@ class FlowModel():
 
     return  
   
+  def get_module(name):
+    
+    return [] 
+
+
+  def get_operation(name):
+    
+    return 

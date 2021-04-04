@@ -52,5 +52,5 @@ class ModulesPanel(Panel):
     self.tree_view.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=S + W + E + N)
 
 
-  def set_modules(self, modules):
-    print("MD", modules)
+  def set_modules_meta(self, modules_meta):
+    pass

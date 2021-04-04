@@ -29,11 +29,11 @@ class FlowsPanel(Panel):
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + E + N)
     self.flow_list_box.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + N)
 
-  def set_flow_names(self, names):
-    self.names_combo_box['values'] = names
+  def set_work_sheet_names(self, work_sheet_names):
+    self.names_combo_box['values'] = work_sheet_names
 
-  def set_flow(self, flow):
-    self.modulesvar.set(flow)
+  def set_work_sheet(self, work_sheet):
+    self.modulesvar.set(work_sheet['steps'])
     
     return
 

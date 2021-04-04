@@ -8,28 +8,16 @@ class FlowController():
   def __init__(self, parent):
     self.parent = parent
 
+    print("CONTROLLER")
+
     self.model = FlowModel()
     self.view = FlowView(self.parent)
 
-    self.flow_names = []
+    self.work_sheet_names = []
 
     self.start()
 
-
-  def get_flow_names(self):
-    self.flow_names = self.model.get_flow_names()
-
-  def show_flow_names(self):
-    self.view.show_flow_names(self.flow_names)
-
-
-  def get_flow_content(self, flow_name="compare"):
-    self.flow = self.model.get_flow(flow_name)
-  
-  def show_flow_content(self):
-    self.view.show_flow(self.flow)
-
-
+# Common methods
   @classmethod
   def get_config():
     paths = []
@@ -45,46 +33,46 @@ class FlowController():
 
     return
 
-  
+
+# Meta data
   def get_all(self):
-    self.get_modules()
-    
-    self.get_flow_names()
-    
-    self.get_flow_content()
+    self.get_modules_meta()   
+    self.get_work_sheet_names()
+    self.get_work_sheet()
 
     return
 
-
-  def get_modules(self):
-    ''' 
-      Get modules & operations
-    '''
-    self.modules = []
+  def get_modules_meta(self):
+    self.modules_meta = self.model.get_modules_meta()
 
     return
 
+  def get_work_sheet_names(self):
+    self.work_sheet_names = self.model.get_work_sheet_names()
+
+
+  def get_work_sheet(self, work_sheet_name="compare"):
+    self.work_sheet = self.model.get_work_sheet(work_sheet_name)
+  
 
   def show_all(self):
-    self.show_modules()
-    self.show_flow_names()
-    self.show_flow_content()
+    self.show_modules_meta()
+    self.show_work_sheet_names()
+    self.show_work_sheet()
 
     return
 
 
-  def show_modules(self):
-    # self.view.show_modules(self.modules)
+  def show_modules_meta(self):
+    self.view.show_modules_meta(self.modules_meta)
 
     return
 
-
-  def show_flows(self):
-    # self.view.show_flows(self.flows)
-
-    return
+  def show_work_sheet_names(self):
+    self.view.show_work_sheet_names(self.work_sheet_names)
 
 
-  def run():
+  def show_work_sheet(self):
+    self.view.show_work_sheet(self.work_sheet)
 
     return
