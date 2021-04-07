@@ -2,6 +2,7 @@ import os
 import glob
 from tkinter import filedialog as fd
 
+from .models import *
 from ..configuration import Configuration
 
 class MngrModel():
@@ -13,6 +14,10 @@ class MngrModel():
     self.worksheets_paths = cfg.get_worksheets_paths()
     self.input_path = cfg.get_input_path()
     self.result_path = cfg.get_result_path()
+
+    self.modules_model = ModulesModel(self)
+    self.flows_model = FlowsModel(self)
+
 
   #   self.work_sheet_names = []
   #   self.work_sheet = {}
