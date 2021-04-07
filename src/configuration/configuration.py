@@ -4,8 +4,10 @@ import json
 class Configuration():
   def __init__(self):
     self.load_configuration()
+    self.load_factory()
 
 
+  # Loaders
   def load_configuration(self):
     # TODO read from config.json
     self.factory_path = "../operation-loader"
@@ -16,8 +18,16 @@ class Configuration():
     self.worksheets_paths=["d:/Projects/mine/github/work-shop/modules_and_worksheets/worksheets"]
 
 
+  def load_factory(self):
+    self.factory = None
+  
+
+  # Getters
+  def get_factory(self):
+    return self.factory
+
   def get_factory_path(self):
-    return self.input_path
+    return self.factory_path
 
 
   def get_input_path(self):

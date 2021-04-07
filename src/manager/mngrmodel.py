@@ -1,5 +1,5 @@
-from tkinter import filedialog as fd
-
+# from tkinter import filedialog as fd
+import sys
 from .models import *
 from ..configuration import Configuration
 
@@ -13,8 +13,19 @@ class MngrModel():
     self.input_path = cfg.get_input_path()
     self.result_path = cfg.get_result_path()
 
+    # import factory fo loading modules outside of the package.
+    # temporary since the factory is not installed via pip
+    factory_path = cfg.get_factory_path()
+    sys.path.append(factory_path)
+    import factory
+
+    self.factory = factory
+
+    # Create models
     self.modules_model = ModulesModel(self)
     self.flows_model = FlowsModel(self)
+
+
 
 
   #   self.work_sheet_names = []

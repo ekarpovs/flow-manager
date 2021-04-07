@@ -14,20 +14,25 @@ class ModulesModel(Model):
     self.load_modules_meta()
 
 
-  def load_modules_meta(self):
-      for mp in self.parent.modules_paths:
-        module_meta = {"path": mp, "modules": {}}
-        pattern = "{}/*.py".format(mp)
-        md_names = [
-          md 
-          for md in [md[len(md)-1].split('.')[0] 
-          for md in [md.replace('\\', '/').split('/') 
-          for md in [mds for mds in glob.glob(pattern)]]] if not md.startswith('__')
-        ]
-        
-        
-        module_meta["modules"] = md_names
-        self.modules_meta.append(module_meta)
-        
-      print(self.modules_meta)
+  def read_modules_names(self, path):
+    names = [f[:-3] for f in os.listdir(path)
+                  if f.endswith('.py') and f != '__init__.py']
+    return names
 
+  
+  def load_modules_meta(self):
+    for mp in self.parent.modules_paths:
+      module_meta = {"path": mp, "modules": {}}
+      module_names = self.read_modules_names(mp)
+      
+      module_meta["modules"] = [{"name": mn, "operations": self.load_module_meta(mn)} for mn in module_names]
+      # module_meta["modules"] = self.load_module_meta(module_names)
+      self.modules_meta.append(module_meta)
+        
+    print(self.modules_meta)
+
+  
+  def load_module_meta(self, module_names):
+    module_meta =  self.parent.factory.get_module_meta(module_names)
+
+    return module_meta   
