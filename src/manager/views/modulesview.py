@@ -2,9 +2,9 @@ from tkinter import *
 from tkinter import ttk
 
 from ...uiconst import *
-from .panel import Panel
+from .view import View
 
-class ModulesPanel(Panel):
+class ModulesView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 

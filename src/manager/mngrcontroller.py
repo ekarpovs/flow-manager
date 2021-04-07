@@ -1,16 +1,16 @@
-from .flowrunner import FlowRunner  
-from .flowmodel import FlowModel  
-from .flowview import FlowView  
+from .runner import Runner  
+from .mngrmodel import MngrModel  
+from .mngrview import MngrView  
 
-class FlowController():
+class MngrController():
   def __init__(self, parent):
     self.parent = parent
 
-    print("CONTROLLER")
+    print("MNGR-CONTROLLER")
 
-    self.runner = FlowRunner()
-    self.model = FlowModel()
-    self.view = FlowView(self.parent)
+    self.runner = Runner()
+    self.model = MngrModel()
+    self.view = MngrView(self.parent)
 
 
     #  
@@ -41,14 +41,14 @@ class FlowController():
     # self.get = get
 
     # Bind to flows panel
-    self.view.flows_frame.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
-    self.view.flows_frame.btn_load.bind("<Button>", self.load)
-    self.view.flows_frame.btn_run.bind("<Button>", self.run)
-    self.view.flows_frame.btn_step.bind("<Button>", self.step)
+    self.view.flows_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
+    self.view.flows_view.btn_load.bind("<Button>", self.load)
+    self.view.flows_view.btn_run.bind("<Button>", self.run)
+    self.view.flows_view.btn_step.bind("<Button>", self.step)
 
-    self.model.read_work_sheet_names()
-    self.work_sheet_names = self.model.get_work_sheet_names()
-    self.work_sheet_name = None
+    # self.model.read_work_sheet_names()
+    # self.work_sheet_names = self.model.get_work_sheet_names()
+    # self.work_sheet_name = None
     
     self.start()
 
@@ -63,8 +63,8 @@ class FlowController():
     # bunding actions?
     # self.actions.btn_run.bind("<Button>", self.run)
 
-    self.get_all()
-    self.show_all()
+    # self.get_all()
+    # self.show_all()
 
     return
 
@@ -115,7 +115,7 @@ class FlowController():
 
 # Actions
   def selected(self, event):
-    self.work_sheet_name = self.view.flows_frame.names_combo_box.get()
+    self.work_sheet_name = self.view.flows_view.names_combo_box.get()
     print("selected", self.work_sheet_name)
     self.model.load_work_sheet(self.work_sheet_name)
 
@@ -144,9 +144,9 @@ class FlowController():
 
   def load(self, event):
     cv2image = self.model.load_image()
-    self.view.output_frame.set_original_image(cv2image)
+    self.view.output_view.set_original_image(cv2image)
 
   def load_mage(self):
     cv2image = self.model.load_image()
 
-    self.view.output_frame.set_original_image(cv2image)
+    self.view.output_view.set_original_image(cv2image)

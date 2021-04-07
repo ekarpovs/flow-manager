@@ -1,7 +1,7 @@
 import sys
 import json 
 
-class FlowRunner():
+class Runner():
   def __init__(self):
 
     print("RUNNER")

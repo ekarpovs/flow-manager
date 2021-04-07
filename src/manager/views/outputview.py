@@ -2,9 +2,9 @@ from tkinter import *
 from PIL import Image, ImageTk
 
 from ...uiconst import *
-from .panel import Panel
+from .view import View
 
-class OutputPanel(Panel):
+class OutputView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
