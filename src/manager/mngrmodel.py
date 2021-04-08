@@ -13,42 +13,21 @@ class MngrModel():
     self.input_path = cfg.get_input_path()
     self.result_path = cfg.get_result_path()
 
+    self.factory = self.import_factory_ref(cfg)
+
+    # Create models
+    self.modules_model = ModulesModel(self)
+    self.flows_model = FlowsModel(self)
+
+  @staticmethod
+  def import_factory_ref(cfg):  
     # import factory fo loading modules outside of the package.
     # temporary since the factory is not installed via pip
     factory_path = cfg.get_factory_path()
     sys.path.append(factory_path)
     import factory
 
-    self.factory = factory
-
-    # Create models
-    self.modules_model = ModulesModel(self)
-    self.flows_model = FlowsModel(self)
-
-
-
-
-  #   self.work_sheet_names = []
-  #   self.work_sheet = {}
-
-  #   self.load_modules_meta()
-
-
-
-
-  # def load_modules_meta(self):
-  #     for mp in self.modules_paths:
-  #       pattern = "{}/*.py".format(mp)
-  #       names = [m for m in glob.glob(pattern)]
-  #       names = [f.replace('\\', '/').split('/') for f in names]
-  #       names = [f[len(f)-1].split('.')[0] for f in names]
-  #       names = [f for f in names if not f.startswith('__')]
-
-  #       print(names)
-
-
-
-
+    return factory
 
 
 
