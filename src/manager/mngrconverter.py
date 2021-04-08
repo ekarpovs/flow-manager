@@ -14,16 +14,8 @@ class MngrConverter():
     self.result_path = cfg.get_result_path()
 
     # Create converters
-    self.modules_model = ModulesConverter(self)
-    self.flows_model = FlowsConverter(self)
-
-
-# Getters
-
-
-# Getters wrappers
-
-
+    self.modules_converter = ModulesConverter(self)
+    self.flows_converter = FlowsConverter(self)
 
 
 

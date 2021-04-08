@@ -23,14 +23,17 @@ class MngrController():
     self.start()
 
   def start(self):
-    # bunding actions?
-    # self.actions.btn_run.bind("<Button>", self.run)
-
-    # self.get_all()
-    # self.show_all()
-
+    self.update_modules_view()
+    
     return
 
+
+  def update_modules_view(self):
+    modules_meta = self.model.modules_model.get_modules_meta()
+    modules_meta_conv = self.converter.modules_converter.convert_meta(modules_meta)
+    self.view.modules_view.set_modules_meta(modules_meta_conv)
+
+    return
 
 # # Meta data
 #   def get_all(self):

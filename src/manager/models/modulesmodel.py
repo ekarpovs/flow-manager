@@ -12,6 +12,7 @@ class ModulesModel(Model):
 
     self.modules_meta_from_all_paths = []
     self.load_modules_meta_from_all_paths()
+    # print(self.modules_meta_from_all_paths)
 
 # Loaders - model initialization
   def read_modules_names(self, path):
@@ -39,5 +40,5 @@ class ModulesModel(Model):
     return module_meta   
 
 # Getters
-  def get_modules_meta(self, path):
-    return self.modules_meta_from_all_paths[path]
+  def get_modules_meta(self):
+    return self.modules_meta_from_all_paths
