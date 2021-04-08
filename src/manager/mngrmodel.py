@@ -41,53 +41,6 @@ class MngrModel():
 
 
 # Meta data
-  # def get_modules_meta(self):
-  #   modules = {
-  #     "blur": {
-  #     "descr": "Bluring operations",
-  #     "opers": [
-  #         {
-  #           "name": "avg",
-  #           "descr": "Performs average bluring."
-  #         },
-  #         {
-  #           "name": "gaus",
-  #           "descr": "Performs Gausian bluring."
-  #         }
-  #       ]
-  #     },
-  #     "bsc": {
-  #     "descr": "Basic operations",
-  #     "opers": [
-  #         {
-  #           "name": "crop",
-  #           "descr": "Crops an image."
-  #         },
-  #         {
-  #           "name": "flip",
-  #           "descr": "Flips an image."
-  #         }
-  #       ]
-  #     },
-  #     "cntrs": {
-  #     "descr": "Contours operations",
-  #     "opers": [
-  #         {
-  #           "name": "find",
-  #           "descr": "Finds contours of an image."
-  #         },
-  #         {
-  #           "name": "sort",
-  #           "descr": "Sorts contours."
-  #         }
-  #       ]
-  #     }
-  #   }
-
-  #   return modules
-
-  
-
 
   # # def get_work_sheet_names_mock(self):
   # #   # TODO: from FS 

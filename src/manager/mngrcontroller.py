@@ -24,14 +24,24 @@ class MngrController():
 
   def start(self):
     self.update_modules_view()
-    
+
     return
 
 
   def update_modules_view(self):
+    # TODO: add wrappers to MngrModel & MngrConverter
     modules_meta = self.model.modules_model.get_modules_meta()
     modules_meta_conv = self.converter.modules_converter.convert_meta(modules_meta)
     self.view.modules_view.set_modules_meta(modules_meta_conv)
+
+    return
+
+
+  def update_flows_view(self):
+    # TODO: add wrappers to MngrModel & MngrConverter
+    flows_meta = self.model.flows_model.get_flows_meta()
+    # flows_meta_conv = self.converter.flows_converter.convert_meta(modules_meta)
+    # self.view.flows_view.set_flows_meta(flows_meta_conv)
 
     return
 
