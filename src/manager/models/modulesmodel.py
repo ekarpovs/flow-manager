@@ -16,7 +16,7 @@ class ModulesModel(Model):
 
   def read_modules_names(self, path):
     names = [f[:-3] for f in os.listdir(path)
-                  if f.endswith('.py') and f != '__init__.py']
+                  if f.endswith('.py') and f != '__init__.py' and f != 'tester.py']
     return names
 
   
