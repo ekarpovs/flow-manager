@@ -39,9 +39,5 @@ class ModulesModel(Model):
     return module_meta   
 
 # Getters
-  def get_modules_paths(self):
-    return self.parent.modules_paths
-
-
   def get_modules_meta(self, path):
     return self.modules_meta_from_all_paths[path]

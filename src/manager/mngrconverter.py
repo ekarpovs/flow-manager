@@ -1,11 +1,11 @@
 # from tkinter import filedialog as fd
 import sys
-from .models import *
+from .converters import *
 from ..configuration import Configuration
 
-class MngrModel():
+class MngrConverter():
   def __init__(self):
-    print("MNGR-MODEL")
+    print("MNGR-CONVERTER")
 
     cfg = Configuration()
     self.modules_paths = cfg.get_modules_paths()
@@ -13,22 +13,10 @@ class MngrModel():
     self.input_path = cfg.get_input_path()
     self.result_path = cfg.get_result_path()
 
-    self.factory = self.import_factory_ref(cfg)
+    # Create converters
+    self.modules_model = ModulesConverter(self)
+    self.flows_model = FlowsConverter(self)
 
-    # Create models
-    self.modules_model = ModulesModel(self)
-    self.flows_model = FlowsModel(self)
-
-
-  @staticmethod
-  def import_factory_ref(cfg):  
-    # import factory fo loading modules from outside of the package.
-    # temporary, since the factory is not installed via pip
-    factory_path = cfg.get_factory_path()
-    sys.path.append(factory_path)
-    import factory
-
-    return factory
 
 # Getters
 
