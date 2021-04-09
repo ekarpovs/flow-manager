@@ -38,12 +38,12 @@ class FlowsView(View):
 
 
 
-  def set_work_sheet_names(self, work_sheet_names):
-    self.names_combo_box['values'] = work_sheet_names
+  def set_worksheets_names(self, worksheets_names):
+    self.names_combo_box['values'] = ['new', *worksheets_names]
     self.names_combo_box.current(0)
     # self.names_combo_box.set(work_sheet_names[0])
 
-  def set_work_sheet(self, work_sheet):
+  def set_worksheet(self, work_sheet):
     self.modulesvar.set(work_sheet['steps'])
     
     return

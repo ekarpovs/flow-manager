@@ -24,6 +24,7 @@ class MngrController():
 
   def start(self):
     self.update_modules_view()
+    self.update_flows_view()
 
     return
 
@@ -39,9 +40,8 @@ class MngrController():
 
   def update_flows_view(self):
     # TODO: add wrappers to MngrModel & MngrConverter
-    flows_meta = self.model.flows_model.get_flows_meta()
-    # flows_meta_conv = self.converter.flows_converter.convert_meta(modules_meta)
-    # self.view.flows_view.set_flows_meta(flows_meta_conv)
+    worksheets_names = self.model.flows_model.get_worksheets_names_from_all_paths()
+    self.view.flows_view.set_worksheets_names(worksheets_names)
 
     return
 
