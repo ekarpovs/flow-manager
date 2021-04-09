@@ -12,7 +12,6 @@ class FlowsModel(Model):
     
 
     self.worksheets_from_all_paths = []
-    self.load_worksheets_from_all_paths()
 
     # Current flow
     self.flow_meta = {}

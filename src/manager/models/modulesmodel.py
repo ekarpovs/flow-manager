@@ -10,8 +10,6 @@ class ModulesModel(Model):
     print("MODULES-MODEL")
 
     self.modules_meta_from_all_paths = []
-    self.load_modules_meta_from_all_paths()
-    # print(self.modules_meta_from_all_paths)
 
 # Loaders - model initialization
   def read_modules_names(self, path):
