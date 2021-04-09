@@ -54,10 +54,13 @@ class MngrController():
     name, path = worksheet_name.split('<')
     name = name[:-1]
     path =  path[:-1]
+    ws_empty = {'steps':[]}
     # move to flows conveter
-
-    worksheet = self.model.flows_model.get_worksheet(path, name)
-    self.view.flows_view.set_worksheet(worksheet)
+    if path != "":
+      worksheet = self.model.flows_model.get_worksheet(path, name)
+      self.view.flows_view.set_worksheet(worksheet)
+    else:
+      self.view.flows_view.set_worksheet(ws_empty)
 
     return
 
