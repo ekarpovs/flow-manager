@@ -1,4 +1,6 @@
 import os
+import json
+from tkinter.constants import W
 from .model import Model
 
 class FlowsModel(Model):
@@ -11,6 +13,12 @@ class FlowsModel(Model):
 
     self.worksheets_from_all_paths = []
     self.load_worksheets_from_all_paths()
+
+    # print(self.get_worksheet("../modules-and-worksheets/worksheets-ocv", "ocv02"))
+    # print(self.get_worksheets_names("../modules-and-worksheets/worksheets-ocv"))
+    # print(self.get_worksheets_from_all_paths())
+    print(self.get_worksheets_names_from_all_paths())
+
 
     # Current flow
     self.flow_meta = {}
@@ -29,21 +37,46 @@ class FlowsModel(Model):
 
   def load_worksheets(self, path):
     # worksheets = {"path": path, "flows": {}}
-    self.worksheets_names = self.read_worksheets_names(path)
-    print(self.worksheets_names)
-    # flows_meta["flows"] = [{"name": mn, "meta": self.load_worksheet(mn)} for mn in flows_names]
+    worksheets_names = self.read_worksheets_names(path)
+    worksheets = {"path": path, "worksheets": [{"name": wsn,  "content": self.load_worksheet(path, wsn)} for wsn in worksheets_names]}
 
-    return
+    return worksheets
 
 
-  def load_worksheet(self, worksheets_names):
-    # module_meta =  self.parent.factory.get_module_meta(module_names)
+  def load_worksheet(self, path, worksheets_names):  
     worksheet = {}
+    ffn = "{}/{}.json".format(path, worksheets_names)
+    with open(ffn, 'rt') as ws:
+      worksheet = json.load(ws)
 
     return worksheet
 
 
 
 # Getters
-  def get_flows_meta(self):
-    return self.flows_meta
+# for all paths
+  def get_worksheets_from_all_paths(self):
+    wss_all = self.worksheets_from_all_paths
+    return [wss['worksheets'] for wss in wss_all]
+
+  def get_worksheets_names_from_all_paths(self):
+    names = []
+    for wss in self.get_worksheets_from_all_paths():
+      for ws in wss:
+        names.append(ws['name'])
+    
+    return names
+
+# by path
+  def get_worksheets(self, path):
+    wss_all = self.worksheets_from_all_paths
+    return [wss['worksheets'] for wss in wss_all if wss['path'] == path][0]
+  
+  def get_worksheets_names(self, path):
+    return [ws['name'] for ws in self.get_worksheets(path)]
+
+
+  def get_worksheet(self, path, name):
+    return [ws['content'] for ws in self.get_worksheets(path) if ws['name'] == name][0]
+
+

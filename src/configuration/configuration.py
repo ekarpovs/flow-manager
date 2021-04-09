@@ -15,7 +15,7 @@ class Configuration():
     self.input_path="d:/Projects/mine/github/work-shop/data/input" 
     self.result_path="d:/Projects/mine/github/work-shop/data/output" 
     self.modules_paths = ["../modules-and-worksheets/modules", "../modules-and-worksheets/modules-common"]
-    self.worksheets_paths=["d:/Projects/mine/github/work-shop/modules-and-worksheets/worksheets"]
+    self.worksheets_paths=["../modules-and-worksheets/worksheets", "../modules-and-worksheets/worksheets-ocv"]
 
 
   def load_factory(self):
