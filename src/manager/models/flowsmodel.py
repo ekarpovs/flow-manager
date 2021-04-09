@@ -14,12 +14,6 @@ class FlowsModel(Model):
     self.worksheets_from_all_paths = []
     self.load_worksheets_from_all_paths()
 
-    # print(self.get_worksheet("../modules-and-worksheets/worksheets-ocv", "ocv02"))
-    # print(self.get_worksheets_names("../modules-and-worksheets/worksheets-ocv"))
-    # print(self.get_worksheets_from_all_paths())
-    # print(self.get_worksheets_names_from_all_paths())
-
-
     # Current flow
     self.flow_meta = {}
 
@@ -60,12 +54,13 @@ class FlowsModel(Model):
     return [wss['worksheets'] for wss in wss_all]
 
   def get_worksheets_names_from_all_paths(self):
-    names = []
-    for wss in self.get_worksheets_from_all_paths():
-      for ws in wss:
-        names.append(ws['name'])
-    
-    return names
+    worksheets_names = []
+    for set in self.worksheets_from_all_paths:
+      path = set['path']
+      for wss in set['worksheets']:
+        worksheets_names.append({"name":wss['name'], "path": path})    
+
+    return worksheets_names
 
 # by path
   def get_worksheets(self, path):
