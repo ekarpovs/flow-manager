@@ -32,8 +32,9 @@ class MngrController():
   def update_modules_view(self):
     # TODO: add wrappers to MngrModel & MngrConverter
     self.model.modules_model.load_modules_meta_from_all_paths()
-    modules_meta = self.model.modules_model.get_modules_meta()
-    modules_meta_conv = self.converter.modules_converter.convert_meta(modules_meta)
+    modules_meta_conv = self.converter.modules_converter.convert_meta(
+      self.model.modules_model.get_modules_meta())
+
     self.view.modules_view.set_modules_meta(modules_meta_conv)
 
     return
@@ -42,7 +43,9 @@ class MngrController():
   def update_flows_view(self):
     # TODO: add wrappers to MngrModel & MngrConverter
     self.model.flows_model.load_worksheets_from_all_paths()
-    worksheets_names = self.model.flows_model.get_worksheets_names_from_all_paths()
+    worksheets_names = self.converter.flows_converter.convert_worksheets_names(
+      self.model.flows_model.get_worksheets_names_from_all_paths())
+
     self.view.flows_view.set_worksheets_names(worksheets_names)
 
     return
@@ -51,12 +54,11 @@ class MngrController():
 # Actions
   def selected(self, event):
     item = self.view.flows_view.names_combo_box.get()
-    path, name = self.converter.flows_converter.split_ws_item(item)
-    if path != "":
-      flow_meta = self.model.flows_model.get_flow_meta(path, name)
-      self.view.flows_view.set_flow_meta(flow_meta)
-    else:
-      self.view.flows_view.set_flow_meta(self.converter.flows_converter.get_empty_flow())
+    flow_meta = self.converter.flows_converter.convert_flow_meta(
+      self.model.flows_model.get_flow_meta(
+        *self.converter.flows_converter.convert_ws_item(item)))
+
+    self.view.flows_view.set_flow_meta(flow_meta)
 
     return
 

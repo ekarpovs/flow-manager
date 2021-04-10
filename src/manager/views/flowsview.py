@@ -39,26 +39,18 @@ class FlowsView(View):
 
 
   def set_worksheets_names(self, worksheets_names):
-    # Move to flows converter
-    names = []
-    worksheets_names = [{'name': 'new', 'path': ''}, *worksheets_names]
-    for wsn in worksheets_names:
-      name = "{} <{}>".format(wsn['name'], wsn['path'])
-      names.append(name)
-    # Move to flows converter
-
-    self.names_combo_box['values'] = names
+    self.names_combo_box['values'] = worksheets_names
     self.names_combo_box.current(0)
 
   def set_flow_meta(self, flow_meta):
-    # Move to flows converter
-    steps = flow_meta['steps']
-    names = []
-    for step in steps:
-      names.append(step['exec'])
-    # Move to flows converter
+    # # Move to flows converter
+    # steps = flow_meta['steps']
+    # names = []
+    # for step in steps:
+    #   names.append(step['exec'])
+    # # Move to flows converter
 
-    self.modulesvar.set(names)
+    self.modulesvar.set(flow_meta)
     
     return
 
