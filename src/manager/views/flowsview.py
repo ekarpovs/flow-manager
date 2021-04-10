@@ -50,9 +50,9 @@ class FlowsView(View):
     self.names_combo_box['values'] = names
     self.names_combo_box.current(0)
 
-  def set_worksheet(self, worksheet):
+  def set_flow_meta(self, flow_meta):
     # Move to flows converter
-    steps = worksheet['steps']
+    steps = flow_meta['steps']
     names = []
     for step in steps:
       names.append(step['exec'])
