@@ -73,4 +73,8 @@ class FlowsModel(Model):
   def get_worksheet(self, path, name):
     return [ws['content'] for ws in self.get_worksheets(path) if ws['name'] == name][0]
 
+  def get_flow_meta(self, path, name):
+    self.flow_meta = self.get_worksheet(path, name)
+
+    return self.flow_meta
 
