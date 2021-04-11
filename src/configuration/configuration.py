@@ -11,8 +11,8 @@ class Configuration():
     # TODO read from config.json
     self.factory_path = "../operation-loader"
 
-    self.input_path="d:/Projects/mine/github/work-shop/data/input" 
-    self.result_path="d:/Projects/mine/github/work-shop/data/output" 
+    self.input_path="../data/input" 
+    self.result_path="../data/output" 
     self.modules_paths = ["../modules-and-worksheets/modules", "../modules-and-worksheets/modules-common"]
     self.worksheets_paths=["../modules-and-worksheets/worksheets", "../modules-and-worksheets/worksheets-ocv"]
 

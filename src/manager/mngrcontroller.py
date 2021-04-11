@@ -1,7 +1,9 @@
+from tkinter import image_names
 from .runner import Runner  
 from .mngrmodel import MngrModel  
 from .mngrconverter import MngrConverter  
 from .mngrview import MngrView  
+from ..configuration import Configuration
 
 class MngrController():
   def __init__(self, parent):
@@ -9,8 +11,10 @@ class MngrController():
 
     print("MNGR-CONTROLLER")
 
-    self.runner = Runner()
-    self.model = MngrModel()
+    cfg = Configuration()
+
+    self.runner = Runner(cfg)
+    self.model = MngrModel(cfg)
     self.converter = MngrConverter()
     self.view = MngrView(self.parent)
 
@@ -71,14 +75,13 @@ class MngrController():
 
   def run(self, event):
     # Move to runner
-    self.runner.run_flow(self.flow_meta) 
-    # execute the flow
-    # Call view to select next break point
+    cv2image = self.runner.run_flow(self.flow_meta) 
+    self.view.output_view.set_original_image(cv2image)
 
   
   def step(self, event):
     pass
 
   def load(self, event):
-    cv2image = self.model.load_image()
-    self.view.output_view.set_original_image(cv2image)
+    cv2image = self.runner.load_image() 
+    self.view.output_view.set_result_image(cv2image)
