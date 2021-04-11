@@ -4,7 +4,6 @@ import json
 class Configuration():
   def __init__(self):
     self.load_configuration()
-    self.load_factory()
 
 
   # Loaders
@@ -17,18 +16,17 @@ class Configuration():
     self.modules_paths = ["../modules-and-worksheets/modules", "../modules-and-worksheets/modules-common"]
     self.worksheets_paths=["../modules-and-worksheets/worksheets", "../modules-and-worksheets/worksheets-ocv"]
 
-
-  def load_factory(self):
-    self.factory = None
+    # Set paths for access factory and modules outside of the application
+    for path in self.modules_paths:
+      sys.path.append(path)
+    # Till the operation-loader is not installed via pip
+    sys.path.append(self.factory_path)
+    import factory
+    self.factory = factory
   
 
-  # Getters
   def get_factory(self):
     return self.factory
-
-  def get_factory_path(self):
-    return self.factory_path
-
 
   def get_input_path(self):
     return self.input_path

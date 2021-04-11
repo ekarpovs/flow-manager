@@ -11,6 +11,7 @@ class ModulesModel(Model):
 
     self.modules_meta_from_all_paths = []
 
+# Metadata
 # Loaders - model initialization
   def read_modules_names(self, path):
     names = [f[:-3] for f in os.listdir(path)
@@ -19,7 +20,8 @@ class ModulesModel(Model):
 
   
   def load_modules_meta_from_all_paths(self):
-    for path in self.parent.modules_paths:
+    modules_paths = self.parent.get_modules_paths()
+    for path in modules_paths:
       self.modules_meta_from_all_paths.append(self.load_modules_meta(path))
        
 
@@ -31,8 +33,8 @@ class ModulesModel(Model):
     return modules_meta
 
 
-  def load_module_meta(self, module_names):
-    module_meta =  self.parent.factory.get_module_meta(module_names)
+  def load_module_meta(self, module_name):
+    module_meta = self.parent.get_factory().get_module_meta(module_name)
 
     return module_meta   
 

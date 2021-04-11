@@ -24,12 +24,12 @@ class FlowsModel(Model):
     return worksheets_names
   
   def load_worksheets_from_all_paths(self):
-    for path in self.parent.worksheets_paths:
+    worksheets_paths = self.parent.get_worksheets_paths()
+    for path in worksheets_paths:
       self.worksheets_from_all_paths.append(self.load_worksheets(path))
        
 
   def load_worksheets(self, path):
-    # worksheets = {"path": path, "flows": {}}
     worksheets_names = self.read_worksheets_names(path)
     worksheets = {"path": path, "worksheets": [{"name": wsn,  "content": self.load_worksheet(path, wsn)} for wsn in worksheets_names]}
 
@@ -78,6 +78,6 @@ class FlowsModel(Model):
       self.flow_meta = self.get_worksheet(path, name)
     else:
       self.flow_meta = {}
-      
+
     return self.flow_meta
 

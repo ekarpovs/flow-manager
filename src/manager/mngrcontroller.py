@@ -50,46 +50,35 @@ class MngrController():
 
     return
 
-
-# Actions
-  def selected(self, event):
-    item = self.view.flows_view.names_combo_box.get()
-    flow_meta = self.converter.flows_converter.convert_flow_meta(
-      self.model.flows_model.get_flow_meta(
-        *self.converter.flows_converter.convert_ws_item(item)))
+  def update_flow_meta(self, item):
+    flow_meta = self.model.flows_model.get_flow_meta(
+        *self.converter.flows_converter.convert_ws_item(item))
+    self.flow_meta = flow_meta
+    flow_meta = self.converter.flows_converter.convert_flow_meta(flow_meta)
 
     self.view.flows_view.set_flow_meta(flow_meta)
 
     return
 
+
+# Actions
+  def selected(self, event):
+    item = self.view.flows_view.names_combo_box.get()
+    self.update_flow_meta(item)
+    
+    return
+
+
   def run(self, event):
-    self.get_work_sheet()
-    self.steps = self.work_sheet['steps']
+    # Move to runner
+    self.runner.run_flow(self.flow_meta) 
     # execute the flow
-    kwargs = {}
-    for step in self.steps:
-      print("step", step)
-      # load the step's function
-      fnc = self.get(step['exec'])
-      kwargs = fnc(step, **kwargs)    
     # Call view to select next break point
 
   
   def step(self, event):
-    if self.step_name == None:
-      self.get_work_sheet()
-      # Temporary
-      self.step_name = "clrs.bgrto"
-
-    fnc = self.get(self.step_name)
-    print(fnc)
-    # Call view to select next step
+    pass
 
   def load(self, event):
     cv2image = self.model.load_image()
-    self.view.output_view.set_original_image(cv2image)
-
-  def load_mage(self):
-    cv2image = self.model.load_image()
-
     self.view.output_view.set_original_image(cv2image)

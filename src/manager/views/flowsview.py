@@ -43,13 +43,6 @@ class FlowsView(View):
     self.names_combo_box.current(0)
 
   def set_flow_meta(self, flow_meta):
-    # # Move to flows converter
-    # steps = flow_meta['steps']
-    # names = []
-    # for step in steps:
-    #   names.append(step['exec'])
-    # # Move to flows converter
-
     self.modulesvar.set(flow_meta)
     
     return
