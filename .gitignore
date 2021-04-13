@@ -5,4 +5,5 @@ src/manager/__pycache__
 src/manager/views/__pycache__
 src/manager/models/__pycache__
 src/manager/converters/__pycache__
+src/manager/runner/__pycache__
 .vscode

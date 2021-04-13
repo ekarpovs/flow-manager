@@ -20,8 +20,10 @@ class MngrController():
 
     # Bind to flows panel
     self.view.flows_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
-    self.view.flows_view.flow_list_box.bind('<<ListboxSelect>>', lambda e: self.step_selected(self.view.flows_view.flow_list_box.curselection()))
-    self.view.flows_view.flow_list_box.bind("<Double-1>", lambda e: self.step_update(self.view.flows_view.flow_list_box.curselection()))
+    self.view.flows_view.flow_list_box.bind('<<ListboxSelect>>', 
+      lambda e: self.step_selected(self.view.flows_view.flow_list_box.curselection()))
+    self.view.flows_view.flow_list_box.bind("<Double-1>", 
+      lambda e: self.step_update(self.view.flows_view.flow_list_box.curselection()))
     self.view.flows_view.btn_load.bind("<Button>", self.load)
     self.view.flows_view.btn_run.bind("<Button>", self.run)
     self.view.flows_view.btn_step.bind("<Button>", self.step)
@@ -74,13 +76,12 @@ class MngrController():
     
     return
 
-  def step_selected(self, event):
-    # item = self.view.flows_view.flow_list_box.get()
-
+  def step_selected(self, idx):
+    print("selected idx", idx[0], self.flow_meta['steps'][idx[0]])
     return    
 
-  def step_update(self, event):
-    # item = self.view.flows_view.flow_list_box.get()
+  def step_update(self, idx):
+    print("update idx", idx[0], self.flow_meta['steps'][idx[0]])
 
     return    
 
