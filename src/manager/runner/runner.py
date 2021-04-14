@@ -7,7 +7,6 @@ class Runner():
 
     print("RUNNER")
     self.contextstack = ContextStack()
-    self.cfg = cfg
     self.get = cfg.get_factory().get
     self.cv2image = None
   

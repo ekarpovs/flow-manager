@@ -115,6 +115,7 @@ class MngrController():
 
 
   def load(self, event):
-    image_full_file_name = "{}\scan-01.jpg".format(self.cfg.get_input_path())
+    image_full_file_name = "{}\gc.png".format(self.cfg.get_input_path())
+    # image_full_file_name = "{}\scan-01.jpg".format(self.cfg.get_input_path())
     cv2image = self.runner.load_image(image_full_file_name) 
     self.view.output_view.set_original_image(cv2image)
