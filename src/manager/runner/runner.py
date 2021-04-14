@@ -23,7 +23,6 @@ class Runner():
 
     return self.cv2image
 
-
   def run_flow(self, flow_meta):
     kwargs = {}
     kwargs['orig'] = self.cv2image
@@ -37,6 +36,9 @@ class Runner():
     return kwargs['image']
 
 
+  def top(self):
+    self.contextstack.reset()
+    return
 
   def step_back(self):
     if self.contextstack.isEmpty():
@@ -48,8 +50,6 @@ class Runner():
     print(step_context.step_meta)
     
     return kwargs['image']  
-
-
 
   def run_step(self, flow_meta):
     if self.contextstack.isEmpty():

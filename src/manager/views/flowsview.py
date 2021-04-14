@@ -30,6 +30,7 @@ class FlowsView(View):
     self.btn_run = Button(self, text='Run', width=BTNW)
     self.btn_step = Button(self, text='Step', width=BTNW)
     self.btn_back = Button(self, text='Back', width=BTNW)
+    self.btn_top = Button(self, text='Top', width=BTNW)
 
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + E + N)
     self.flow_list_box.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + N)
@@ -37,6 +38,7 @@ class FlowsView(View):
     self.btn_run.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=W + S)
     self.btn_step.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + S)
     self.btn_back.grid(row=5, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_top.grid(row=6, column=0, padx=PADX, pady=PADY, sticky=W + S)
 
 
 
