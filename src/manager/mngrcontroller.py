@@ -11,10 +11,10 @@ class MngrController():
 
     print("MNGR-CONTROLLER")
 
-    cfg = Configuration()
+    self.cfg = Configuration()
 
-    self.runner = Runner(cfg)
-    self.model = MngrModel(cfg)
+    self.runner = Runner(self.cfg)
+    self.model = MngrModel(self.cfg)
     self.converter = MngrConverter()
     self.view = MngrView(self.parent)
 
@@ -115,5 +115,6 @@ class MngrController():
 
 
   def load(self, event):
-    cv2image = self.runner.load_image() 
+    image_full_file_name = "{}\scan-01.jpg".format(self.cfg.get_input_path())
+    cv2image = self.runner.load_image(image_full_file_name) 
     self.view.output_view.set_original_image(cv2image)

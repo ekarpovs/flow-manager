@@ -12,9 +12,8 @@ class Runner():
     self.cv2image = None
   
 
-  def load_image(self):
+  def load_image(self, image_full_file_name):
     # TODO: get from view
-    image_full_file_name = "{}\scan-01.jpg".format(self.cfg.get_input_path())
     self.cv2image = cv2.imread(image_full_file_name)
 
     if len(self.cv2image.shape) > 2:
@@ -24,32 +23,12 @@ class Runner():
     return self.cv2image
 
   def run_flow(self, flow_meta):
-    kwargs = {}
-    kwargs['orig'] = self.cv2image
-    kwargs['image'] = self.cv2image
     steps = flow_meta['steps']
     for step in steps:
-      # load the step's function
-      operation = self.get(step['exec'])
-      kwargs = operation(step, **kwargs)    
+      image = self.run_step(flow_meta)
 
-    return kwargs['image']
+    return image
 
-
-  def top(self):
-    self.contextstack.reset()
-    return
-
-  def step_back(self):
-    if self.contextstack.isEmpty():
-      print("On the top")
-      return None
-
-    kwargs = self.contextstack.peek().kwargs
-    step_context = self.contextstack.pop()
-    print(step_context.step_meta)
-    
-    return kwargs['image']  
 
   def run_step(self, flow_meta):
     if self.contextstack.isEmpty():
@@ -73,3 +52,19 @@ class Runner():
     self.contextstack.push(step_context)
 
     return kwargs['image']
+
+
+  def step_back(self):
+    if self.contextstack.isEmpty():
+      print("On the top")
+      return None
+
+    kwargs = self.contextstack.peek().kwargs
+    step_context = self.contextstack.pop()
+    print(step_context.step_meta)
+    
+    return kwargs['image']  
+
+  def top(self):
+    self.contextstack.reset()
+    return
