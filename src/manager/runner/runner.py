@@ -38,7 +38,20 @@ class Runner():
 
 
 
-  def run_step(self, step_meta):
+  def step_back(self):
+    if self.contextstack.isEmpty():
+      print("On the top")
+      return None
+
+    kwargs = self.contextstack.peek().kwargs
+    step_context = self.contextstack.pop()
+    print(step_context.step_meta)
+    
+    return kwargs['image']  
+
+
+
+  def run_step(self, flow_meta):
     if self.contextstack.isEmpty():
       kwargs = {}
       kwargs['orig'] = self.cv2image
@@ -46,10 +59,17 @@ class Runner():
     else:
       kwargs = self.contextstack.peek().kwargs
 
-    step_context = Context(step_meta, **kwargs)
-    self.contextstack.push(step_context)
+    steps = flow_meta['steps']
+    if self.contextstack.size() >= len(steps):
+      print("No more steps")
+      return None
+
+    current_step = steps[self.contextstack.size()]
     # load the step's function
-    operation = self.get(step_meta['exec'])
-    kwargs = operation(step_meta, **kwargs)    
+    operation = self.get(current_step['exec'])
+    kwargs = operation(current_step, **kwargs)    
+    # Store the step context with result
+    step_context = Context(current_step, **kwargs)
+    self.contextstack.push(step_context)
 
     return kwargs['image']

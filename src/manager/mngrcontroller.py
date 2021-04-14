@@ -27,6 +27,7 @@ class MngrController():
     self.view.flows_view.btn_load.bind("<Button>", self.load)
     self.view.flows_view.btn_run.bind("<Button>", self.run)
     self.view.flows_view.btn_step.bind("<Button>", self.step)
+    self.view.flows_view.btn_back.bind("<Button>", self.back)
    
     self.start()
 
@@ -93,8 +94,17 @@ class MngrController():
 
   
   def step(self, event):
-    cv2image = self.runner.run_step(self.flow_meta) 
-    self.view.output_view.set_result_image(cv2image)
+    cv2image = self.runner.run_step(self.flow_meta)
+    if cv2image is not None:
+      self.view.output_view.set_result_image(cv2image)
+
+  def back(self, event):
+    cv2image = self.runner.step_back()
+    if cv2image is not None:
+      self.view.output_view.set_result_image(cv2image)
+    else:
+      print("clean the output image")
+
 
   def load(self, event):
     cv2image = self.runner.load_image() 
