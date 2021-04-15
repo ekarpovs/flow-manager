@@ -1,4 +1,6 @@
 from tkinter import *
+import re
+from tkinter.ttk import Combobox
 from ...uiconst import *
 
 class OperParamsView(LabelFrame):
@@ -13,6 +15,7 @@ class OperParamsView(LabelFrame):
     self.grid()
     self.rowconfigure(0, weight=1)
     self.columnconfigure(0, weight=1)
+    self.columnconfigure(1, weight=1)
 
     self.param_controls = []
 
@@ -22,14 +25,28 @@ class OperParamsView(LabelFrame):
     [param.grid_forget() for param in self.param_controls]
 
     for i, param in enumerate(params):
-      param_control = self.controls_factory(param)
+      param_control, param_label = self.controls_factory(param)
       self.param_controls.append(param_control)
-      self.param_controls[i].grid(row=i, column=0, stick=W)
+      self.param_controls.append(param_label)
+      param_control.grid(row=i, column=0, stick=W)
+      param_label.grid(row=i, column=1, stick=W)
     
     return
 
   def controls_factory(self, param):
     # Create control regarding definition --Type:domein...--
-    param_control = Label(self, text=param)
+    build_data = re.findall('--([^$]*)--', param)[0]
+    label_text = param[len(build_data)+4:] 
+    param_label = Label(self, text=label_text)
+    param_type, param_domain, param_possible_valuess, param_default_value =  build_data.split(':') 
+    print("build_data", param_type, param_domain, param_possible_valuess, param_default_value)
+    if (param_type == 'n') or (param_type == 'f') or (param_type == 'str'):
+      param_control = Entry(self, text=param_default_value)
+    elif (param_type == 'b'):
+      param_control = Checkbutton(self, text='')
+    elif (param_type == 's'):
+      param_control = Combobox(self, text='')
+    else:
+      param_control = Label(self, text='unknown param type')
 
-    return param_control
+    return param_control, param_label
