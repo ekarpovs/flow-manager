@@ -79,7 +79,12 @@ class MngrController():
     return
 
   def step_selected(self, idx):
-    print("selected idx", idx[0], self.flow_meta['steps'][idx[0]])
+    step = self.flow_meta['steps'][idx[0]]
+    module_name, oper_name = step['exec'].split('.')
+    doc = self.model.modules_model.read_operation_doc(module_name, oper_name)
+    doc = self.converter.flows_converter.convert_oper_doc(doc)
+    self.view.flows_view.set_operation_params(doc)
+    # print('fdoc', doc)
     return    
 
   def step_update(self, idx):

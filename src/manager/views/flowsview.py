@@ -1,4 +1,5 @@
 from os import read
+from src.manager.views.operparamsview import OperParamsView
 from tkinter import *
 from tkinter import ttk
 
@@ -14,8 +15,8 @@ class FlowsView(View):
     self['text'] = 'Flows panel'
 
     self.grid()
-    # self.rowconfigure(0, weight=1)
-    self.rowconfigure(1, weight=1)
+    self.rowconfigure(1, weight=2)
+    self.rowconfigure(2, weight=1)
     self.columnconfigure(0, weight=1)
 
     self.namesvar = StringVar()
@@ -26,6 +27,8 @@ class FlowsView(View):
     self.modulesvar = StringVar(value=self.flow)
     self.flow_list_box = Listbox(self, height=10, listvariable=self.modulesvar)
 
+    self.oper_params_view = OperParamsView(self)
+
     self.btn_load = Button(self, text='Load', width=BTNW)
     self.btn_run = Button(self, text='Run', width=BTNW)
     self.btn_step = Button(self, text='Step', width=BTNW)
@@ -34,11 +37,15 @@ class FlowsView(View):
 
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + E + N)
     self.flow_list_box.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + N)
-    self.btn_load.grid(row=2, column=0, padx=PADX, pady=PADY, sticky=W + S)
-    self.btn_run.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=W + S)
-    self.btn_step.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + S)
-    self.btn_back.grid(row=5, column=0, padx=PADX, pady=PADY, sticky=W + S)
-    self.btn_top.grid(row=6, column=0, padx=PADX, pady=PADY, sticky=W + S)
+
+    self.oper_params_view.grid(row=2, column=0, padx=PADX, pady=PADY, sticky=W + E + N)
+
+    # TODO: separate view
+    self.btn_load.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_run.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_step.grid(row=5, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_back.grid(row=6, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_top.grid(row=7, column=0, padx=PADX, pady=PADY, sticky=W + S)
 
 
 
@@ -51,4 +58,7 @@ class FlowsView(View):
     
     return
 
-
+  def set_operation_params(self, params):
+    self.oper_params_view.set_operation_params(params)
+    # self.paramsVar.set(params)
+    pass

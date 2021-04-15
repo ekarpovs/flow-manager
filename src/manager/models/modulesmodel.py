@@ -67,6 +67,23 @@ class ModulesModel(Model):
     with open(ffn, "w") as outfile: 
       json.dump(module_meta, outfile, indent = 4, sort_keys = True)
 
+  @staticmethod
+  def read_operation_doc(module_name, oper_name):
+    path = "../data/meta"
+    ffn = "{}/{}.json".format(path, module_name)
+    with open(ffn, 'rt') as f:
+      meta = json.load(f)['meta']
+
+    for fmeta in meta:
+      fname = fmeta['name']
+      if fname == oper_name:
+        fdoc = fmeta['doc']
+
+        return fdoc
+    
+    return ''
+
+
 # Getters
   def get_modules_meta(self):
     return self.modules_meta_from_all_paths
