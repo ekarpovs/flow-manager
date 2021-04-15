@@ -42,10 +42,11 @@ class ModulesConverter(Converter):
         ml_item = self.module_level_item(iid, v1, module)
         converted.append(ml_item)
         md_iid = module['name']
-        operations = module['meta']['func'] 
+        operations = module['meta']['func']
         for n, oper in enumerate(operations):
           v1 = str(j)+ '.'+ str(n)
-          oper_item = self.operation_level_item(md_iid, v1, oper)
+          operdoc = module['meta']['meta'][n]['doc']
+          oper_item = self.operation_level_item(md_iid, v1, oper, operdoc)
           converted.append(oper_item)
 
     return converted
@@ -62,6 +63,7 @@ class ModulesConverter(Converter):
     return {"parent":parent_iid, "index":"end", "iid":name, "text":name, "values": [v1, meta['descr']]}
 
   @staticmethod
-  def operation_level_item(parent_iid, v1, name):
+  def operation_level_item(parent_iid, v1, name, doc):
     iid = parent_iid+'.'+name
-    return {"parent":parent_iid, "index":"end", "iid":iid, "text":name, "values": [v1, "here will be func __doc__"]}
+    # return {"parent":parent_iid, "index":"end", "iid":iid, "text":name, "values": [v1, "here will be func __doc__"]}
+    return {"parent":parent_iid, "index":"end", "iid":iid, "text":name, "values": [v1, doc[0]]}
