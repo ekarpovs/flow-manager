@@ -41,9 +41,13 @@ class OperParamsView(LabelFrame):
     param_type, param_domain, param_possible_valuess, param_default_value =  build_data.split(':') 
     print("build_data", param_type, param_domain, param_possible_valuess, param_default_value)
     if (param_type == 'n') or (param_type == 'f') or (param_type == 'str'):
-      param_control = Entry(self, text=param_default_value)
+      value = IntVar()
+      param_control = Entry(self, textvariable=value)
+      value.set(param_default_value)
     elif (param_type == 'b'):
-      param_control = Checkbutton(self, text='')
+      value = BooleanVar()
+      param_control = Checkbutton(self, variable=value, onvalue=True, offvalue=False)
+      value.set(True)     
     elif (param_type == 's'):
       param_control = Combobox(self, text='')
     else:
