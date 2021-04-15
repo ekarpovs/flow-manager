@@ -1,4 +1,5 @@
 import os
+import json
 
 from .model import Model
 
@@ -36,7 +37,35 @@ class ModulesModel(Model):
   def load_module_meta(self, module_name):
     module_meta = self.parent.get_factory().get_module_meta(module_name)
 
+    module_meta = self.format_module_meta(module_meta)
+    self.store_module_meta(module_name, module_meta)
+
     return module_meta   
+
+  @staticmethod
+  def format_module_meta(module_meta):
+    module_meta['descr'] = module_meta['descr'].replace('\n', '') 
+    meta = module_meta['meta']
+    for fmeta in meta:
+      fdoc = fmeta['doc']
+      fdoc = fdoc.strip().split('\n')
+      fd = []
+      for line in fdoc:
+        line = line.expandtabs().strip()
+        if line != "":
+          fd.append(line)
+      fmeta['doc'] = fd
+    
+    return module_meta
+    
+
+  @staticmethod
+  def store_module_meta(module_name, module_meta):
+    # temporary
+    path = "../data/meta"
+    ffn = "{}/{}.json".format(path, module_name)
+    with open(ffn, "w") as outfile: 
+      json.dump(module_meta, outfile, indent = 4, sort_keys = True)
 
 # Getters
   def get_modules_meta(self):
