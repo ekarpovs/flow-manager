@@ -55,6 +55,16 @@ class FlowsView(View):
 
   def set_flow_meta(self, flow_meta):
     self.modulesvar.set(flow_meta)
+    self.activate_flow_meta_view()
+
+    return
+
+  def activate_flow_meta_view(self):
+    start_idx = 0
+    # self.flow_list_box.selection_set(start_idx)
+    self.flow_list_box.activate(start_idx)
+    self.flow_list_box.selection_set(ACTIVE)
+    self.flow_list_box.see(start_idx)
     
     return
 
