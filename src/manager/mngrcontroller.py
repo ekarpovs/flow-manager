@@ -75,6 +75,7 @@ class MngrController():
   def selected(self, event):
     item = self.view.flows_view.names_combo_box.get()
     self.update_flow_meta(item)
+    self.view.flows_view.clear_operation_params()
     
     return
 
@@ -84,7 +85,6 @@ class MngrController():
     doc = self.model.modules_model.read_operation_doc(module_name, oper_name)
     doc = self.converter.flows_converter.convert_oper_doc(doc)
     self.view.flows_view.set_operation_params(doc)
-    # print('fdoc', doc)
     return    
 
   def step_update(self, idx):
