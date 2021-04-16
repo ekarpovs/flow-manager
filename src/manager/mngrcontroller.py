@@ -29,7 +29,12 @@ class MngrController():
     self.view.flows_view.btn_step.bind("<Button>", self.step)
     self.view.flows_view.btn_back.bind("<Button>", self.back)
     self.view.flows_view.btn_top.bind("<Button>", self.top)
-   
+
+    self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
+    self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
+
+
+
     self.start()
 
   def start(self):
@@ -80,6 +85,10 @@ class MngrController():
     return
 
   def step_selected(self, idx):
+    print("idx", idx)
+    if not idx:
+      return
+       
     step = self.flow_meta['steps'][idx[0]]
     module_name, oper_name = step['exec'].split('.')
     doc = self.model.modules_model.read_operation_doc(module_name, oper_name)
@@ -124,3 +133,14 @@ class MngrController():
     # image_full_file_name = "{}\scan-01.jpg".format(self.cfg.get_input_path())
     cv2image = self.runner.load_image(image_full_file_name) 
     self.view.output_view.set_original_image(cv2image)
+
+
+  def save(self, event):
+    print("save new operation params")
+
+    return
+
+  def reset(self, event):
+    print("restore defaults operation params")
+
+    return

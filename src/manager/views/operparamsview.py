@@ -17,8 +17,13 @@ class OperParamsView(LabelFrame):
 
     self.param_controls = []
 
+    self.btn_save = Button(self, text='Save', width=BTNW)
+    self.btn_reset = Button(self, text='Restet', width=BTNW)
+
+
   def clear_operation_params(self):
     [param.grid_forget() for param in self.param_controls]
+    self.param_controls = []
 
     return
 
@@ -33,6 +38,16 @@ class OperParamsView(LabelFrame):
       param_control.grid(row=i, column=0, padx=PADX, pady=PADY, sticky=W+N)
       param_label.grid(row=i, column=1, padx=PADX, pady=PADY, sticky=W+S)
     
+    btns_row = len(self.param_controls)
+    if btns_row > 0:
+      self.btn_save['state']=NORMAL
+      self.btn_reset['state']=NORMAL
+      self.btn_save.grid(row=btns_row, column=0, padx=PADX, pady=PADY, sticky=W + S)
+      self.btn_reset.grid(row=btns_row, column=1, padx=PADX, pady=PADY, sticky=W + S)
+    else:
+      self.btn_save['state']=DISABLED
+      self.btn_reset['state']=DISABLED
+
     return
 
     
