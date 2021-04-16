@@ -7,39 +7,46 @@ class OperParamsView(LabelFrame):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
-
     self['bd'] = 2
     self['relief'] = RIDGE
     self['text'] = 'Selected operation parameters'
 
     self.grid()
-    self.rowconfigure(0, weight=1)
     self.columnconfigure(0, weight=1)
-    self.columnconfigure(1, weight=1)
+    self.columnconfigure(1, weight=2)
 
     self.param_controls = []
 
+  def clear_operation_params(self):
+    [param.grid_forget() for param in self.param_controls]
+
+    return
 
   def set_operation_params(self, params):
-    # Clean the view
-    [param.grid_forget() for param in self.param_controls]
+    self.clear_operation_params()
 
     for i, param in enumerate(params):
       param_control, param_label = self.controls_factory(param)
       self.param_controls.append(param_control)
       self.param_controls.append(param_label)
-      param_control.grid(row=i, column=0, stick=W)
-      param_label.grid(row=i, column=1, stick=W)
+      # self.rowconfigure(i, weight=1)
+      param_control.grid(row=i, column=0, padx=PADX, pady=PADY, sticky=W+N)
+      param_label.grid(row=i, column=1, padx=PADX, pady=PADY, sticky=W+S)
     
     return
+
+    
 
   def controls_factory(self, param):
     # Create control regarding definition --Type:domein...--
     build_data = re.findall('--([^$]*)--', param)[0]
     label_text = param[len(build_data)+4:] 
-    param_label = Label(self, text=label_text)
+    param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
     param_type, param_domain, param_possible_valuess, param_default_value =  build_data.split(':') 
-    print("build_data", param_type, param_domain, param_possible_valuess, param_default_value)
+    # print("build_data", param_type, param_domain, param_possible_valuess, param_default_value)
+    # build_data n s [0,4,6,32,36,40,44,50,52,82] 6
+
+    # Check param_domain
     if (param_type == 'n') or (param_type == 'f') or (param_type == 'str'):
       value = IntVar()
       param_control = Entry(self, textvariable=value)
