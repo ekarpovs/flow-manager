@@ -30,7 +30,7 @@ class MngrController():
     self.view.flows_view.btn_back.bind("<Button>", self.back)
     self.view.flows_view.btn_top.bind("<Button>", self.top)
 
-    self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
+    self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
 
 
@@ -135,8 +135,9 @@ class MngrController():
     self.view.output_view.set_original_image(cv2image)
 
 
-  def save(self, event):
-    print("save new operation params")
+  def apply(self, event):
+    params = self.view.flows_view.oper_params_view.collect_operation_params()
+    print("apply new operation params", params)
 
     return
 
