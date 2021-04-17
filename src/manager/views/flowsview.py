@@ -68,8 +68,8 @@ class FlowsView(View):
     
     return
 
-  def set_operation_params(self, params):
-    self.oper_params_view.set_operation_params(params)
+  def set_operation_params(self, exec, params):
+    self.oper_params_view.set_operation_params(exec, params)
 
     return
 

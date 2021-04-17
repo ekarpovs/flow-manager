@@ -15,33 +15,37 @@ class OperParamsView(LabelFrame):
     self.columnconfigure(0, weight=1)
     self.columnconfigure(1, weight=2)
 
-    self.param_controls = []
+    self.operation_param_controls = {"exec": "", "param_controls": []}
 
     self.btn_apply = Button(self, text='Apply', width=BTNW)
     self.btn_reset = Button(self, text='Restet', width=BTNW)
 
 
   def clear_operation_params(self):
-    for control in self.param_controls:
+    for control in self.operation_param_controls['param_controls']:
       control['control'].grid_forget()
-      control['label'].grid_forget()
-    
-    self.param_controls = []
-
+      control['label'].grid_forget()   
+      self.operation_param_controls['exec'] = ""
+      self.operation_param_controls['param_controls'] = []
     return
 
+  def init_operation_params(self, exec):
+    self.operation_param_controls["exec"] = exec
+    
+    return
 
-  def set_operation_params(self, params):
+  def set_operation_params(self, exec, params):
     self.clear_operation_params()
+    self.init_operation_params(exec)
 
     for i, param in enumerate(params):
       param_control, param_label = self.controls_factory(param)
-      self.param_controls.append({"control": param_control,"label": param_label})
+      self.operation_param_controls['param_controls'].append({"control": param_control,"label": param_label})
 
       param_control.grid(row=i, column=0, padx=PADX, pady=PADY, sticky=W+N)
       param_label.grid(row=i, column=1, padx=PADX, pady=PADY, sticky=W+S)
     
-    btns_row = len(self.param_controls)
+    btns_row = len(self.operation_param_controls['param_controls'])
     if btns_row > 0:
       self.btn_apply['state']=NORMAL
       self.btn_reset['state']=NORMAL
@@ -55,7 +59,7 @@ class OperParamsView(LabelFrame):
 
   def collect_operation_params(self):
     params = []
-    for control in self.param_controls:
+    for control in self.operation_param_controls['param_controls']:
       name = control['label']['text'].split(':')[0]
       if type(control['control']) is Entry: 
         value = control['control'].get()
@@ -66,7 +70,7 @@ class OperParamsView(LabelFrame):
       
       params.append({"name": name, "value": value})
 
-    return params
+    return {"exec":self.operation_param_controls['exec'], "params":params}
 
 
   def controls_factory(self, param):

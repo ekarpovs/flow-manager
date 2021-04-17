@@ -81,3 +81,7 @@ class FlowsModel(Model):
 
     return self.flow_meta
 
+  def update_current_flow_params(params):
+    
+    
+    return

@@ -93,7 +93,7 @@ class MngrController():
     module_name, oper_name = step['exec'].split('.')
     doc = self.model.modules_model.read_operation_doc(module_name, oper_name)
     doc = self.converter.flows_converter.convert_oper_doc(doc)
-    self.view.flows_view.set_operation_params(doc)
+    self.view.flows_view.set_operation_params(step['exec'], doc)
     return    
 
   def step_update(self, idx):
@@ -137,7 +137,8 @@ class MngrController():
 
   def apply(self, event):
     params = self.view.flows_view.oper_params_view.collect_operation_params()
-    print("apply new operation params", params)
+    print(params)
+    # self.model.flows_model.update_current_flow_params(params)
 
     return
 
