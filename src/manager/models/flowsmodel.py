@@ -84,13 +84,14 @@ class FlowsModel(Model):
   def update_current_flow_params(self, operation_params_item):
     idx = operation_params_item['idx']
     flow_item_to_update = self.flow_meta['steps'][idx]
-    print(flow_item_to_update)
+    print("before", flow_item_to_update)
     for param in operation_params_item['params']:
       print(param['name'])
-      if (param['name']).strip() in flow_item_to_update:
-        print("in item")
-      else:
-        print("not in item")
+      pn = param['name'].strip() 
+      pv = param['value'] 
+      flow_item_to_update[pn] = pv
+
+    print("after", flow_item_to_update)
       
     
     return
