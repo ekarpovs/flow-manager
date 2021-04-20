@@ -66,16 +66,22 @@ class OperParamsView(LabelFrame):
 
   def get_operation_params_item(self):
     params = []
+    print("get_ ... _item operation_param_controls", self.operation_param_controls)
     for control in self.operation_param_controls['param_controls']:
       name = control['label']['text'].split(':')[0]
-      if type(control['control']) is Entry: 
-        value = control['control'].get()
+      if type(control['control']) is Entry:
+        try:
+          value = int(control['control'].get().strip())
+          print("Entry value type", type(value))
+        except ValueError:
+          value = control['control'].get()
       elif type(control['control'] is Checkbutton):
         value = control['control'].instate(['selected'])
       else:
-        print(type(control['control']))
+        print("wrong control type", type(control['control']))
       
       params.append({"name": name, "value": value})
+      
       operation_params_item = {"idx": self.operation_param_controls['idx'], "exec": self.operation_param_controls['exec'], "params": params}
       
     return operation_params_item
