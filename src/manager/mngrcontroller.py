@@ -124,11 +124,14 @@ class MngrController():
 
   
   def step(self, event):
+    self.view.flows_view.set_next_selection()
+
     cv2image = self.runner.run_step(self.flow_meta)
     if cv2image is not None:
       self.view.output_view.set_result_image(cv2image)
 
   def back(self, event):
+    self.view.flows_view.set_next_selection(back=True)
     cv2image = self.runner.step_back()
     if cv2image is not None:
       self.view.output_view.set_result_image(cv2image)

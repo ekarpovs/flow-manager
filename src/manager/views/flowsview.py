@@ -25,7 +25,7 @@ class FlowsView(View):
 
     self.flow = []
     self.modulesvar = StringVar(value=self.flow)
-    self.flow_list_box = Listbox(self, height=10, listvariable=self.modulesvar)
+    self.flow_list_box = Listbox(self, height=10, listvariable=self.modulesvar, selectmode=BROWSE)
 
     self.oper_params_view = OperParamsView(self)
 
@@ -55,16 +55,26 @@ class FlowsView(View):
 
   def set_flow_meta(self, flow_meta):
     self.modulesvar.set(flow_meta)
-    self.activate_flow_meta_view()
+    self.set_next_selection()
 
     return
 
-  def activate_flow_meta_view(self):
-    start_idx = 0
-    # self.flow_list_box.selection_set(start_idx)
-    self.flow_list_box.activate(start_idx)
+  def set_next_selection(self, back=False):
+    idx = self.flow_list_box.curselection()
+    print("Next selection", idx)
+    if len(idx) == 0:
+      next_idx = 0
+    else:
+      if back:
+        next_idx = idx[0]-1
+      else:
+        next_idx = idx[0]+1
+
+      self.flow_list_box.selection_clear(idx, idx)
+    
+    self.flow_list_box.activate(next_idx)
     self.flow_list_box.selection_set(ACTIVE)
-    self.flow_list_box.see(start_idx)
+    self.flow_list_box.see(next_idx)
     
     return
 
