@@ -18,6 +18,7 @@ class OperParamsView(LabelFrame):
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
 
     self.btn_apply = Button(self, text='Apply', width=BTNW)
+    self.btn_save = Button(self, text='Save', width=BTNW)
     self.btn_reset = Button(self, text='Restet', width=BTNW)
 
 
@@ -36,11 +37,11 @@ class OperParamsView(LabelFrame):
     
     return
 
-  def set_operation_params(self, idx, exec, params):
+  def set_operation_params(self, idx, exec, oper_params):
     self.clear_operation_params()
     self.init_operation_params(idx, exec)
 
-    for i, param in enumerate(params):
+    for i, param in enumerate(oper_params):
       param_control, param_label = self.controls_factory(param)
       self.operation_param_controls['idx'] = idx
       self.operation_param_controls['param_controls'].append({"control": param_control,"label": param_label})
@@ -51,11 +52,14 @@ class OperParamsView(LabelFrame):
     btns_row = len(self.operation_param_controls['param_controls'])
     if btns_row > 0:
       self.btn_apply['state']=NORMAL
+      self.btn_save['state']=NORMAL
       self.btn_reset['state']=NORMAL
       self.btn_apply.grid(row=btns_row, column=0, padx=PADX, pady=PADY, sticky=W + S)
+      self.btn_save.grid(row=btns_row+1, column=0, padx=PADX, pady=PADY, sticky=W + S)
       self.btn_reset.grid(row=btns_row, column=1, padx=PADX, pady=PADY, sticky=W + S)
     else:
       self.btn_apply['state']=DISABLED
+      self.btn_save['state']=DISABLED
       self.btn_reset['state']=DISABLED
 
     return
@@ -76,23 +80,34 @@ class OperParamsView(LabelFrame):
       
     return operation_params_item
 
-
-  def controls_factory(self, param):
+  def parse_single_param(self, param):
     # Create control regarding definition --Type:domein...--
     build_data = re.findall('--([^$]*)--', param)[0]
     label_text = param[len(build_data)+4:] 
-    param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
     param_type, param_domain, param_possible_valuess, param_default_value =  build_data.split(':') 
 
-    # Check param_domain
+    return param_type, param_domain, param_possible_valuess, param_default_value, label_text
+
+  def controls_factory(self, param):
+    # {"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l}    
+    param_type = param['type']
+    param_domain = param['domain']
+    param_possible_valuess = param['p_values']
+    param_name = param['name']
+    param_value = param['value']
+    label_text = param['label']
+
+    param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
+
+    # !!!! NEED to Check param_domain !!!
     if (param_type == 'n') or (param_type == 'f') or (param_type == 'str'):
       value = IntVar()
       param_control = Entry(self, textvariable=value)
-      value.set(param_default_value)
+      value.set(param_value)
     elif (param_type == 'b'):
       value = BooleanVar()
       param_control = Checkbutton(self, variable=value, onvalue=True, offvalue=False)
-      value.set(param_default_value)
+      value.set(param_value)
     # elif (param_type == 's'):
     #   param_control = Combobox(self, text='')
     else:

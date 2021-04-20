@@ -31,6 +31,7 @@ class MngrController():
     self.view.flows_view.btn_top.bind("<Button>", self.top)
 
     self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
+    self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
 
 
@@ -90,10 +91,33 @@ class MngrController():
       return
        
     step = self.flow_meta['steps'][idx[0]]
+    print("step from flow", step)
     module_name, oper_name = step['exec'].split('.')
     doc = self.model.modules_model.read_operation_doc(module_name, oper_name)
-    doc = self.converter.flows_converter.convert_oper_doc(doc)
-    self.view.flows_view.set_operation_params(idx[0], step['exec'], doc)
+    oper_params_defenition = self.converter.flows_converter.filter_oper_doc(doc)
+    print("operation params definition from doc: {} {}".format(step['exec'], oper_params_defenition))
+    # !!!!!!! MERGE WITH REAL PARAMETERS FROM FLOW META !!!!!!!!
+    oper_params = []
+    for param_def in oper_params_defenition:
+      print("param_def", param_def)
+      t, d, pvs, df, l = self.view.flows_view.oper_params_view.parse_single_param(param_def)
+      p_name = l.split(':')[0].strip()
+      print("p_name, df",p_name, df)
+      if p_name in step:
+        p_value = step[p_name]
+        print("p_value", p_value)
+      else:
+        p_value = df
+
+      oper_params.append({"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l})
+      print("param_def after", param_def)
+      
+
+    print("operation params definition after the merge: {} {}".format(step['exec'], oper_params))
+
+    oper_params
+
+    self.view.flows_view.set_operation_params(idx[0], step['exec'], oper_params)
 
     return    
 
@@ -136,13 +160,21 @@ class MngrController():
     self.view.output_view.set_original_image(cv2image)
 
 
+  # Operation
   def apply(self, event):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
-
+    
     return
 
+  def save(self, event):
+    operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
+    self.model.flows_model.update_current_flow_params(operation_params_item)
+    
+    return
+
+
   def reset(self, event):
-    print("restore defaults operation params")
+    print("reset by the operation defaults params")
 
     return

@@ -40,7 +40,7 @@ class FlowsConverter(Converter):
     return names
 
   @staticmethod
-  def convert_oper_doc(doc):
+  def filter_oper_doc(doc):
     fdoc = []
     for line in doc:
       if line.startswith('--'):
