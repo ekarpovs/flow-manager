@@ -15,7 +15,7 @@ class ImagesView(View):
     self['text'] = 'Images panel'
 
     self.height, self.width = get_panel_size(parent)
-    print("image panel size", self.height, self.width)
+    # print("image panel size", self.height, self.width)
     
     self.grid()
     self.rowconfigure(0, weight=1)
@@ -51,6 +51,32 @@ class ImagesView(View):
     self.names_combo_box.current(0)
 
     return
+
+  def set_file_names_list(self, file_names_list):
+    self.modulesvar.set(file_names_list)
+    self.set_first_selection()
+
+    return
+  
+  
+
+  def set_first_selection(self):
+    idx = self.flow_list_box.curselection()
+    if len(idx) == 0:
+      idx = 0
+    self.flow_list_box.selection_clear(idx, idx)
+    self.select_list_item(0)
+    
+    return
+
+
+  def select_list_item(self, idx):
+    self.flow_list_box.activate(idx)
+    self.flow_list_box.selection_set(ACTIVE)
+    self.flow_list_box.see(idx)
+
+    return
+
 
   def resize(self, image):
     h, w = image.shape[:2]

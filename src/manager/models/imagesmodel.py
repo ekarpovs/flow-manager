@@ -16,7 +16,8 @@ class ImagesModel(Model):
     return self.parent.get_input_paths()
 
 
-  def load_images_files_list(self, path):
-    images_files = []
+  def get_images_file_names_list(self, path):
+    images_files_list = [f for f in os.listdir(path) if f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg')]
     
-    return images_files
+    return images_files_list
+

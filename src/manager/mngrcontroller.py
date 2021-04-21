@@ -41,6 +41,9 @@ class MngrController():
     self.update_flows_view()
     self.update_images_view()
 
+    # !!!!! Temporary
+    path = '../data/input'
+    self.update_images_file_names_list(path)
     return
 
 
@@ -75,12 +78,19 @@ class MngrController():
 
     return
 
+
   def update_images_view(self):
     paths = self.model.images_model.get_input_paths()
     self.view.images_view.set_input_paths(paths)
 
     return
 
+
+  def update_images_file_names_list(self, path):
+    file_names_list = self.model.images_model.get_images_file_names_list(path)
+    self.view.images_view.set_file_names_list(file_names_list)
+
+    return
 
 
 # Actions
