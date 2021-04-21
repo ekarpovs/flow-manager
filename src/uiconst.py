@@ -13,3 +13,10 @@ def calculate_reminder_height(parent, frames):
 
   return parent_height - used_height - PADY*2
 
+
+def get_panel_size(parent):
+  parent.update()
+  width = parent.winfo_width()
+  height = parent.winfo_height()
+
+  return width, height

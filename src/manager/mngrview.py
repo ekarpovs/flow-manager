@@ -10,8 +10,6 @@ class MngrView(LabelFrame):
     super().__init__(parent)
     self.parent = parent
 
-    print("MNGR-VIEW")
-
     self.grid()
     self.rowconfigure(0, weight=1)
     self.columnconfigure(0, weight=1)
@@ -23,7 +21,7 @@ class MngrView(LabelFrame):
 
     self.flows_view = FlowsView(self)
 
-    self.output_view = OutputView(self)
+    self.output_view = ImagesView(self)
 
     self.divide_view()
 

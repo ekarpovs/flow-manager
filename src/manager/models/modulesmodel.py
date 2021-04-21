@@ -8,8 +8,6 @@ class ModulesModel(Model):
     super().__init__()
     self.parent = parent 
 
-    print("MODULES-MODEL")
-
     self.modules_meta_from_all_paths = []
 
 # Metadata

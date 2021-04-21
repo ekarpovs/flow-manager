@@ -22,6 +22,9 @@ class ModulesView(View):
     self['bg'] = "light yellow"
     self['text'] = 'Modules panel'
 
+    # height, width = get_panel_size(parent)
+    # print("modules panel size", height, width)
+
     self.grid()
     self.rowconfigure(0, weight=3)
     self.rowconfigure(1, weight=1)

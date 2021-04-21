@@ -5,7 +5,6 @@ from .contextstack import ContextStack
 class Runner():
   def __init__(self, cfg):
 
-    print("RUNNER")
     self.contextstack = ContextStack()
     self.get = cfg.get_factory().get
     self.cv2image = None

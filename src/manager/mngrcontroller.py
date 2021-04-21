@@ -9,8 +9,6 @@ class MngrController():
   def __init__(self, parent):
     self.parent = parent
 
-    print("MNGR-CONTROLLER")
-
     self.cfg = Configuration()
 
     self.runner = Runner(self.cfg)

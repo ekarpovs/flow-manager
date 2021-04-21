@@ -6,8 +6,6 @@ class FlowsConverter(Converter):
     super().__init__()
     self.parent = parent 
 
-    print("FLOWS-CONVERTER")
-
 
   @staticmethod
   def convert_worksheets_names(worksheets_names):

@@ -14,6 +14,10 @@ class FlowsView(View):
     self['bg'] = "mint cream"
     self['text'] = 'Flows panel'
 
+    # height, width = get_panel_size(parent)
+    # print("flows panel size", height, width)
+
+
     self.grid()
     self.rowconfigure(1, weight=1)
     self.rowconfigure(2, weight=4)

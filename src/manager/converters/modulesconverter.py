@@ -27,8 +27,6 @@ class ModulesConverter(Converter):
     super().__init__()
     self.parent = parent 
 
-    print("MODULES-CONVERTER")
-
 
   def convert_meta(self, modules_meta):
     converted = []

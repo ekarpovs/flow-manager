@@ -5,7 +5,6 @@ from ..configuration import Configuration
 
 class MngrConverter():
   def __init__(self):
-    print("MNGR-CONVERTER")
 
     cfg = Configuration()
     self.modules_paths = cfg.get_modules_paths()

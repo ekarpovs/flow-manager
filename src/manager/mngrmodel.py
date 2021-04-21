@@ -5,7 +5,6 @@ from ..configuration import Configuration
 
 class MngrModel():
   def __init__(self, cfg):
-    print("MNGR-MODEL")
 
     self.cfg = cfg
 
