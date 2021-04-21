@@ -1,6 +1,5 @@
 import os
 import json
-from tkinter.constants import W
 from .model import Model
 
 class FlowsModel(Model):
