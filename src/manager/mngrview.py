@@ -21,13 +21,13 @@ class MngrView(LabelFrame):
 
     self.flows_view = FlowsView(self)
 
-    self.output_view = ImagesView(self)
+    self.images_view = ImagesView(self)
 
     self.divide_view()
 
     self.modules_view.grid(row=0, column=0)
     self.flows_view.grid(row=0, column=1)
-    self.output_view.grid(row=0, column=2)
+    self.images_view.grid(row=0, column=2)
 
 
 # Show Meta data
@@ -57,8 +57,8 @@ class MngrView(LabelFrame):
     self.modules_view['width'] = int(w/4)
     self.flows_view['height'] = h - PADY*2
     self.flows_view['width'] = int(w/4)
-    self.output_view['height'] = h - PADY*2
-    self.output_view['width'] = w - int(w/4)*2 - 5
+    self.images_view['height'] = h - PADY*2
+    self.images_view['width'] = w - int(w/4)*2 - 5
     self.modules_view.grid_propagate(0)
     self.flows_view.grid_propagate(0)
-    self.output_view.grid_propagate(0)
+    self.images_view.grid_propagate(0)

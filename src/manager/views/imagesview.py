@@ -46,6 +46,12 @@ class ImagesView(View):
     self.flow_list_box.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=N+S+W+E)
 
 
+  def set_input_paths(self, paths):
+    self.names_combo_box['values'] = paths
+    self.names_combo_box.current(0)
+
+    return
+
   def resize(self, image):
     h, w = image.shape[:2]
     ratio = w/h

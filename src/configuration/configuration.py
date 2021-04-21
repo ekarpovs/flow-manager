@@ -11,7 +11,7 @@ class Configuration():
     # TODO read from config.json
     self.factory_path = "../operation-loader"
 
-    self.input_path="../data/input" 
+    self.input_paths=["../data/input"]
     self.result_path="../data/output" 
     self.modules_paths = ["../modules-and-worksheets/modules", "../modules-and-worksheets/modules-common"]
     self.worksheets_paths=["../modules-and-worksheets/worksheets", "../modules-and-worksheets/worksheets-ocv"]
@@ -28,8 +28,8 @@ class Configuration():
   def get_factory(self):
     return self.factory
 
-  def get_input_path(self):
-    return self.input_path
+  def get_input_paths(self):
+    return self.input_paths
 
   def get_result_path(self):
     return self.result_path
@@ -39,4 +39,3 @@ class Configuration():
 
   def get_worksheets_paths(self):
     return self.worksheets_paths
-

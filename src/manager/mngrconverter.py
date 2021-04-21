@@ -9,7 +9,7 @@ class MngrConverter():
     cfg = Configuration()
     self.modules_paths = cfg.get_modules_paths()
     self.worksheets_paths = cfg.get_worksheets_paths()
-    self.input_path = cfg.get_input_path()
+    self.input_paths = cfg.get_input_paths()
     self.result_path = cfg.get_result_path()
 
     # Create converters

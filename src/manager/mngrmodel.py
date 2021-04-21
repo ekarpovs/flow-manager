@@ -11,6 +11,7 @@ class MngrModel():
     # Create models
     self.modules_model = ModulesModel(self)
     self.flows_model = FlowsModel(self)
+    self.images_model = ImagesModel(self)
 
 
   def get_modules_paths(self):
@@ -18,6 +19,10 @@ class MngrModel():
   
   def get_worksheets_paths(self):
     return self.cfg.get_worksheets_paths()
+
+  def get_input_paths(self):
+    return self.cfg.get_input_paths()
+
 
   def get_factory(self):
     return self.cfg.get_factory()

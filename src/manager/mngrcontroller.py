@@ -39,6 +39,7 @@ class MngrController():
   def start(self):
     self.update_modules_view()
     self.update_flows_view()
+    self.update_images_view()
 
     return
 
@@ -73,6 +74,13 @@ class MngrController():
     self.view.flows_view.set_flow_meta(flow_meta)
 
     return
+
+  def update_images_view(self):
+    paths = self.model.images_model.get_input_paths()
+    self.view.images_view.set_input_paths(paths)
+
+    return
+
 
 
 # Actions
@@ -146,7 +154,7 @@ class MngrController():
 
   def load(self, event):
     self.view.flows_view.set_first_selection()
-    image_full_file_name = "{}\gc.png".format(self.cfg.get_input_path())
+    image_full_file_name = "{}\page.jpg".format(self.cfg.get_input_path())
     # image_full_file_name = "{}\scan-01.jpg".format(self.cfg.get_input_path())
     cv2image = self.runner.load_image(image_full_file_name) 
     self.view.output_view.set_original_image(cv2image)
