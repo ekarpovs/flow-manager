@@ -99,7 +99,8 @@ class MngrController():
     item = self.view.flows_view.names_combo_box.get()
     self.update_flow_meta(item)
     self.view.flows_view.clear_operation_params()
-    
+    self.set_top_state()
+
     return
 
   def step_selected(self, idx):
@@ -157,11 +158,16 @@ class MngrController():
 
 
   def top(self, event):
+    self.set_top_state()
+    return
+  
+  def set_top_state(self):
     self.runner.top()
     print("clean the output image")
     self.view.images_view.reset_result_image()
     self.view.flows_view.set_first_selection()
 
+    return
 
   # Operation buttons
   def apply(self, event):
@@ -183,10 +189,11 @@ class MngrController():
     return
 
 
-# Images
+# Imagesc
   def selected_path(self, event):
     item = self.view.images_view.names_combo_box.get()
     self.update_images_file_names_list(item)
+    self.set_top_state()
     
     return
 
@@ -194,11 +201,12 @@ class MngrController():
     print("idx", idx)
     if not idx:
       return
-    self.file_idx = idx[0]    
+    self.file_idx = idx[0]
+    
     return
 
   def load(self, event):
-    self.view.flows_view.set_first_selection()
+    self.set_top_state()
 
     idx = self.file_idx
     image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
