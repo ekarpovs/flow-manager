@@ -7,9 +7,8 @@ class ImagesModel(Model):
     super().__init__()
     self.parent = parent 
 
-
-
-
+    self.path = ''
+    self.images_files_list = []
 
   def get_input_paths(self):
 
@@ -17,7 +16,12 @@ class ImagesModel(Model):
 
 
   def get_images_file_names_list(self, path):
-    images_files_list = [f for f in os.listdir(path) if f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg')]
     
-    return images_files_list
+    self.path = path
+    self.images_files_list = [f for f in os.listdir(path) if f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg')]
+    
+    return self.images_files_list
 
+  def get_selected_file_full_name(self, idx):
+
+    return "{}/{}".format(self.path, self.images_files_list[idx])

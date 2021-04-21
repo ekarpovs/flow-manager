@@ -22,7 +22,6 @@ class MngrController():
       lambda e: self.step_selected(self.view.flows_view.flow_list_box.curselection()))
     self.view.flows_view.flow_list_box.bind("<Double-1>", 
       lambda e: self.step_update(self.view.flows_view.flow_list_box.curselection()))
-    self.view.flows_view.btn_load.bind("<Button>", self.load)
     self.view.flows_view.btn_run.bind("<Button>", self.run)
     self.view.flows_view.btn_step.bind("<Button>", self.step)
     self.view.flows_view.btn_back.bind("<Button>", self.back)
@@ -32,7 +31,12 @@ class MngrController():
     self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
 
+    self.view.images_view.btn_load.bind("<Button>", self.load)
+    self.view.images_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)
+    self.view.images_view.file_names_list_box.bind('<<ListboxSelect>>', 
+      lambda e: self.image_file_selected(self.view.images_view.file_names_list_box.curselection()))
 
+    self.file_idx = None
 
     self.start()
 
@@ -41,9 +45,6 @@ class MngrController():
     self.update_flows_view()
     self.update_images_view()
 
-    # !!!!! Temporary
-    path = '../data/input'
-    self.update_images_file_names_list(path)
     return
 
 
@@ -136,38 +137,40 @@ class MngrController():
   def run(self, event):
     # Move to runner
     cv2image = self.runner.run_flow(self.flow_meta) 
-    self.view.output_view.set_result_image(cv2image)
+    self.view.images_view.set_result_image(cv2image)
 
   
   def step(self, event):
     cv2image = self.runner.run_step(self.flow_meta)
     if cv2image is not None:
-      self.view.output_view.set_result_image(cv2image)
+      self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_next_selection()
 
   def back(self, event):
     cv2image = self.runner.step_back()
     if cv2image is not None:
-      self.view.output_view.set_result_image(cv2image)
+      self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_next_selection(back=True)
     else:
       print("clean the output image")
-      self.view.output_view.reset_result_image()
+      self.view.images_view.reset_result_image()
 
 
   def top(self, event):
     self.runner.top()
     print("clean the output image")
-    self.view.output_view.reset_result_image()
+    self.view.images_view.reset_result_image()
     self.view.flows_view.set_first_selection()
 
 
   def load(self, event):
     self.view.flows_view.set_first_selection()
-    image_full_file_name = "{}\page.jpg".format(self.cfg.get_input_path())
-    # image_full_file_name = "{}\scan-01.jpg".format(self.cfg.get_input_path())
+
+    idx = self.file_idx
+    image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
+
     cv2image = self.runner.load_image(image_full_file_name) 
-    self.view.output_view.set_original_image(cv2image)
+    self.view.images_view.set_original_image(cv2image)
 
 
   # Operation buttons
@@ -188,3 +191,19 @@ class MngrController():
     print("reset by the operation defaults params")
 
     return
+
+
+# Images
+  def selected_path(self, event):
+    item = self.view.images_view.names_combo_box.get()
+    self.update_images_file_names_list(item)
+    
+    return
+
+  def image_file_selected(self, idx):
+    print("idx", idx)
+    if not idx:
+      return
+    self.file_idx = idx[0]    
+    return
+

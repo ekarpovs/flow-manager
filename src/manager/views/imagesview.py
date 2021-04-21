@@ -38,12 +38,15 @@ class ImagesView(View):
     self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar)
     self.names_combo_box['state'] = 'readonly'
 
-    self.flow = []
-    self.modulesvar = StringVar(value=self.flow)
-    self.flow_list_box = Listbox(self, height=10, listvariable=self.modulesvar, selectmode=BROWSE)
+    self.btn_load = Button(self, text='Load', width=BTNW)
+
+    self.paths = []
+    self.modulesvar = StringVar(value=self.paths)
+    self.file_names_list_box = Listbox(self, height=10, listvariable=self.modulesvar, selectmode=BROWSE)
 
     self.names_combo_box.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
-    self.flow_list_box.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=N+S+W+E)
+    self.btn_load.grid(row=1, column=1, padx=PADX, pady=PADY, sticky=W + S)
+    self.file_names_list_box.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=N+S+W+E)
 
 
   def set_input_paths(self, paths):
@@ -61,19 +64,19 @@ class ImagesView(View):
   
 
   def set_first_selection(self):
-    idx = self.flow_list_box.curselection()
+    idx = self.file_names_list_box.curselection()
     if len(idx) == 0:
       idx = 0
-    self.flow_list_box.selection_clear(idx, idx)
+    self.file_names_list_box.selection_clear(idx, idx)
     self.select_list_item(0)
     
     return
 
 
   def select_list_item(self, idx):
-    self.flow_list_box.activate(idx)
-    self.flow_list_box.selection_set(ACTIVE)
-    self.flow_list_box.see(idx)
+    self.file_names_list_box.activate(idx)
+    self.file_names_list_box.selection_set(ACTIVE)
+    self.file_names_list_box.see(idx)
 
     return
 

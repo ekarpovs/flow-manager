@@ -33,7 +33,7 @@ class FlowsView(View):
 
     self.oper_params_view = OperParamsView(self)
 
-    self.btn_load = Button(self, text='Load', width=BTNW)
+    # self.btn_load = Button(self, text='Load', width=BTNW)
     self.btn_run = Button(self, text='Run', width=BTNW)
     self.btn_step = Button(self, text='Step', width=BTNW)
     self.btn_back = Button(self, text='Back', width=BTNW)
@@ -45,11 +45,11 @@ class FlowsView(View):
     self.oper_params_view.grid(row=2, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
 
     # TODO: separate view
-    self.btn_load.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=W + S)
-    self.btn_run.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + S)
-    self.btn_step.grid(row=5, column=0, padx=PADX, pady=PADY, sticky=W + S)
-    self.btn_back.grid(row=6, column=0, padx=PADX, pady=PADY, sticky=W + S)
-    self.btn_top.grid(row=7, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    # self.btn_load.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_run.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_step.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_back.grid(row=5, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_top.grid(row=6, column=0, padx=PADX, pady=PADY, sticky=W + S)
 
 
 
