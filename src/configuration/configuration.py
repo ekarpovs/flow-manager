@@ -9,12 +9,16 @@ class Configuration():
   # Loaders
   def load_configuration(self):
     # TODO read from config.json
-    self.factory_path = "../operation-loader"
+    ffn = "{}.json".format('config')
+    with open(ffn, 'rt') as ws:
+      cfg = json.load(ws)
 
-    self.input_paths=["../data/input"]
-    self.result_path="../data/output" 
-    self.modules_paths = ["../modules-and-worksheets/modules", "../modules-and-worksheets/modules-common"]
-    self.worksheets_paths=["../modules-and-worksheets/worksheets", "../modules-and-worksheets/worksheets-ocv"]
+
+    self.factory_path = cfg['factory'] 
+    self.input_paths = cfg['images']
+    self.result_path = cfg['results']
+    self.modules_paths = cfg['modules']
+    self.worksheets_paths = cfg['worksheets']
 
     # Set paths for access factory and modules outside of the application
     for path in self.modules_paths:
@@ -24,6 +28,15 @@ class Configuration():
     import factory
     self.factory = factory
   
+
+  # def load_config_file(self):
+  #   ffn = "{}.json".format('config')
+  #   with open(ffn, 'rt') as ws:
+  #     cfg = json.load(ws)
+  #     print(cfg)
+
+  #   return cfg
+
 
   def get_factory(self):
     return self.factory
