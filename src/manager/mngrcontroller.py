@@ -124,17 +124,16 @@ class MngrController():
 
   
   def step(self, event):
-    self.view.flows_view.set_next_selection()
-
     cv2image = self.runner.run_step(self.flow_meta)
     if cv2image is not None:
       self.view.output_view.set_result_image(cv2image)
+      self.view.flows_view.set_next_selection()
 
   def back(self, event):
-    self.view.flows_view.set_next_selection(back=True)
     cv2image = self.runner.step_back()
     if cv2image is not None:
       self.view.output_view.set_result_image(cv2image)
+      self.view.flows_view.set_next_selection(back=True)
     else:
       print("clean the output image")
       self.view.output_view.reset_result_image()
@@ -144,16 +143,18 @@ class MngrController():
     self.runner.top()
     print("clean the output image")
     self.view.output_view.reset_result_image()
+    self.view.flows_view.set_first_selection()
 
 
   def load(self, event):
+    self.view.flows_view.set_first_selection()
     image_full_file_name = "{}\gc.png".format(self.cfg.get_input_path())
     # image_full_file_name = "{}\scan-01.jpg".format(self.cfg.get_input_path())
     cv2image = self.runner.load_image(image_full_file_name) 
     self.view.output_view.set_original_image(cv2image)
 
 
-  # Operation
+  # Operation buttons
   def apply(self, event):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)

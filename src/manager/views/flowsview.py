@@ -55,7 +55,24 @@ class FlowsView(View):
 
   def set_flow_meta(self, flow_meta):
     self.modulesvar.set(flow_meta)
-    self.set_next_selection()
+    self.set_first_selection()
+
+    return
+
+  def set_first_selection(self):
+    idx = self.flow_list_box.curselection()
+    if len(idx) == 0:
+      idx = 0
+    self.flow_list_box.selection_clear(idx, idx)
+    self.select_list_item(0)
+    
+    return
+
+
+  def select_list_item(self, idx):
+    self.flow_list_box.activate(idx)
+    self.flow_list_box.selection_set(ACTIVE)
+    self.flow_list_box.see(idx)
 
     return
 
@@ -72,11 +89,10 @@ class FlowsView(View):
 
       self.flow_list_box.selection_clear(idx, idx)
     
-    self.flow_list_box.activate(next_idx)
-    self.flow_list_box.selection_set(ACTIVE)
-    self.flow_list_box.see(next_idx)
+    self.select_list_item(next_idx)
     
     return
+
 
   def set_operation_params(self, idx, exec, oper_params):
     self.oper_params_view.set_operation_params(idx, exec, oper_params)
