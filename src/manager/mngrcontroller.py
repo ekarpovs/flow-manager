@@ -163,16 +163,6 @@ class MngrController():
     self.view.flows_view.set_first_selection()
 
 
-  def load(self, event):
-    self.view.flows_view.set_first_selection()
-
-    idx = self.file_idx
-    image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
-
-    cv2image = self.runner.load_image(image_full_file_name) 
-    self.view.images_view.set_original_image(cv2image)
-
-
   # Operation buttons
   def apply(self, event):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
@@ -207,3 +197,11 @@ class MngrController():
     self.file_idx = idx[0]    
     return
 
+  def load(self, event):
+    self.view.flows_view.set_first_selection()
+
+    idx = self.file_idx
+    image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
+
+    cv2image = self.runner.load_image(image_full_file_name) 
+    self.view.images_view.set_original_image(cv2image)
