@@ -16,6 +16,10 @@ class MngrController():
     self.converter = MngrConverter()
     self.view = MngrView(self.parent)
 
+    # Bind to modules panel
+    self.view.modules_view.btn_add.bind("<Button>", self.add)
+
+
     # Bind to flows panel
     self.view.flows_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
     self.view.flows_view.flow_list_box.bind('<<ListboxSelect>>', 
@@ -31,6 +35,7 @@ class MngrController():
     self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
 
+    # Bind to images panel
     self.view.images_view.btn_load.bind("<Button>", self.load)
     self.view.images_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)
     self.view.images_view.file_names_list_box.bind('<<ListboxSelect>>', 
@@ -95,6 +100,13 @@ class MngrController():
 
 
 # Actions
+
+  # Modules panel
+  def add(self, event):
+    print("ADD")
+    return
+
+  # Flows panel
   def selected(self, event):
     item = self.view.flows_view.names_combo_box.get()
     self.update_flow_meta(item)
@@ -169,7 +181,7 @@ class MngrController():
 
     return
 
-  # Operation buttons
+  # Operation parameters sub panel
   def apply(self, event):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
@@ -189,7 +201,7 @@ class MngrController():
     return
 
 
-# Imagesc
+# Images panel
   def selected_path(self, event):
     item = self.view.images_view.names_combo_box.get()
     self.update_images_file_names_list(item)
