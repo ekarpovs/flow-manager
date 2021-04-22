@@ -79,7 +79,8 @@ class FlowsModel(Model):
     return self.flow_meta
 
   def add_opearation_to_current_flow(self, oper):
-    self.flow_meta['steps'].append(oper)
+    new_oper = {'exec': oper}
+    self.flow_meta['steps'].append(new_oper)
     
     return self.flow_meta
 

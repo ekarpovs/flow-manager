@@ -63,3 +63,10 @@ class ModulesView(View):
         self.tree_view.insert(parent=parent, index=index, iid=iid, text=text, values=values)
       else:
         self.tree_view.insert(parent=parent, index=index, iid=iid, text=text)
+
+  def get_selected_operation_meta(self):
+    cur_id = self.tree_view.focus()
+    if len(self.tree_view.get_children(cur_id)) == 0:
+      return cur_id
+    else:
+      return None

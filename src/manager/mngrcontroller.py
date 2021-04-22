@@ -103,7 +103,12 @@ class MngrController():
 
   # Modules panel
   def add(self, event):
-    print("ADD")
+    operation_meta = self.view.modules_view.get_selected_operation_meta()
+    if operation_meta is not None:
+      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta)
+      new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
+      self.view.flows_view.set_flow_meta(new_flow_meta)
+
     return
 
   # Flows panel
