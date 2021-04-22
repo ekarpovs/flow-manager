@@ -78,15 +78,15 @@ class FlowsModel(Model):
 
     return self.flow_meta
 
-  def add_opearation_to_current_flow(self, oper):
+  def add_opearation_to_current_flow(self, oper, idx):
     new_oper = {'exec': oper}
-    self.flow_meta['steps'].append(new_oper)
-    
+    self.flow_meta['steps'].insert(idx, new_oper)
+
     return self.flow_meta
 
 
   def remove_operation_from_current_flow(self, idx):
-    self.flow_meta.pop(idx)
+    self.flow_meta['steps'].pop(idx)
 
     return self.flow_meta
 

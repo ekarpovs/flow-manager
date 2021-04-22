@@ -1,3 +1,4 @@
+from src.manager.models import model
 from tkinter import image_names
 from .runner import Runner  
 from .mngrmodel import MngrModel  
@@ -26,6 +27,8 @@ class MngrController():
       lambda e: self.step_update(self.view.flows_view.flow_list_box.curselection()))
 
     self.view.flows_view.btn_add.bind("<Button>", self.add)
+    self.view.flows_view.btn_remove.bind("<Button>", self.remove)
+
     self.view.flows_view.btn_run.bind("<Button>", self.run)
     self.view.flows_view.btn_step.bind("<Button>", self.step)
     self.view.flows_view.btn_back.bind("<Button>", self.back)
@@ -102,14 +105,6 @@ class MngrController():
 # Actions
 
   # Modules panel
-  def add(self, event):
-    operation_meta = self.view.modules_view.get_selected_operation_meta()
-    if operation_meta is not None:
-      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta)
-      new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
-      self.view.flows_view.set_flow_meta(new_flow_meta)
-
-    return
 
   # Flows panel
   def selected(self, event):
@@ -151,6 +146,25 @@ class MngrController():
 
     return    
 
+  def add(self, event):
+    # Get item position after that will be added new one
+    cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
+    # Get item position from modules view
+    operation_meta = self.view.modules_view.get_selected_operation_meta()
+    # Perform if operation only selected
+    if operation_meta is not None:
+      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx)
+      new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
+      self.view.flows_view.set_flow_meta(new_flow_meta)
+
+    return
+
+  def remove(self, event):
+    cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
+    self.model.flows_model.remove_operation_from_current_flow(cur_idx)
+    self.view.flows_view.flow_list_box.delete(cur_idx, cur_idx)
+
+    return
 
   def run(self, event):
     # Move to runner
