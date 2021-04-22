@@ -17,8 +17,6 @@ class MngrController():
     self.view = MngrView(self.parent)
 
     # Bind to modules panel
-    self.view.modules_view.btn_add.bind("<Button>", self.add)
-
 
     # Bind to flows panel
     self.view.flows_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
@@ -26,6 +24,8 @@ class MngrController():
       lambda e: self.step_selected(self.view.flows_view.flow_list_box.curselection()))
     self.view.flows_view.flow_list_box.bind("<Double-1>", 
       lambda e: self.step_update(self.view.flows_view.flow_list_box.curselection()))
+
+    self.view.flows_view.btn_add.bind("<Button>", self.add)
     self.view.flows_view.btn_run.bind("<Button>", self.run)
     self.view.flows_view.btn_step.bind("<Button>", self.step)
     self.view.flows_view.btn_back.bind("<Button>", self.back)

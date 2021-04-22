@@ -27,7 +27,6 @@ class ModulesView(View):
 
     self.grid()
     self.rowconfigure(0, weight=3)
-    self.rowconfigure(1, weight=1)
     self.columnconfigure(0, weight=1)
     # self.columnconfigure(1, weight=1)
 
@@ -46,9 +45,6 @@ class ModulesView(View):
     self.tree_view.configure(yscrollcommand=self.tree_view_scrollbar.set)
     
     self.tree_view.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=S + W + E + N)
-
-    self.btn_add = Button(self, text='Add', width=BTNW)
-    self.btn_add.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + N)
 
 
   def set_modules_meta(self, modules_meta):
