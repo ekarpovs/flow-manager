@@ -78,6 +78,17 @@ class FlowsModel(Model):
 
     return self.flow_meta
 
+  def add_opearation_to_current_flow(self, oper):
+    self.flow_meta['steps'].append(oper)
+    
+    return self.flow_meta
+
+
+  def remove_operation_from_current_flow(self, idx):
+    self.flow_meta.pop(idx)
+
+    return self.flow_meta
+
   def update_current_flow_params(self, operation_params_item):
     idx = operation_params_item['idx']
     flow_item_to_update = self.flow_meta['steps'][idx]
@@ -90,5 +101,4 @@ class FlowsModel(Model):
 
     print("after", flow_item_to_update)
       
-    
-    return
+    return flow_item_to_update
