@@ -42,8 +42,8 @@ class Runner():
       return None
 
     current_step = steps[self.contextstack.size()]
-    # if current_step.get('useorig', False) == True:
-    #   kwargs['image'] = kwargs['orig'].copy()
+    if current_step.get('useorig', False) == True:
+      kwargs['image'] = kwargs['orig'].copy()
     # Craete the step context with input values 
     step_context = Context(current_step, **kwargs)
     # load the step's function
