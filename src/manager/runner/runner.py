@@ -1,6 +1,7 @@
 import cv2
 from .context import Context
 from .contextstack import ContextStack
+from .wrapper import flowoperation
 
 class Runner():
   def __init__(self, cfg):
@@ -42,13 +43,14 @@ class Runner():
       return None
 
     current_step = steps[self.contextstack.size()]
-    if current_step.get('useorig', False) == True:
-      kwargs['image'] = kwargs['orig'].copy()
+    # if current_step.get('useorig', False) == True:
+    #   kwargs['image'] = kwargs['orig'].copy()
     # Craete the step context with input values 
     step_context = Context(current_step, **kwargs)
     # load the step's function
     operation = self.get(current_step['exec'])
-    kwargs = operation(current_step, **kwargs)    
+    wrapped = flowoperation(operation)
+    kwargs = wrapped(current_step, **kwargs)    
     # Set result to step context
     step_context.set_after(**kwargs)
     # Store the context
