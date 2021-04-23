@@ -147,13 +147,13 @@ class MngrController():
     return    
 
   def add(self, event):
-    # Get item position after that will be added new one
+    # Get destination item position after that will be added new one
     cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
-    # Get item position from modules view
+    # Get source item position from modules view
     operation_meta = self.view.modules_view.get_selected_operation_meta()
     # Perform if operation only selected
     if operation_meta is not None:
-      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx)
+      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx+1)
       new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
       self.view.flows_view.set_flow_meta(new_flow_meta)
 
