@@ -242,5 +242,6 @@ class MngrController():
     idx = self.file_idx
     image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
 
-    cv2image = self.runner.load_image(image_full_file_name) 
+    cv2image = self.model.images_model.get_image(image_full_file_name)
+    self.runner.set_input_image(cv2image) 
     self.view.images_view.set_original_image(cv2image)

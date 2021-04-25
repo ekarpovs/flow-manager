@@ -1,5 +1,5 @@
+import cv2
 import os
-import json
 from .model import Model
 
 class ImagesModel(Model):
@@ -25,3 +25,13 @@ class ImagesModel(Model):
   def get_selected_file_full_name(self, idx):
 
     return "{}/{}".format(self.path, self.images_files_list[idx])
+
+  @staticmethod
+  def get_image(image_full_file_name):
+    cv2image = cv2.imread(image_full_file_name)
+
+    if len(cv2image.shape) > 2:
+      b,g,r = cv2.split(cv2image)
+      cv2image = cv2.merge((r,g,b))
+
+    return cv2image

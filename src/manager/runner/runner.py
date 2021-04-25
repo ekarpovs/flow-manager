@@ -1,4 +1,3 @@
-import cv2
 from .context import Context
 from .contextstack import ContextStack
 from .wrapper import flowoperation
@@ -10,16 +9,11 @@ class Runner():
     self.get = cfg.get_factory().get
     self.cv2image = None
   
+  def set_input_image(self, cv2image):
+    self.cv2image = cv2image
 
-  def load_image(self, image_full_file_name):
-    # TODO: get from view
-    self.cv2image = cv2.imread(image_full_file_name)
-
-    if len(self.cv2image.shape) > 2:
-      b,g,r = cv2.split(self.cv2image)
-      self.cv2image = cv2.merge((r,g,b))
-
-    return self.cv2image
+    return
+    
 
   def run_flow(self, flow_meta):
     steps = flow_meta['steps']
