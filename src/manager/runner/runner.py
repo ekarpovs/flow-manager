@@ -9,7 +9,8 @@ class Runner():
     self.contextstack = ContextStack()
     self.get = cfg.get_factory().get
     self.cv2image = None
-  
+    self.counter = 0
+ 
   def set_input_image(self, cv2image):
     self.cv2image = cv2image
 
@@ -28,8 +29,9 @@ class Runner():
 
     return operation
 
-  def init_step_input(self):
+  def init_step(self):
     if self.contextstack.isEmpty():
+      self.counter = 0
       kwargs = {}
       kwargs['orig'] = self.cv2image
       kwargs['image'] = self.cv2image
@@ -38,23 +40,26 @@ class Runner():
 
     return kwargs
 
+  def increment_counter(self):
+    self.counter += 1
+    return
+
+  def dencrement_counter(self):
+    self.counter -= 1
+    return
+
 
   def run(self, flow_meta, one = False):
     steps = flow_meta['steps']
+    image = None
 
     # for idx, step in enumerate(steps):
     execute = True
-    idx = 0
-    while(execute and idx < len(steps)):
-      if self.contextstack.size() >= len(steps):
-        print("No more steps")
-        return None
-
-      # current_step = steps[self.contextstack.size()]
-      current_step = steps[self.contextstack.size()]
+    while(execute and self.counter < len(steps)):
+      current_step = steps[self.counter]
+      self.increment_counter()
 
       image = self.run_step(current_step)
-      idx += 1
       if one == True: 
         execute = False
 
@@ -64,9 +69,9 @@ class Runner():
 
 
   def run_step(self, current_step):
-    kwargs = self.init_step_input()
+    kwargs = self.init_step()
     # Craete the step context with input values 
-    step_context = Context(0, current_step, **kwargs)
+    step_context = Context(current_step, **kwargs)
     # load the step's function
     operation = self.get(current_step['exec'])
     wrapped = flowoperation(operation)
@@ -81,15 +86,17 @@ class Runner():
 
 
   def back(self):
-    if self.contextstack.isEmpty():
+    if self.contextstack.isEmpty() or self.counter == 0:
       print("On the top")
       return None
 
     kwargs = self.contextstack.peek().kwargs_before
     step_context = self.contextstack.pop()
+    self.dencrement_counter()
     
     return kwargs['image']  
 
   def top(self):
     self.contextstack.reset()
+    self.counter = 0
     return

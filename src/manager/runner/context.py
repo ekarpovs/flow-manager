@@ -1,6 +1,5 @@
 class Context:
-  def __init__(self, idx, step_meta, **kwargs):
-    self.idx = idx
+  def __init__(self, step_meta, **kwargs):
     self.step_meta = step_meta
     self.kwargs_before = kwargs
     self.kwargs_after = None
