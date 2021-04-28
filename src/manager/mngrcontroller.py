@@ -116,7 +116,6 @@ class MngrController():
     return
 
   def step_selected(self, idx):
-    print("idx", idx)
     if not idx:
       return
        
@@ -168,18 +167,18 @@ class MngrController():
 
   def run(self, event):
     # Move to runner
-    cv2image = self.runner.run_flow(self.flow_meta) 
+    cv2image = self.runner.run(self.flow_meta) 
     self.view.images_view.set_result_image(cv2image)
 
   
   def step(self, event):
-    cv2image = self.runner.run_step(self.flow_meta)
+    cv2image = self.runner.run(self.flow_meta, True)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_next_selection()
 
   def back(self, event):
-    cv2image = self.runner.step_back()
+    cv2image = self.runner.back()
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_next_selection(back=True)
@@ -229,7 +228,6 @@ class MngrController():
     return
 
   def image_file_selected(self, idx):
-    print("idx", idx)
     if not idx:
       return
     self.file_idx = idx[0]
