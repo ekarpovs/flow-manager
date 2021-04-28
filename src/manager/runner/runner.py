@@ -53,13 +53,14 @@ class Runner():
     steps = flow_meta['steps']
     image = None
 
-    # for idx, step in enumerate(steps):
     execute = True
     while(execute and self.counter < len(steps)):
+      
       current_step = steps[self.counter]
       self.increment_counter()
 
       image = self.run_step(current_step)
+
       if one == True: 
         execute = False
 
@@ -71,7 +72,7 @@ class Runner():
   def run_step(self, current_step):
     kwargs = self.init_step()
     # Craete the step context with input values 
-    step_context = Context(current_step, **kwargs)
+    step_context = Context(**kwargs)
     # load the step's function
     operation = self.get(current_step['exec'])
     wrapped = flowoperation(operation)
@@ -91,10 +92,11 @@ class Runner():
       return None
 
     kwargs = self.contextstack.peek().kwargs_before
-    step_context = self.contextstack.pop()
+    self.contextstack.pop()
     self.dencrement_counter()
     
     return kwargs['image']  
+
 
   def top(self):
     self.contextstack.reset()
