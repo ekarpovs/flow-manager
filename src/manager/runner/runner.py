@@ -87,7 +87,7 @@ class Runner():
   def back(self):
 
     image = None
-    if self.state.prev() == None:
+    if not self.state.prev():
       self.state.reset()
       self.contextstack.reset()
       print("On the top")
