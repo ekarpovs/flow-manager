@@ -1,4 +1,5 @@
 class State:
+  # STATEMENT - LOCAL CLASS 
   class Statement:
     def __init__(self, parent):
       self.parent = parent
@@ -10,6 +11,9 @@ class State:
 
     def set(self, step):
       self.counter = self.parent.counter
+      if self.type is not None:
+        return
+      self.step = step
       gforinrange = step.get('gforinrange', None)
       if gforinrange is not None:
         self.type = 'gforinrange'
@@ -24,14 +28,33 @@ class State:
 
       return
 
+
+    def gforinrange_continue(self):
+      # for i in range(x, y, s):
+      if (self.counter >= self.end) and (self.param['x'] < self.param['y']):
+        self.param['x'] += self.param['s']
+        # Update the step parameters
+        i_name = self.step['gforinrange']['i']
+        self.step[i_name] = self.param['x']
+        return True
+
+      return False
+
+
     def get_counter(self):
       self.counter += 1
-      if self.type and (self.counter >= self.end):
-        self.counter = self.begin
+      if self.type == 'gforinrange':
+        if self.type and self.gforinrange_continue():
+          self.counter = self.begin
 
       return self.counter
 
 
+    def get_params(self):
+      
+      return
+
+  # STATE 
   def __init__(self):
     self.reset()
 
@@ -60,6 +83,7 @@ class State:
       step = self.steps[self.counter]
       self.statement.set(step)      
       self.counter = self.statement.get_counter()
+      # Update step parameters from statement
 
     return step
 
