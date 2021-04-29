@@ -16,20 +16,6 @@ class Runner():
 
     return
 
-  def preprocessor(self, step, operation):
-
-    gforinrange = step.get('gforinrange', None)
-    if gforinrange is not None:
-      param = step['gforinrange'].get('i', "")
-      x = step['gforinrange'].get('x', 0)
-      y = step['gforinrange'].get('y', 10)
-      s = step['gforinrange'].get('s', 1)
-      d = step['gforinrange'].get('d', 0)
-      print("perprocessor - gforinrange: param, x, y, s, d", param, x, y, s, d)
-
-    return operation
-
-
   def init_step(self):
     if self.contextstack.isEmpty():
       # self.state.reset()
