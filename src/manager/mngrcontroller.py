@@ -167,21 +167,22 @@ class MngrController():
 
   def run(self, event):
     # Move to runner
-    cv2image = self.runner.run(self.flow_meta) 
+    counter, cv2image = self.runner.run(self.flow_meta) 
     self.view.images_view.set_result_image(cv2image)
+    self.view.flows_view.set_next_selection(counter)
 
   
   def step(self, event):
-    cv2image = self.runner.run(self.flow_meta, True)
+    counter, cv2image = self.runner.run(self.flow_meta, True)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_next_selection()
+      self.view.flows_view.set_next_selection(counter)
 
   def back(self, event):
-    cv2image = self.runner.back()
+    counter, cv2image = self.runner.back()
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_next_selection(back=True)
+      self.view.flows_view.set_next_selection(counter, back=True)
     else:
       print("clean the output image")
       self.view.images_view.reset_result_image()

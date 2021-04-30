@@ -36,7 +36,7 @@ class State:
       return
 
 
-    def gforinrange_continue(self):
+    def gforinrange_forward(self):
       # for i in range(x, y, s):
       if (self.counter >= self.end) and (self.param['x'] < self.param['y']):
         self.param['x'] += self.param['s']
@@ -49,10 +49,29 @@ class State:
       return False
 
 
-    def get_counter(self):
+    def gforinrange_backward(self):
+      # for i in range(x, y, s):
+      if (self.counter <= self.end) and (self.param['x'] > 0):
+        self.param['x'] = self.param['x'] - self.param['s']
+        return True
+
+      return False
+
+
+
+    def next_counter(self):
       self.counter += 1
       if self.type == 'gforinrange':
-        if self.type and self.gforinrange_continue():
+        if self.type and self.gforinrange_forward():
+          self.counter = self.begin
+
+      return self.counter
+
+
+    def prev_counter(self):
+      self.counter -= 1
+      if self.type == 'gforinrange':
+        if self.type and self.gforinrange_backward():
           self.counter = self.begin
 
       return self.counter
@@ -86,17 +105,17 @@ class State:
     if self.counter < len(self.steps):
       step = self.steps[self.counter]
       self.statement.set(step)      
-      self.counter = self.statement.get_counter()
+      self.counter = self.statement.next_counter()
 
-    return step
+    return self.counter, step
 
 
   def prev(self):
     step = None
     if self.counter > 0:
-      self.counter -= 1
+      self.counter = self.statement.prev_counter()
       step = self.steps[self.counter]
 
-    return step
+    return self.counter, step
 
   

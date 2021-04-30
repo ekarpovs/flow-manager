@@ -41,7 +41,7 @@ class Runner():
 
     execute = True
     while(execute):
-      current_step = self.state.next()
+      counter, current_step = self.state.next()
       if current_step is not None:
         image = self.run_step(current_step)
         if one == True: 
@@ -49,8 +49,7 @@ class Runner():
       else:
         execute = False
 
-
-    return image
+    return counter, image
 
 
   def run_step(self, current_step):
@@ -73,16 +72,18 @@ class Runner():
   def back(self):
 
     image = None
-    if not self.state.prev():
+    counter, current_step = self.state.prev()
+    if current_step is None:
       self.state.reset()
       self.contextstack.reset()
       print("On the top")
-      return None
+      counter = 0
+      return counter, None
     else:
       image = self.contextstack.peek().kwargs_before['image']
-      self.contextstack.pop()
-    
-    return image
+      self.contextstack.pop()   
+
+    return counter, image
 
 
   def top(self):
