@@ -182,7 +182,7 @@ class MngrController():
     counter, cv2image = self.runner.back()
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_next_selection(counter, back=True)
+      self.view.flows_view.set_next_selection(counter)
     else:
       print("clean the output image")
       self.view.images_view.reset_result_image()

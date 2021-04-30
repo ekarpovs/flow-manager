@@ -89,20 +89,12 @@ class FlowsView(View):
 
     return
 
-  def set_next_selection(self, back=False):
-    idx = self.flow_list_box.curselection()
+  def set_next_selection(self, idx):
     print("Next selection", idx)
-    if len(idx) == 0:
-      next_idx = 0
-    else:
-      if back:
-        next_idx = idx[0]-1
-      else:
-        next_idx = idx[0]+1
-
-      self.flow_list_box.selection_clear(idx, idx)
-    
-    self.select_list_item(next_idx)
+    cur_idx = self.flow_list_box.curselection()
+    self.flow_list_box.selection_clear(cur_idx, cur_idx)
+   
+    self.select_list_item(idx)
     
     return
 
