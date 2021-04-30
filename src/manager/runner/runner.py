@@ -1,13 +1,13 @@
 from tkinter.constants import E
 from .state import State
 from .context import Context
-from .contextstack import ContextStack
+from .stack import Stack
 from .wrapper import flowoperation
 
 class Runner():
   def __init__(self, cfg):
     self.state = State()
-    self.contextstack = ContextStack()
+    self.contextstack = Stack()
     self.get = cfg.get_factory().get
     self.cv2image = None
  

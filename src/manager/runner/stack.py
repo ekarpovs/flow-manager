@@ -2,7 +2,7 @@
 # Used to return -infinite when stack is empty
 from sys import maxsize
 
-class ContextStack:
+class Stack:
   def __init__(self):
     self.stack = []
 
