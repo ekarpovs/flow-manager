@@ -40,15 +40,15 @@ class Runner():
     return kwargs
 
 
-  def run_step(self, current_step):
+  def run_step(self, steps_meta):
     kwargs = self.init_step()
     # Craete the step context with input values 
-    step_context = Context(**kwargs)
+    step_context = Context(steps_meta, **kwargs)
     # load the step's function
-    operation = self.get(current_step['exec'])
+    operation = self.get(steps_meta['exec'])
     wrapped = flowoperation(operation)
     # Run the step
-    kwargs = wrapped(current_step, **kwargs)    
+    kwargs = wrapped(steps_meta, **kwargs)    
     # Set result to step context
     step_context.set_after(**kwargs)
     # Store the context
@@ -57,14 +57,23 @@ class Runner():
     return kwargs['image']
     
 
-  def calculate_next_step_index(self):
+  @staticmethod
+  def has_statement(step):
+    statements = ['gforinrange', 'gif', 'gelese']
+    
+    res = any(item in step for item in statements)
+    
+    return res
+
+
+  def calculate_next_step_index(self, step_meta):
     
     self.step_index += 1
 
     return
 
 
-  def calculate_prev_step_index(self):
+  def calculate_prev_step_index(self, step_meta):
     
     self.step_index -= 1
 
@@ -76,15 +85,15 @@ class Runner():
       self.reset()
 
     image = None
-    steps = flow_meta['steps']
+    steps_meta = flow_meta['steps']
 
     execute = True
     while(execute):
-      current_step = steps[self.step_index]
-      if (current_step is not None) and (self.step_index < len(steps)):
-        image = self.run_step(current_step)
-        if self.step_index < len(steps) - 1:
-          self.calculate_next_step_index()
+      step_meta = steps_meta[self.step_index]
+      if (step_meta is not None) and (self.step_index < len(steps_meta)):
+        image = self.run_step(step_meta)
+        if self.step_index < len(steps_meta) - 1:
+          self.calculate_next_step_index(step_meta)
         if one == True: 
           execute = False
       else:
@@ -99,8 +108,10 @@ class Runner():
 
     if self.step_index > 0:
       image = self.context_stack.peek().kwargs_before['image']
+      step_meta = self.context_stack.peek().step_meta
       self.context_stack.pop()
-      self.calculate_prev_step_index()
+
+      self.calculate_prev_step_index(step_meta)
 
     return self.step_index, image
 
