@@ -69,6 +69,8 @@ class Runner():
   def calculate_next_step_index(self, step_meta):
     
     self.step_index += 1
+    if self.has_statement(step_meta):
+      pass
 
     return
 
@@ -76,6 +78,8 @@ class Runner():
   def calculate_prev_step_index(self, step_meta):
     
     self.step_index -= 1
+    if self.has_statement(step_meta):
+      pass
 
     return
 
@@ -85,19 +89,22 @@ class Runner():
       self.reset()
 
     image = None
-    steps_meta = flow_meta['steps']
+    steps_meta = flow_meta['steps']    
 
     execute = True
     while(execute):
-      step_meta = steps_meta[self.step_index]
-      if (step_meta is not None) and (self.step_index < len(steps_meta)):
-        image = self.run_step(step_meta)
-        if self.step_index < len(steps_meta) - 1:
-          self.calculate_next_step_index(step_meta)
-        if one == True: 
-          execute = False
-      else:
+      if self.step_index >= len(steps_meta):
+        print("no more steps")
         execute = False
+      else:
+        step_meta = steps_meta[self.step_index]
+        if (step_meta is not None) and (self.step_index < len(steps_meta)):
+          image = self.run_step(step_meta)
+          self.calculate_next_step_index(step_meta)
+          if one == True: 
+            execute = False
+        else:
+          execute = False
 
     return self.step_index, image
 
