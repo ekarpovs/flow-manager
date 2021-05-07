@@ -46,6 +46,8 @@ class MngrView(LabelFrame):
     return
 
 
+# View state
+
 
 ################### Local methods ###########################
   def divide_view(self):
