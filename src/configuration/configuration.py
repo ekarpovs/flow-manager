@@ -13,18 +13,10 @@ class Configuration():
     with open(ffn, 'rt') as ws:
       self.cfg = json.load(ws)
 
-    # Set paths for access factory and modules outside of the application
+    # Set paths for access modules outside of the application
     for path in self.cfg['modules']:
       sys.path.append(path)
     
-    # Till the operation-loader is not installed via pip
-    sys.path.append(self.cfg['factory'])
-    import factory
-    self.factory = factory
-  
-
-  def get_factory(self):
-    return self.factory
 
   def get_input_paths(self):
     return self.cfg['images']

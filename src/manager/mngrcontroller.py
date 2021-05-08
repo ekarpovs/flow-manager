@@ -1,6 +1,7 @@
 from src.manager.models import model
 from tkinter import image_names
 from flow_runner import Runner
+import operation_loader
 
 from .mngrmodel import MngrModel  
 from .mngrconverter import MngrConverter  
@@ -13,11 +14,7 @@ class MngrController():
 
     self.cfg = Configuration()
 
-    factory = self.cfg.get_factory()
-
-    # self.runner = self.cfg.get_runner()
-
-    self.runner = Runner(factory)
+    self.runner = Runner(operation_loader)
     self.model = MngrModel(self.cfg)
     self.converter = MngrConverter()
     self.view = MngrView(self.parent)
