@@ -68,16 +68,16 @@ class FlowsView(View):
 
   def set_flow_meta(self, flow_meta):
     self.modulesvar.set(flow_meta)
-    self.set_first_selection()
+    self.set_selection()
 
     return
 
-  def set_first_selection(self):
-    idx = self.flow_list_box.curselection()
-    if len(idx) == 0:
-      idx = 0
-    self.flow_list_box.selection_clear(idx, idx)
-    self.select_list_item(0)
+  def set_selection(self, idx=0):
+    cur_idx = self.flow_list_box.curselection()
+    if len(cur_idx) == 0:
+      cur_idx = 0
+    self.flow_list_box.selection_clear(cur_idx, cur_idx)
+    self.select_list_item(idx)
     
     return
 
@@ -88,15 +88,6 @@ class FlowsView(View):
     self.flow_list_box.see(idx)
     self.flow_list_box.event_generate("<<ListboxSelect>>")
 
-    return
-
-  def set_next_selection(self, idx):
-    print("Next selection", idx)
-    cur_idx = self.flow_list_box.curselection()
-    self.flow_list_box.selection_clear(cur_idx, cur_idx)
-   
-    self.select_list_item(idx)
-    
     return
 
 

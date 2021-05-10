@@ -113,7 +113,7 @@ class MngrController():
     item = self.view.flows_view.names_combo_box.get()
     self.update_flow_meta(item)
     self.view.flows_view.clear_operation_params()
-    self.set_top_state()
+    # self.set_top_state()
 
     return
 
@@ -132,7 +132,7 @@ class MngrController():
       p_name = l.split(':')[0].strip()
       if p_name in step:
         p_value = step[p_name]
-        print("p_value", p_value)
+        # print("p_value", p_value)
       else:
         p_value = df
 
@@ -171,20 +171,20 @@ class MngrController():
     # Move to runner
     counter, cv2image = self.runner.run(self.flow_meta) 
     self.view.images_view.set_result_image(cv2image)
-    self.view.flows_view.set_next_selection(counter)
+    self.view.flows_view.set_selection(counter)
 
   
   def step(self, event):
     counter, cv2image = self.runner.run(self.flow_meta, True)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_next_selection(counter)
+      self.view.flows_view.set_selection(counter)
 
   def back(self, event):
     counter, cv2image = self.runner.back()
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_next_selection(counter)
+      self.view.flows_view.set_selection(counter)
     else:
       print("clean the output image")
       self.view.images_view.reset_result_image()
@@ -198,7 +198,7 @@ class MngrController():
     self.runner.top()
     print("clean the output image")
     self.view.images_view.reset_result_image()
-    self.view.flows_view.set_first_selection()
+    self.view.flows_view.set_selection()
 
     return
 
@@ -226,7 +226,7 @@ class MngrController():
   def selected_path(self, event):
     item = self.view.images_view.names_combo_box.get()
     self.update_images_file_names_list(item)
-    self.set_top_state()
+    # self.set_top_state()
     
     return
 
@@ -238,7 +238,7 @@ class MngrController():
     return
 
   def load(self, event):
-    self.set_top_state()
+    # self.set_top_state()
 
     idx = self.file_idx
     image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)

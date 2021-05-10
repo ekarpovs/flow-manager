@@ -57,18 +57,18 @@ class ImagesView(View):
 
   def set_file_names_list(self, file_names_list):
     self.modulesvar.set(file_names_list)
-    self.set_first_selection()
+    self.set_selection()
 
     return
   
   
 
-  def set_first_selection(self):
-    idx = self.file_names_list_box.curselection()
-    if len(idx) == 0:
-      idx = 0
-    self.file_names_list_box.selection_clear(idx, idx)
-    self.select_list_item(0)
+  def set_selection(self, idx=0):
+    cur_idx = self.file_names_list_box.curselection()
+    if len(cur_idx) == 0:
+      cur_idx = 0
+    self.file_names_list_box.selection_clear(cur_idx, cur_idx)
+    self.select_list_item(idx)
     
     return
 
