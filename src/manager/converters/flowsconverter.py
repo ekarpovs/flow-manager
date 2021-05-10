@@ -36,11 +36,3 @@ class FlowsConverter(Converter):
         names.append(step['exec'])
 
     return names
-
-  @staticmethod
-  def filter_oper_doc(doc):
-    fdoc = []
-    for line in doc:
-      if line.startswith('--'):
-        fdoc.append(line)
-    return fdoc

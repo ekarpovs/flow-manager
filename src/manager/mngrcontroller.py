@@ -123,8 +123,10 @@ class MngrController():
        
     step = self.flow_meta['steps'][idx[0]]
     module_name, oper_name = step['exec'].split('.')
-    doc = self.model.modules_model.read_operation_doc(module_name, oper_name)
-    oper_params_defenition = self.converter.flows_converter.filter_oper_doc(doc)
+
+
+    oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
+
     # !!!!!!! MERGE WITH REAL PARAMETERS FROM FLOW META !!!!!!!!
     oper_params = []
     for param_def in oper_params_defenition:
@@ -141,6 +143,7 @@ class MngrController():
     self.view.flows_view.set_operation_params(idx[0], step['exec'], oper_params)
 
     return    
+
 
   def step_update(self, idx):
     print("update idx", idx[0], self.flow_meta['steps'][idx[0]])

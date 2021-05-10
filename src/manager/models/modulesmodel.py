@@ -83,6 +83,17 @@ class ModulesModel(Model):
     
     return ''
 
+  @staticmethod
+  def read_operation_params_defenition(module_name, oper_name):
+    fdoc = ModulesModel.read_operation_doc(module_name, oper_name)
+    
+    fpdef = []
+    for line in fdoc:
+      if line.startswith('--'):
+        fpdef.append(line)
+    
+    return fpdef
+
 
 # Getters
   def get_modules_meta(self):
