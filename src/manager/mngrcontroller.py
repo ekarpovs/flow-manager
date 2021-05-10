@@ -126,20 +126,13 @@ class MngrController():
 
 
     oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
+    
+    oper_params = self.converter.modules_converter.convert_params_defenition_to_object(step, oper_params_defenition)
 
     # !!!!!!! MERGE WITH REAL PARAMETERS FROM FLOW META !!!!!!!!
-    oper_params = []
-    for param_def in oper_params_defenition:
-      t, d, pvs, df, l = self.view.flows_view.oper_params_view.parse_single_param(param_def)
-      p_name = l.split(':')[0].strip()
-      if p_name in step:
-        p_value = step[p_name]
-        # print("p_value", p_value)
-      else:
-        p_value = df
+    # Check that p_value is not either 'h' or 'w' -> convert to real values from image(if exists)
 
-      oper_params.append({"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l})
-      
+
     self.view.flows_view.set_operation_params(idx[0], step['exec'], oper_params)
 
     return    

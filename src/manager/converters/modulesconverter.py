@@ -1,3 +1,4 @@
+import re
 from .converter import Converter
 
 '''
@@ -65,3 +66,31 @@ class ModulesConverter(Converter):
     iid = parent_iid+'.'+name
     # return {"parent":parent_iid, "index":"end", "iid":iid, "text":name, "values": [v1, "here will be func __doc__"]}
     return {"parent":parent_iid, "index":"end", "iid":iid, "text":name, "values": [v1, doc[0]]}
+
+
+  @staticmethod
+  def parse_single_param_defenition(param_defenition):
+    # Regarding definition --Type:domein...--
+    build_data = re.findall('--([^$]*)--', param_defenition)[0]
+    label_text = param_defenition[len(build_data)+4:] 
+    param_type, param_domain, param_possible_valuess, param_default_value =  build_data.split(':') 
+
+    return param_type, param_domain, param_possible_valuess, param_default_value, label_text
+
+
+  @staticmethod
+  def convert_params_defenition_to_object(step, params_defenition):
+    oper_params = []
+    for param_def in params_defenition:
+      t, d, pvs, df, l = ModulesConverter.parse_single_param_defenition(param_def)
+      print("t, d, pvs, df, l", t, d, pvs, df, l)
+      p_name = l.split(':')[0].strip()
+      if p_name in step:
+        p_value = step[p_name]
+        # print("p_name: p_value", p_name, p_value)
+      else:
+        p_value = df
+
+      oper_params.append({"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l})
+
+    return oper_params

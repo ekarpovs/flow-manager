@@ -1,5 +1,4 @@
 from tkinter import *
-import re
 from tkinter.ttk import Combobox, Checkbutton
 from ...uiconst import *
 
@@ -89,13 +88,6 @@ class OperParamsView(LabelFrame):
       
     return operation_params_item
 
-  def parse_single_param(self, param):
-    # Create control regarding definition --Type:domein...--
-    build_data = re.findall('--([^$]*)--', param)[0]
-    label_text = param[len(build_data)+4:] 
-    param_type, param_domain, param_possible_valuess, param_default_value =  build_data.split(':') 
-
-    return param_type, param_domain, param_possible_valuess, param_default_value, label_text
 
   def controls_factory(self, param):
     # {"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l}    

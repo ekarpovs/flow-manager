@@ -67,6 +67,8 @@ class ModulesModel(Model):
     with open(ffn, "w") as outfile: 
       json.dump(module_meta, outfile, indent = 4, sort_keys = True)
 
+
+# Operation documentation
   @staticmethod
   def read_operation_doc(module_name, oper_name):
     path = "../data/meta"
