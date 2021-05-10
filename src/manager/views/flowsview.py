@@ -86,6 +86,7 @@ class FlowsView(View):
     self.flow_list_box.activate(idx)
     self.flow_list_box.selection_set(ACTIVE)
     self.flow_list_box.see(idx)
+    self.flow_list_box.event_generate("<<ListboxSelect>>")
 
     return
 
