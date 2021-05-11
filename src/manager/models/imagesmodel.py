@@ -26,12 +26,14 @@ class ImagesModel(Model):
 
     return "{}/{}".format(self.path, self.images_files_list[idx])
 
-  @staticmethod
-  def get_image(image_full_file_name):
-    cv2image = cv2.imread(image_full_file_name)
+  def get_image(self, image_full_file_name):
+    self.cv2image = cv2.imread(image_full_file_name)
 
-    if len(cv2image.shape) > 2:
-      b,g,r = cv2.split(cv2image)
-      cv2image = cv2.merge((r,g,b))
+    if len(self.cv2image.shape) > 2:
+      b,g,r = cv2.split(self.cv2image)
+      self.cv2image = cv2.merge((r,g,b))
 
-    return cv2image
+    return self.cv2image
+
+  def get_original_image_size(self):
+    return self.cv2image.shape[:2]
