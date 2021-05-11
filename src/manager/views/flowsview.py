@@ -73,6 +73,7 @@ class FlowsView(View):
     return
 
   def set_selection(self, idx=0):
+    self.flow_list_box.focus_set()
     cur_idx = self.flow_list_box.curselection()
     if len(cur_idx) == 0:
       cur_idx = 0
@@ -87,6 +88,7 @@ class FlowsView(View):
     self.flow_list_box.selection_set(ACTIVE)
     self.flow_list_box.see(idx)
     self.flow_list_box.event_generate("<<ListboxSelect>>")
+
 
     return
 

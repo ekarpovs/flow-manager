@@ -113,7 +113,7 @@ class MngrController():
     item = self.view.flows_view.names_combo_box.get()
     self.update_flow_meta(item)
     self.view.flows_view.clear_operation_params()
-    # self.set_top_state()
+    self.set_top_state()
 
     return
 
@@ -234,7 +234,7 @@ class MngrController():
     return
 
   def load(self, event):
-    # self.set_top_state()
+    self.set_top_state()
 
     idx = self.file_idx
     image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
