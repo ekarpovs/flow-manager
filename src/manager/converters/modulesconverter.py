@@ -79,7 +79,7 @@ class ModulesConverter(Converter):
 
 
   @staticmethod
-  def convert_params_defenition_to_object(step, params_defenition):
+  def convert_params_defenition_to_object(step, params_defenition, orig_image_size = (0,0)):
     oper_params = []
     for param_def in params_defenition:
       t, d, pvs, df, l = ModulesConverter.parse_single_param_defenition(param_def)
@@ -89,6 +89,14 @@ class ModulesConverter(Converter):
         p_value = step[p_name]
         # print("p_name: p_value", p_name, p_value)
       else:
+        # Check that default value is not either 'h' or 'w' -> convert to real values from image(if exists)
+        (h, w) = orig_image_size
+        if (h > 0) and (w > 0):
+          if df == 'h':
+            df = h
+          if df == 'w':
+            df = w
+            
         p_value = df
 
       oper_params.append({"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l})

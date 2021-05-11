@@ -129,11 +129,9 @@ class MngrController():
 
     oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
     
-    oper_params = self.converter.modules_converter.convert_params_defenition_to_object(step, oper_params_defenition)
-
+    orig_image_size = self.model.images_model.get_original_image_size()
+    oper_params = self.converter.modules_converter.convert_params_defenition_to_object(step, oper_params_defenition, orig_image_size)
     # !!!!!!! MERGE WITH REAL PARAMETERS FROM FLOW META !!!!!!!!
-    # Check that p_value is not either 'h' or 'w' -> convert to real values from image(if exists)
-
 
     self.view.flows_view.set_operation_params(idx[0], step['exec'], oper_params)
 
