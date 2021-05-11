@@ -14,8 +14,7 @@ class ImagesView(View):
     self['bg'] = "snow2"
     self['text'] = 'Images panel'
 
-    self.height, self.width = get_panel_size(parent)
-    # print("image panel size", self.height, self.width)
+    self.panel_height, self.panel_width = get_panel_size(parent)
     
     self.grid()
     self.rowconfigure(0, weight=1)
@@ -64,6 +63,7 @@ class ImagesView(View):
   
 
   def set_selection(self, idx=0):
+    self.file_names_list_box.focus_set()
     cur_idx = self.file_names_list_box.curselection()
     if len(cur_idx) == 0:
       cur_idx = 0
@@ -77,27 +77,35 @@ class ImagesView(View):
     self.file_names_list_box.activate(idx)
     self.file_names_list_box.selection_set(ACTIVE)
     self.file_names_list_box.see(idx)
+    self.file_names_list_box.event_generate("<<ListboxSelect>>")
 
     return
 
-
-  def resize(self, image):
-    h, w = image.shape[:2]
+  def calculate_new_size(self, image):
+    (h, w) = image.shape[:2]
     ratio = w/h
-    if h > self.height//2:
-      h = self.height//2
-      w = int(w*ratio)
-    if w > self.width//2:    
-      w = self.width//2
-      h = int(h*ratio)
+    if h > self.panel_height//2:
+      h = self.panel_height//2
+      w = int(h*ratio)
+    if w > self.panel_width//2:    
+      w = self.panel_width//2
+      h = int(w/ratio)
+    
+    self.h = h
+    self.w = w
 
-    dim = (w, h)
+
+  def fit_image_to_panel(self, image):
+    self.calculate_new_size(image)
+    
+    dim = (self.w, self.h)
     image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
     return image
 
+
   def set_original_image(self, cv2image):
-    cv2image = self.resize(cv2image)
+    cv2image = self.fit_image_to_panel(cv2image)
     image = Image.fromarray(cv2image)
     imagetk = ImageTk.PhotoImage(image=image)
 
@@ -107,7 +115,7 @@ class ImagesView(View):
     return
 
   def set_result_image(self, cv2image):
-    cv2image = self.resize(cv2image)
+    cv2image = self.fit_image_to_panel(cv2image)
     image = Image.fromarray(cv2image)
     imagetk = ImageTk.PhotoImage(image=image)
 
