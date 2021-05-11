@@ -9,6 +9,7 @@ class ImagesModel(Model):
 
     self.path = ''
     self.images_files_list = []
+    self.cv2image = None
 
   def get_input_paths(self):
 
@@ -36,4 +37,8 @@ class ImagesModel(Model):
     return self.cv2image
 
   def get_original_image_size(self):
-    return self.cv2image.shape[:2]
+    size = (0, 0)
+    if self.cv2image is not None:
+      size = self.cv2image.shape[:2]
+    
+    return size
