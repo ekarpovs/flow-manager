@@ -19,9 +19,9 @@ class MngrController():
     self.converter = MngrConverter()
     self.view = MngrView(self.parent)
 
-    # Bind to modules panel
+# Bind to modules panel
 
-    # Bind to flows panel
+# Bind to flows panel
     self.view.flows_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
     self.view.flows_view.flow_list_box.bind('<<ListboxSelect>>', 
       lambda e: self.step_selected(self.view.flows_view.flow_list_box.curselection()))
@@ -40,7 +40,7 @@ class MngrController():
     self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
 
-    # Bind to images panel
+# Bind to images panel
     self.view.images_view.btn_load.bind("<Button>", self.load)
     self.view.images_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)
     self.view.images_view.file_names_list_box.bind('<<ListboxSelect>>', 
@@ -48,8 +48,11 @@ class MngrController():
 
     self.file_idx = None
 
+# Start
     self.start()
+    
 
+# Initialization
   def start(self):
     self.update_modules_view()
     self.update_flows_view()
@@ -105,10 +108,9 @@ class MngrController():
 
 
 # Actions
+# Modules panel' events and commands
 
-  # Modules panel
-
-  # Flows panel
+# Flows panel's events and commands
   def selected(self, event):
     item = self.view.flows_view.names_combo_box.get()
     self.update_flow_meta(item)
@@ -156,12 +158,14 @@ class MngrController():
 
     return
 
+
   def remove(self, event):
     cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
     self.model.flows_model.remove_operation_from_current_flow(cur_idx)
     self.view.flows_view.flow_list_box.delete(cur_idx, cur_idx)
 
     return
+
 
   def run(self, event):
     # Move to runner
@@ -176,6 +180,7 @@ class MngrController():
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection(counter)
 
+
   def back(self, event):
     counter, cv2image = self.runner.back()
     if cv2image is not None:
@@ -186,10 +191,12 @@ class MngrController():
       self.view.images_view.reset_result_image()
 
 
+
   def top(self, event):
     self.set_top_state()
     return
   
+
   def set_top_state(self):
     self.runner.top()
     print("clean the output image")
@@ -198,7 +205,8 @@ class MngrController():
 
     return
 
-  # Operation parameters sub panel
+
+# Operation parameters sub panel's commands
   def apply(self, event):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
@@ -218,13 +226,13 @@ class MngrController():
     return
 
 
-# Images panel
+# Images panel's commands
   def selected_path(self, event):
     item = self.view.images_view.names_combo_box.get()
     self.update_images_file_names_list(item)
-    # self.set_top_state()
     
     return
+
 
   def image_file_selected(self, idx):
     if not idx:
@@ -233,12 +241,12 @@ class MngrController():
     
     return
 
-  def load(self, event):
-    self.set_top_state()
 
+  def load(self, event):
     idx = self.file_idx
     image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
 
     cv2image = self.model.images_model.get_image(image_full_file_name)
     self.runner.set_input_image(cv2image) 
     self.view.images_view.set_original_image(cv2image)
+    self.set_top_state()
