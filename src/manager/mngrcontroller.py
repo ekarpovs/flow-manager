@@ -185,7 +185,7 @@ class MngrController():
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection(counter)
     else:
-      print("clean the output image")
+      # print("clean the output image")
       self.view.images_view.reset_result_image()
 
 
@@ -197,7 +197,7 @@ class MngrController():
 
   def set_top_state(self):
     self.runner.top()
-    print("clean the output image")
+    # print("clean the output image")
     self.view.images_view.reset_result_image()
     self.view.flows_view.set_selection()
 

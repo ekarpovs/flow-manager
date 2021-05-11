@@ -74,7 +74,7 @@ class OperParamsView(LabelFrame):
             value = float(entry_value)
           else:  
             value = int(entry_value)
-          print("Entry value type", type(value))
+          # print("Entry value type", type(value))
         except ValueError:
           value = entry_value
       elif type(control['control'] is Checkbutton):
