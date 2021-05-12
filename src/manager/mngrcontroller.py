@@ -28,8 +28,9 @@ class MngrController():
     self.view.flows_view.flow_list_box.bind("<Double-1>", 
       lambda e: self.step_update(self.view.flows_view.flow_list_box.curselection()))
 
-    self.view.flows_view.btn_add.bind("<Button>", self.add)
-    self.view.flows_view.btn_remove.bind("<Button>", self.remove)
+    self.view.flows_view.btn_add.bind("<Button>", self.add_step_to_flow_meta)
+    self.view.flows_view.btn_remove.bind("<Button>", self.remove_step_from_flow_meta)
+    self.view.flows_view.btn_reset.bind("<Button>", self.reset_flow_meta)
 
     self.view.flows_view.btn_run.bind("<Button>", self.run)
     self.view.flows_view.btn_step.bind("<Button>", self.step)
@@ -83,7 +84,7 @@ class MngrController():
     return
 
   def update_flow_meta(self, item):
-    flow_meta = self.model.flows_model.get_flow_meta(
+    flow_meta = self.model.flows_model.load_flow_meta(
         *self.converter.flows_converter.convert_ws_item(item))
     self.flow_meta = flow_meta
     flow_meta = self.converter.flows_converter.convert_flow_meta(flow_meta)
@@ -112,12 +113,18 @@ class MngrController():
 
 # Flows panel's events and commands
   def selected(self, event):
-    item = self.view.flows_view.names_combo_box.get()
-    self.update_flow_meta(item)
-    self.view.flows_view.clear_operation_params()
+    self.set_selected_flow_meta()
     self.set_top_state()
 
     return
+
+  def set_selected_flow_meta(self):
+    item = self.view.flows_view.names_combo_box.get()
+    self.update_flow_meta(item)
+    self.view.flows_view.clear_operation_params()
+
+    return
+
 
   def step_selected(self, idx):
     if not idx:
@@ -143,7 +150,7 @@ class MngrController():
 
     return    
 
-  def add(self, event):
+  def add_step_to_flow_meta(self, event):
     # Get destination item position after that will be added new one
     cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
     # Get source item position from modules view
@@ -157,12 +164,19 @@ class MngrController():
     return
 
 
-  def remove(self, event):
+  def remove_step_from_flow_meta(self, event):
     cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
-    self.model.flows_model.remove_operation_from_current_flow(cur_idx)
-    self.view.flows_view.flow_list_box.delete(cur_idx, cur_idx)
+    new_flow_meta = self.model.flows_model.remove_operation_from_current_flow(cur_idx)
+    new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
+    self.view.flows_view.set_flow_meta(new_flow_meta)
+
 
     return
+
+  def reset_flow_meta(self, event):
+    # self.flow_meta = self.model.flows_model.reset_flow_meta()
+    self.set_selected_flow_meta()
+    self.set_top_state()
 
 
   def run(self, event):
@@ -185,7 +199,6 @@ class MngrController():
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection(counter)
     else:
-      # print("clean the output image")
       self.view.images_view.reset_result_image()
 
 
@@ -197,7 +210,6 @@ class MngrController():
 
   def set_top_state(self):
     self.runner.top()
-    # print("clean the output image")
     self.view.images_view.reset_result_image()
     self.view.flows_view.set_selection()
 

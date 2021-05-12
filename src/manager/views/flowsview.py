@@ -40,9 +40,11 @@ class FlowsView(View):
     oper_actions.grid(row=2, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
     self.btn_add = Button(oper_actions, text='Add', width=BTNW)
     self.btn_remove = Button(oper_actions, text='Remove', width=BTNW)
+    self.btn_reset = Button(oper_actions, text='Reset', width=BTNW)
 
     self.btn_add.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + N)   
     self.btn_remove.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=E + N)
+    self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=E + N)
 
     self.oper_params_view.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
 
