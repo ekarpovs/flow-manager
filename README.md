@@ -1,10 +1,11 @@
 # Flow-manager
 
 Desktop application for create, edit, debug and tuning a flow by combination existing operations.
+It is part of the [Image Processing Workshop](https://github.com/ekarpovs/image-processing-workshop) project.
 
 ## Installation
 
-Following packages from the image processing workshop have to be installed localy:
+Following packages from the [Image Processing Workshop](https://github.com/ekarpovs/image-processing-workshop) have to be installed localy:
 
 - flow_runner
 - operation_loader
