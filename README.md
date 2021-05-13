@@ -26,7 +26,7 @@ Edit config.json from . folder:
   ],
   "images": [
     "path_to<input>",
-    "path_to<another_folder_with_images>",
+    "path_to<another_folder_with_images>"
   ],
   "results": "path_to<output>"
 }
@@ -61,4 +61,8 @@ Constarains:
 
 ## Road map
 
-Statements (IF, FOR, WHILE...) for create more complicated workflows
+- Fix existing bugs
+- Implement Statements (IF, FOR, WHILE...) for possibility to create more complicated workflows
+- Improve operation parameters editor builder (add combo boxes, sliders, etc)
+- Implement more modules
+- Implement more worksheets for perform standard tasks
