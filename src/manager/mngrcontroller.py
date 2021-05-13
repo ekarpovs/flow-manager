@@ -37,7 +37,8 @@ class MngrController():
     self.view.flows_view.btn_back.bind("<Button>", self.back)
     self.view.flows_view.btn_top.bind("<Button>", self.top)
 
-    self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
+    self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", 
+      lambda e: self.apply(self.view.flows_view.flow_list_box.curselection()))
     self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", 
       lambda e: self.reset(self.view.flows_view.flow_list_box.curselection()))
@@ -218,9 +219,14 @@ class MngrController():
 
 
 # Operation parameters sub panel's commands
-  def apply(self, event):
+  def apply(self, idx):
+    if not idx:
+      return
+
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
+
+    self.view.flows_view.select_list_item(idx)
     
     return
 
