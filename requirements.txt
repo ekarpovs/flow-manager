@@ -1,3 +1,6 @@
 python > 3.7.4
 cv2 >= 3.4.2
-pillow >= 6.2.0
+tk >= 8.6.8
+# Local installation
+flow_runner >= 0.1
+operation_loader >= 0.1
