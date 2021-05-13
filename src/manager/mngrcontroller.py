@@ -39,7 +39,8 @@ class MngrController():
 
     self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
     self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
-    self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
+    self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", 
+      lambda e: self.reset(self.view.flows_view.flow_list_box.curselection()))
 
 # Bind to images panel
     self.view.images_view.btn_load.bind("<Button>", self.load)
@@ -137,7 +138,7 @@ class MngrController():
     oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
     
     orig_image_size = self.model.images_model.get_original_image_size()
-    oper_params = self.converter.modules_converter.convert_params_defenition_to_object(step, oper_params_defenition, orig_image_size)
+    oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
     # !!!!!!! MERGE WITH REAL PARAMETERS FROM FLOW META !!!!!!!!
 
     self.view.flows_view.set_operation_params(idx[0], step['exec'], oper_params)
@@ -224,14 +225,30 @@ class MngrController():
     return
 
   def save(self, event):
-    operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
-    self.model.flows_model.update_current_flow_params(operation_params_item)
+    # operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
+    # self.model.flows_model.update_current_flow_params(operation_params_item)
     
     return
 
 
-  def reset(self, event):
-    print("reset by the operation defaults params")
+  def reset(self, idx):
+    if not idx:
+      return
+
+    item = self.view.flows_view.names_combo_box.get()      
+    orig_flow_meta = self.model.flows_model.load_worksheet(*self.converter.flows_converter.convert_ws_item(item))
+    step = orig_flow_meta['steps'][idx[0]]
+
+    module_name, oper_name = step['exec'].split('.')
+    
+    oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
+    orig_image_size = self.model.images_model.get_original_image_size()
+    oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
+
+    self.view.flows_view.set_operation_params(idx[0], step['exec'], oper_params)
+
+    operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
+    self.model.flows_model.update_current_flow_params(operation_params_item)
 
     return
 

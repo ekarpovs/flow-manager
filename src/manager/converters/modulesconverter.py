@@ -79,7 +79,7 @@ class ModulesConverter(Converter):
 
 
   @staticmethod
-  def convert_params_defenition_to_object(step, params_defenition, orig_image_size = (0,0)):
+  def convert_params_defenition_to_params(step, params_defenition, orig_image_size = (0,0)):
     oper_params = []
     for param_def in params_defenition:
       t, d, pvs, df, l = ModulesConverter.parse_single_param_defenition(param_def)
@@ -98,6 +98,27 @@ class ModulesConverter(Converter):
             df = w
 
         p_value = df
+
+      oper_params.append({"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l})
+
+    return oper_params
+
+
+  @staticmethod
+  def convert_params_defenition_to_default_params(params_defenition, orig_image_size = (0,0)):
+    oper_params = []
+    for param_def in params_defenition:
+      t, d, pvs, df, l = ModulesConverter.parse_single_param_defenition(param_def)
+      # print("t, d, pvs, df, l", t, d, pvs, df, l)
+      p_name = l.split(':')[0].strip()
+      (h, w) = orig_image_size
+      if (h > 0) and (w > 0):
+        if df == 'h':
+          df = h
+        if df == 'w':
+          df = w
+
+      p_value = df
 
       oper_params.append({"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l})
 
