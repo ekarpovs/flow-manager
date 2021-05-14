@@ -73,7 +73,7 @@ class ModulesConverter(Converter):
     # Regarding definition --Type:domein...--
     build_data = re.findall('--([^$]*)--', param_defenition)[0]
     label_text = param_defenition[len(build_data)+4:] 
-    param_type, param_domain, param_possible_valuess, param_default_value =  build_data.split(':') 
+    param_type, param_domain, param_possible_valuess, param_default_value =  build_data.split(';') 
 
     return param_type, param_domain, param_possible_valuess, param_default_value, label_text
 

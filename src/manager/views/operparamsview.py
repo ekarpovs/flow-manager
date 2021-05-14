@@ -1,5 +1,6 @@
-from tkinter import *
-from tkinter.ttk import Combobox, Checkbutton
+import tkinter as tk
+from tkinter import * 
+from tkinter.ttk import Combobox, Checkbutton, Spinbox
 from ...uiconst import *
 
 class OperParamsView(LabelFrame):
@@ -100,18 +101,93 @@ class OperParamsView(LabelFrame):
 
     param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
 
-    # !!!! NEED to Check param_domain !!!
-    if (param_type == 'n') or (param_type == 'f') or (param_type == 'str'):
-      value = IntVar()
-      param_control = Entry(self, textvariable=value)
-      value.set(param_value)
-    elif (param_type == 'b'):
-      value = BooleanVar()
-      param_control = Checkbutton(self, variable=value, onvalue=True, offvalue=False)
-      value.set(param_value)
-    # elif (param_type == 's'):
-    #   param_control = Combobox(self, text='')
-    else:
-      param_control = Label(self, text='unknown param type')
+    param_control = self.create_param_control(param)
+
+    # param_control = None
+    # # !!!! NEED to Check param_domain !!!
+    # if (param_type == 'n') or (param_type == 'f') or (param_type == 'str'):
+    #   value = IntVar()
+    #   param_control = Entry(self, textvariable=value)
+    #   value.set(param_value)
+    # elif (param_type == 'b'):
+    #   value = BooleanVar()
+    #   param_control = Checkbutton(self, variable=value, onvalue=True, offvalue=False)
+    #   value.set(param_value)
+    # # elif (param_type == 's'):
+    # #   param_control = Combobox(self, text='')
+    # else:
+    #   param_control = Label(self, text='unknown param type')
 
     return param_control, param_label
+
+  
+  def create_param_control(self, param):
+    param_domain = param['domain']
+
+    def domain_single(param):
+
+      param_control = Entry(self)
+      param_default_value = param['value']     
+      item = tk.IntVar()
+      item.set(param_default_value)
+      param_control.textvariable = item
+
+      return param_control
+
+    def domain_list(param):
+      param_control = Entry(self)
+      return param_control
+
+    def domain_flag(param):
+      param_control = Checkbutton(self)
+      return param_control
+
+    #--n;d;[BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82];BGR2GRAY-- type: new color space cv2.COLOR_(...)
+    def domain_dictionary(param):
+      param_control = Combobox(self)
+
+      param_type = param['type']
+      # [BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82]
+      param_possible_values = param['p_values']     
+      param_possible_values_dict, param_keys_tuple = self.parse_possible_values_for_dict(param_possible_values)
+      param_control['values'] = param_keys_tuple
+
+      param_default_value = param['value']     
+      param_control.set(param_default_value)
+      selected_item = tk.StringVar()
+      param_control.textvariable = selected_item
+
+      return param_control
+
+    def domain_range(param):
+      param_control = Spinbox(self)
+      return param_control
+
+    domain_switcher = {
+      's': domain_single,
+      'l': domain_list,
+      'd': domain_dictionary,
+      'r': domain_range,
+      'f': domain_flag
+    }
+
+    control_builder = domain_switcher.get(param_domain, 'Invalid domain')
+
+    return control_builder(param)
+
+
+  @staticmethod
+  def parse_possible_values_for_dict(param_possible_values):
+    end_idx = len(param_possible_values) - 1
+    param_possible_values = param_possible_values[1:end_idx]
+    param_possible_values_list = param_possible_values.split(',')
+    param_possible_values_dict = {}
+    param_key_list = []
+    for item in param_possible_values_list:
+      k,v = item.split(':')
+      param_possible_values_dict[k] = v
+      param_key_list.append(k)
+    
+    param_keys_tuple = tuple(param_key_list)
+
+    return param_possible_values_dict, param_keys_tuple
