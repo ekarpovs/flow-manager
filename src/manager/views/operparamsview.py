@@ -135,11 +135,21 @@ class OperParamsView(LabelFrame):
       return param_control
 
     def domain_list(param):
-      param_control = Entry(self)
+      param_control = Combobox(self)
+      param_possible_values = param['p_values']
+      param_values_tuple = self.parse_possible_values_for_list(param_possible_values)
+      param_control['values'] = param_values_tuple
+
+      param_default_value = param['value']     
+      param_control.set(param_default_value)
+      selected_item = tk.StringVar()
+      param_control.textvariable = selected_item
+
       return param_control
 
     def domain_flag(param):
       param_control = Checkbutton(self)
+
       return param_control
 
     #--n;d;[BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82];BGR2GRAY-- type: new color space cv2.COLOR_(...)
@@ -191,3 +201,17 @@ class OperParamsView(LabelFrame):
     param_keys_tuple = tuple(param_key_list)
 
     return param_possible_values_dict, param_keys_tuple
+
+  @staticmethod
+  def parse_possible_values_for_list(param_possible_values):
+    end_idx = len(param_possible_values) - 1
+    param_possible_values = param_possible_values[1:end_idx]
+    param_possible_values_list = param_possible_values.split(',')
+    param_key_list = []
+    for item in param_possible_values_list:
+      v = item.split(':')
+      param_key_list.append(v)
+    
+    param_values_tuple = tuple(param_key_list)
+
+    return param_values_tuple    
