@@ -103,21 +103,6 @@ class OperParamsView(LabelFrame):
 
     param_control = self.create_param_control(param)
 
-    # param_control = None
-    # # !!!! NEED to Check param_domain !!!
-    # if (param_type == 'n') or (param_type == 'f') or (param_type == 'str'):
-    #   value = IntVar()
-    #   param_control = Entry(self, textvariable=value)
-    #   value.set(param_value)
-    # elif (param_type == 'b'):
-    #   value = BooleanVar()
-    #   param_control = Checkbutton(self, variable=value, onvalue=True, offvalue=False)
-    #   value.set(param_value)
-    # # elif (param_type == 's'):
-    # #   param_control = Combobox(self, text='')
-    # else:
-    #   param_control = Label(self, text='unknown param type')
-
     return param_control, param_label
 
   
@@ -137,7 +122,7 @@ class OperParamsView(LabelFrame):
     def domain_list(param):
       param_control = Combobox(self)
       param_possible_values = param['p_values']
-      param_values_tuple = self.parse_possible_values_for_list(param_possible_values)
+      param_values_tuple = self.parse_possible_values_list(param_possible_values)
       param_control['values'] = param_values_tuple
 
       param_default_value = param['value']     
@@ -157,9 +142,8 @@ class OperParamsView(LabelFrame):
       param_control = Combobox(self)
 
       param_type = param['type']
-      # [BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82]
       param_possible_values = param['p_values']     
-      param_possible_values_dict, param_keys_tuple = self.parse_possible_values_for_dict(param_possible_values)
+      param_keys_tuple = self.parse_possible_values_dict(param_possible_values)
       param_control['values'] = param_keys_tuple
 
       param_default_value = param['value']     
@@ -171,6 +155,16 @@ class OperParamsView(LabelFrame):
 
     def domain_range(param):
       param_control = Spinbox(self)
+
+      param_possible_values = param['p_values']
+      param_values_tuple = self.parse_possible_values_range(param_possible_values)
+      param_control['from_'] = param_values_tuple[0]
+      param_control['to'] = param_values_tuple[1]
+
+      param_default_value = param['value']     
+      selected_item = tk.IntVar(value=param_default_value)
+      param_control.textvariable = selected_item
+
       return param_control
 
     domain_switcher = {
@@ -185,33 +179,42 @@ class OperParamsView(LabelFrame):
 
     return control_builder(param)
 
+  # [BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82]
+  # [0,1,2]
+  # [0,10,1]
 
   @staticmethod
-  def parse_possible_values_for_dict(param_possible_values):
+  def split_possible_values_string(param_possible_values):
     end_idx = len(param_possible_values) - 1
     param_possible_values = param_possible_values[1:end_idx]
-    param_possible_values_list = param_possible_values.split(',')
-    param_possible_values_dict = {}
-    param_key_list = []
-    for item in param_possible_values_list:
-      k,v = item.split(':')
-      param_possible_values_dict[k] = v
-      param_key_list.append(k)
+    return param_possible_values.split(',')
+
+
+  @staticmethod
+  def parse_possible_values_dict(param_possible_values):   
+    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
+    param_key_list = [item.split(':')[0] for  item in param_possible_values_list]
     
     param_keys_tuple = tuple(param_key_list)
 
-    return param_possible_values_dict, param_keys_tuple
+    return param_keys_tuple
+
 
   @staticmethod
-  def parse_possible_values_for_list(param_possible_values):
-    end_idx = len(param_possible_values) - 1
-    param_possible_values = param_possible_values[1:end_idx]
-    param_possible_values_list = param_possible_values.split(',')
-    param_key_list = []
-    for item in param_possible_values_list:
-      v = item.split(':')
-      param_key_list.append(v)
+  def parse_possible_values_list(param_possible_values):
+    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
+    param_key_list = [item for  item in param_possible_values_list]
     
     param_values_tuple = tuple(param_key_list)
 
-    return param_values_tuple    
+    return param_values_tuple
+
+
+  @staticmethod
+  def parse_possible_values_range(param_possible_values):   
+    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
+    param_key_list = [item for  item in param_possible_values_list]
+    
+    param_keys_tuple = tuple(param_key_list)
+
+    return param_keys_tuple
