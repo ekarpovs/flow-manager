@@ -92,16 +92,10 @@ class OperParamsView(LabelFrame):
 
   def controls_factory(self, param):
     # {"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l}    
-    param_type = param['type']
-    param_domain = param['domain']
-    param_possible_valuess = param['p_values']
-    param_name = param['name']
-    param_value = param['value']
-    label_text = param['label']
-
-    param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
-
     param_control = self.create_param_control(param)
+
+    label_text = param['label']
+    param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
 
     return param_control, param_label
 
@@ -110,7 +104,6 @@ class OperParamsView(LabelFrame):
     param_domain = param['domain']
 
     def domain_single(param):
-
       param_control = Entry(self)
       param_default_value = param['value']     
       item = tk.IntVar()
