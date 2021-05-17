@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import * 
-from tkinter.ttk import Combobox, Checkbutton, Spinbox
+from tkinter.ttk import Combobox, Spinbox
 from ...uiconst import *
 
 class OperParamsView(LabelFrame):
@@ -42,9 +42,9 @@ class OperParamsView(LabelFrame):
     self.init_operation_params(idx, exec)
 
     for i, param in enumerate(oper_params):
-      param_control, param_label = self.controls_factory(param)
+      param_command, param_control, param_label = self.controls_factory(param)
       self.operation_param_controls['idx'] = idx
-      self.operation_param_controls['param_controls'].append({"control": param_control,"label": param_label})
+      self.operation_param_controls['param_controls'].append({"command": param_command, "control": param_control,"label": param_label})
 
       param_control.grid(row=i, column=0, padx=PADX, pady=PADY, sticky=W+N)
       param_label.grid(row=i, column=1, padx=PADX, pady=PADY, sticky=W+S)
@@ -70,16 +70,21 @@ class OperParamsView(LabelFrame):
       name = control['label']['text'].split(':')[0]
       if type(control['control']) is Entry:
         entry_value = control['control'].get().strip()
+        if entry_value == '':
+          entry_value = '0'
         try:
           if '.' in entry_value:
             value = float(entry_value)
           else:  
             value = int(entry_value)
-          # print("Entry value type", type(value))
         except ValueError:
           value = entry_value
-      elif type(control['control'] is Checkbutton):
-        value = control['control'].instate(['selected'])
+      elif type(control['control']) is Combobox:
+        value = control['control'].get().strip()
+      elif type(control['control']) is Spinbox:
+        value = control['command']()
+      elif type(control['control']) is Checkbutton:
+        value = control['command']()
       else:
         print("wrong control type", type(control['control']))
       
@@ -92,25 +97,28 @@ class OperParamsView(LabelFrame):
 
   def controls_factory(self, param):
     # {"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l}    
-    param_control = self.create_param_control(param)
+    param_command, param_control = self.create_param_control(param)
 
     label_text = param['label']
     param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
 
-    return param_control, param_label
+    return param_command, param_control, param_label
 
   
   def create_param_control(self, param):
     param_domain = param['domain']
 
     def domain_single(param):
-      param_control = Entry(self)
-      param_default_value = param['value']     
-      item = tk.IntVar()
-      item.set(param_default_value)
-      param_control.textvariable = item
+      param_value = param['value']
+      if param_value == '':
+        param_value = 0
+      item = tk.StringVar()
+  
+      param_control = Entry(self, textvariable=item)
+      item.set(param_value)
+      param_command = None
 
-      return param_control
+      return param_command, param_control
 
     def domain_list(param):
       param_control = Combobox(self)
@@ -121,16 +129,26 @@ class OperParamsView(LabelFrame):
       param_default_value = param['value']     
       param_control.set(param_default_value)
       selected_item = tk.StringVar()
-      param_control.textvariable = selected_item
 
-      return param_control
+      param_control.textvariable = selected_item
+      param_command = None
+
+      return param_command, param_control
 
     def domain_flag(param):
-      param_control = Checkbutton(self)
+      item = tk.StringVar()
 
-      return param_control
+      def get():
+        return item.get()
 
-    #--n;d;[BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82];BGR2GRAY-- type: new color space cv2.COLOR_(...)
+      param_value = param['value']
+      item.set(param_value)
+
+      param_control = Checkbutton(self, variable=item, onvalue='True', offvalue='False', command=get)
+      param_command = get
+
+      return param_command, param_control
+
     def domain_dictionary(param):
       param_control = Combobox(self)
 
@@ -139,26 +157,39 @@ class OperParamsView(LabelFrame):
       param_keys_tuple = self.parse_possible_values_dict(param_possible_values)
       param_control['values'] = param_keys_tuple
 
-      param_default_value = param['value']     
-      param_control.set(param_default_value)
+      param_value = param['value']     
+      param_control.set(param_value)
       selected_item = tk.StringVar()
       param_control.textvariable = selected_item
+      param_command = None
 
-      return param_control
+      return param_command, param_control
 
     def domain_range(param):
-      param_control = Spinbox(self)
-
       param_possible_values = param['p_values']
       param_values_tuple = self.parse_possible_values_range(param_possible_values)
-      param_control['from_'] = param_values_tuple[0]
-      param_control['to'] = param_values_tuple[1]
+      from_ = param_values_tuple[0]
+      to = param_values_tuple[1]
 
-      param_default_value = param['value']     
-      selected_item = tk.IntVar(value=param_default_value)
-      param_control.textvariable = selected_item
+      type = param['type']
+      if type == 'f':
+        item = tk.DoubleVar()
+      elif type == 'n':
+        item = tk.IntVar()
+      else:
+        item = tk.StringVar()
 
-      return param_control
+      def get():
+        return item.get()
+
+      param_control = Spinbox(self, from_=from_, to=to, textvariable=item, wrap=True, command=get)
+
+      param_value = param['value']     
+      item.set(param_value)
+
+      param_command = get
+
+      return param_command, param_control
 
     domain_switcher = {
       's': domain_single,
@@ -172,9 +203,9 @@ class OperParamsView(LabelFrame):
 
     return control_builder(param)
 
-  # [BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82]
-  # [0,1,2]
-  # [0,10,1]
+  # d = [key1:0,key2:1,key3:2]
+  # l = [0,1,2]
+  # r = [0,10,1]
 
   @staticmethod
   def split_possible_values_string(param_possible_values):

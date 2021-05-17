@@ -22,11 +22,17 @@ class MngrController():
 # Bind to modules panel
 
 # Bind to flows panel
+    self.flows_view_idx = 0
+    
     self.view.flows_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
+
     self.view.flows_view.flow_list_box.bind('<<ListboxSelect>>', 
       lambda e: self.step_selected(self.view.flows_view.flow_list_box.curselection()))
-    self.view.flows_view.flow_list_box.bind("<Double-1>", 
-      lambda e: self.step_update(self.view.flows_view.flow_list_box.curselection()))
+    # self.view.flows_view.flow_list_box.bind('<FocusIn>', self.focus_in)
+    # self.view.flows_view.flow_list_box.bind('<FocusOut>', self.focus_out)
+
+    # self.view.flows_view.flow_list_box.bind("<Double-1>", 
+    #   lambda e: self.step_update(self.view.flows_view.flow_list_box.curselection()))
 
     self.view.flows_view.btn_add.bind("<Button>", self.add_step_to_flow_meta)
     self.view.flows_view.btn_remove.bind("<Button>", self.remove_step_from_flow_meta)
@@ -37,8 +43,7 @@ class MngrController():
     self.view.flows_view.btn_back.bind("<Button>", self.back)
     self.view.flows_view.btn_top.bind("<Button>", self.top)
 
-    self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", 
-      lambda e: self.apply(self.view.flows_view.flow_list_box.curselection()))
+    self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
     self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", 
       lambda e: self.reset(self.view.flows_view.flow_list_box.curselection()))
@@ -217,16 +222,22 @@ class MngrController():
 
     return
 
+  def focus_in(self, event):
+    idx = self.view.flows_view.flow_list_box.curselection()
+    print('focus_in: idx', idx, event.widget)
+    self.flows_view_idx = idx
+
+  def focus_out(self, event):
+    idx = self.view.flows_view.flow_list_box.curselection()
+    print('focus_out: idx', idx, event.widget)
+    self.flows_view_idx = idx
+
 
 # Operation parameters sub panel's commands
-  def apply(self, idx):
-    if not idx:
-      return
-
+  def apply(self, event):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
-
-    self.view.flows_view.select_list_item(idx)
+    self.view.flows_view.flow_list_box.focus_set()
     
     return
 
