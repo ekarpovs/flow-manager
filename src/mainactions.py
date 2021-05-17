@@ -39,9 +39,3 @@ class MainActions(Frame):
 
     sys.stdout.write = stdout_redirector
     sys.stderr.write = stderr_redirector
-
-
-  def config(self):
-    cd = ConfigDialog(self.parent)
-    # set modal mode
-    cd.grab_set()
