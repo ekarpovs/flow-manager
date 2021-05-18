@@ -62,8 +62,8 @@ Constarains:
 
 ## Road map
 
-- Fix existing bugs
-- Implement Statements (IF, FOR, WHILE...) for possibility to create more complicated workflows
-- Improve operation parameters editor builder (add combo boxes, sliders, etc)
-- Implement more modules
-- Implement more worksheets for perform standard tasks
+- [ ] Fix existing bugs
+- [ ] Implement Statements (IF, FOR, WHILE...) for possibility to create more complicated workflows
+- [x] Improve operation parameters editor builder (add combo boxes, sliders, etc)
+- [ ] Implement more modules
+- [ ] Implement more worksheets for perform standard tasks
