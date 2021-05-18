@@ -174,7 +174,7 @@ class OperParamsView(LabelFrame):
 
 
       param_value = param['value']
-      if type(param_value) is int:
+      if (type(param_value) is int) or (type(param_value) is float):
         param_value = get_key(param_value)
 
       param_control.set(param_value)
