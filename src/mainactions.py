@@ -20,6 +20,7 @@ class MainActions(Frame):
     self.columnconfigure(4, weight=1)
 
     self.stdout_textbox=ScrolledText(self, height=6, width=105,  wrap=WORD)
+    self.stdout_textbox.bind("<Key>", lambda a: "break")
     self.stdout_textbox.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W+S)
 
     self.stderr_textbox=ScrolledText(self, height=6, width=105,  wrap=WORD)
@@ -30,7 +31,7 @@ class MainActions(Frame):
 
     self.btn_clear = Button(bfr, text='Clear', width=BTNW, command=self.clear)
     self.btn_clear.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=E)
-
+  
     self.btn_exit = Button(bfr, text='Exit', width=BTNW)
     self.btn_exit.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=E)
 
