@@ -93,6 +93,13 @@ class FlowsModel(Model):
 
     return self.flow_meta
 
+  def save_current_flow_meta(self, path, name, meta):
+    print("path", path)
+    print("name", name)
+    print("meta", meta)
+    pass
+
+
   def update_current_flow_params(self, operation_params_item):
     idx = operation_params_item['idx']
     flow_item_to_update = self.flow_meta['steps'][idx]

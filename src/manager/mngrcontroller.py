@@ -37,6 +37,7 @@ class MngrController():
     self.view.flows_view.btn_add.bind("<Button>", self.add_step_to_flow_meta)
     self.view.flows_view.btn_remove.bind("<Button>", self.remove_step_from_flow_meta)
     self.view.flows_view.btn_reset.bind("<Button>", self.reset_flow_meta)
+    self.view.flows_view.btn_save.bind("<Button>", self.save_flow_meta)
 
     self.view.flows_view.btn_run.bind("<Button>", self.run)
     self.view.flows_view.btn_step.bind("<Button>", self.step)
@@ -184,6 +185,12 @@ class MngrController():
     # self.flow_meta = self.model.flows_model.reset_flow_meta()
     self.set_selected_flow_meta()
     self.set_top_state()
+
+  def save_flow_meta(self, event):
+    item = self.view.flows_view.names_combo_box.get()
+    self.model.flows_model.save_current_flow_meta(
+        *self.converter.flows_converter.convert_ws_item(item), self.flow_meta)
+
 
 
   def run(self, event):
