@@ -80,7 +80,8 @@ class OperParamsView(LabelFrame):
         except ValueError:
           value = entry_value
       elif type(control['control']) is Combobox:
-        value = control['control'].get().strip()
+        # value = control['control'].get().strip()
+        value = control['command']()
       elif type(control['control']) is Spinbox:
         value = control['command']()
       elif type(control['control']) is Checkbutton:
@@ -136,7 +137,7 @@ class OperParamsView(LabelFrame):
       return param_command, param_control
 
     def domain_flag(param):
-      item = tk.StringVar()
+      item = tk.BooleanVar()
 
       def get():
         return item.get()
@@ -144,7 +145,7 @@ class OperParamsView(LabelFrame):
       param_value = param['value']
       item.set(param_value)
 
-      param_control = Checkbutton(self, variable=item, onvalue='True', offvalue='False', command=get)
+      param_control = Checkbutton(self, variable=item, onvalue=True, offvalue=False, command=get)
       param_command = get
 
       return param_command, param_control
@@ -152,16 +153,34 @@ class OperParamsView(LabelFrame):
     def domain_dictionary(param):
       param_control = Combobox(self)
 
+      def get():
+        key = param_control.get()
+        value = param_dict.get(key, 0)
+        return value
+
+      # return key for any value
+      def get_key(val):
+        for key, value in param_dict.items():
+          if val == value:
+            return key
+        return "key doesn't exist"
+
       param_type = param['type']
       param_possible_values = param['p_values']     
       param_keys_tuple = self.parse_possible_values_dict(param_possible_values)
       param_control['values'] = param_keys_tuple
 
-      param_value = param['value']     
+      param_dict = self.parse_possible_values_to_dict(param_possible_values)
+
+
+      param_value = param['value']
+      if type(param_value) is int:
+        param_value = get_key(param_value)
+
       param_control.set(param_value)
       selected_item = tk.StringVar()
       param_control.textvariable = selected_item
-      param_command = None
+      param_command = get
 
       return param_command, param_control
 
@@ -222,6 +241,21 @@ class OperParamsView(LabelFrame):
     param_keys_tuple = tuple(param_key_list)
 
     return param_keys_tuple
+
+  @staticmethod
+  def parse_possible_values_to_dict(param_possible_values):   
+    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
+    pairs_list = [item for  item in param_possible_values_list]
+    
+    param_dict = {}
+    for pair_str in pairs_list:
+      kv = pair_str.split(':')
+      k = kv[0]
+      v = int(kv[1])
+      param_dict[k] = v
+
+    return param_dict
+
 
 
   @staticmethod
