@@ -5,7 +5,7 @@ It is part of the [Image Processing Workshop](https://github.com/ekarpovs/image-
 
 ## Installation
 
-Following packages from the [Image Processing Workshop](https://github.com/ekarpovs/image-processing-workshop) have to be installed localy:
+Following packages from the [Image Processing Workshop](https://github.com/ekarpovs/image-processing-workshop) have to be installed locally:
 
 - flow_runner
 - operation_loader
