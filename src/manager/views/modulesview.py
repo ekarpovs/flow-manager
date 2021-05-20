@@ -28,17 +28,13 @@ class ModulesView(View):
     self.grid()
     self.rowconfigure(0, weight=3)
     self.columnconfigure(0, weight=1)
-    # self.columnconfigure(1, weight=1)
-
-    self.tree_view = ttk.Treeview(self)
-    # Inserted at the root, program chooses id:
-   
-    self.tree_view["columns"] = ("one", "two")
-    # self.tree_view["columns"] = ("two")
-    self.tree_view.column("one", width=5)
-    self.tree_view.column("two", width=50)
-    self.tree_view.heading("one", text="Index")
-    self.tree_view.heading("two", text="Description")
+    
+    # Setup Treeview
+    self.tree_view = ttk.Treeview(self, columns=("index, description"), selectmode="browse")
+    # Setup the treview heading
+    self.tree_view.heading('#0', text='Operation')
+    self.tree_view.heading('#1', text='Index')  
+    self.tree_view.heading('#2', text='Description')    
 
     self.tree_view_scrollbar = ttk.Scrollbar(self, orient=VERTICAL, command=self.tree_view.yview)
     self.tree_view_scrollbar.grid(row=0, column=1, sticky=N+S)
