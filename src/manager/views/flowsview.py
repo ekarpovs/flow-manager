@@ -28,8 +28,10 @@ class FlowsView(View):
     # Setup Treeview
     self.flow_tree_view = ttk.Treeview(self, columns=("description"), selectmode="browse")
     # Setup the treview heading
-    self.flow_tree_view.heading('#0', text='Operation')
-    self.flow_tree_view.heading('#1', text='Parameters')  
+    self.flow_tree_view.heading('#0', text='Operation', anchor=W)
+    self.flow_tree_view.heading('#1', text='Parameters', anchor=W)  
+
+    self.flow_tree_view.column('#0', minwidth=70, width=80)
 
     # Setup operation parameters view
     self.oper_params_view = OperParamsView(self)
