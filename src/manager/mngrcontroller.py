@@ -26,14 +26,6 @@ class MngrController():
     
     self.view.flows_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
 
-    self.view.flows_view.flow_list_box.bind('<<ListboxSelect>>', 
-      lambda e: self.step_selected(self.view.flows_view.flow_list_box.curselection()))
-    # self.view.flows_view.flow_list_box.bind('<FocusIn>', self.focus_in)
-    # self.view.flows_view.flow_list_box.bind('<FocusOut>', self.focus_out)
-
-    # self.view.flows_view.flow_list_box.bind("<Double-1>", 
-    #   lambda e: self.step_update(self.view.flows_view.flow_list_box.curselection()))
-
     self.view.flows_view.btn_add.bind("<Button>", self.add_step_to_flow_meta)
     self.view.flows_view.btn_remove.bind("<Button>", self.remove_step_from_flow_meta)
     self.view.flows_view.btn_reset.bind("<Button>", self.reset_flow_meta)
@@ -48,6 +40,10 @@ class MngrController():
     self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", 
       lambda e: self.reset(self.view.flows_view.flow_list_box.curselection()))
+
+    self.view.flows_view.flow_tree_view.bind('<<TreeviewSelect>>', self.step_selected_tree)
+
+
 
 # Bind to images panel
     self.view.images_view.btn_load.bind("<Button>", self.load)
@@ -97,7 +93,7 @@ class MngrController():
     self.flow_meta = flow_meta
     flow_meta = self.converter.flows_converter.convert_flow_meta(flow_meta)
 
-    self.view.flows_view.set_flow_meta(flow_meta)
+    self.view.flows_view.set_flow_meta_to_tree(flow_meta)
 
     return
 
@@ -134,11 +130,10 @@ class MngrController():
     return
 
 
-  def step_selected(self, idx):
-    if not idx:
-      return
-       
-    step = self.flow_meta['steps'][idx[0]]
+  def step_selected_tree(self, event):
+    idx = self.view.flows_view.flow_tree_view.selection()
+    idx = int(idx[0])
+    step = self.flow_meta['steps'][idx]
     module_name, oper_name = step['exec'].split('.')
 
 
@@ -148,9 +143,10 @@ class MngrController():
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
     # !!!!!!! MERGE WITH REAL PARAMETERS FROM FLOW META !!!!!!!!
 
-    self.view.flows_view.set_operation_params(idx[0], step['exec'], oper_params)
+    self.view.flows_view.set_operation_params(idx, step['exec'], oper_params)
 
-    return    
+    return
+
 
 
   def step_update(self, idx):
@@ -160,7 +156,9 @@ class MngrController():
 
   def add_step_to_flow_meta(self, event):
     # Get destination item position after that will be added new one
-    cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
+    # cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
+    cur_idx = self.view.flows_view.flow_tree_view.selection()
+
     # Get source item position from modules view
     operation_meta = self.view.modules_view.get_selected_operation_meta()
     # Perform if operation only selected
@@ -173,7 +171,8 @@ class MngrController():
 
 
   def remove_step_from_flow_meta(self, event):
-    cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
+    # cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
+    cur_idx = self.view.flows_view.flow_tree_view.selection()
     new_flow_meta = self.model.flows_model.remove_operation_from_current_flow(cur_idx)
     new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
     self.view.flows_view.set_flow_meta(new_flow_meta)
@@ -197,21 +196,21 @@ class MngrController():
     # Move to runner
     counter, cv2image = self.runner.run(self.flow_meta) 
     self.view.images_view.set_result_image(cv2image)
-    self.view.flows_view.set_selection(counter)
+    self.view.flows_view.set_selection_tree(counter)
 
   
   def step(self, event):
     counter, cv2image = self.runner.run(self.flow_meta, True)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection(counter)
+      self.view.flows_view.set_selection_tree(counter)
 
 
   def back(self, event):
     counter, cv2image = self.runner.back()
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection(counter)
+      self.view.flows_view.set_selection_tree(counter)
     else:
       self.view.images_view.reset_result_image()
 
@@ -225,26 +224,16 @@ class MngrController():
   def set_top_state(self):
     self.runner.top()
     self.view.images_view.reset_result_image()
-    self.view.flows_view.set_selection()
+    self.view.flows_view.set_selection_tree()
 
     return
-
-  def focus_in(self, event):
-    idx = self.view.flows_view.flow_list_box.curselection()
-    print('focus_in: idx', idx, event.widget)
-    self.flows_view_idx = idx
-
-  def focus_out(self, event):
-    idx = self.view.flows_view.flow_list_box.curselection()
-    print('focus_out: idx', idx, event.widget)
-    self.flows_view_idx = idx
 
 
 # Operation parameters sub panel's commands
   def apply(self, event):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
-    self.view.flows_view.flow_list_box.focus_set()
+    # self.view.flows_view.flow_list_box.focus_set()
     
     return
 
