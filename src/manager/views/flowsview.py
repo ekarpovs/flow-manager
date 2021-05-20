@@ -14,9 +14,6 @@ class FlowsView(View):
     self['bg'] = "mint cream"
     self['text'] = 'Flows panel'
 
-    # height, width = get_panel_size(parent)
-    # print("flows panel size", height, width)
-
 
     self.grid()
     self.rowconfigure(1, weight=1)
@@ -28,8 +25,8 @@ class FlowsView(View):
     self.names_combo_box['state'] = 'readonly'
 
     self.flow = []
-    self.modulesvar = StringVar(value=self.flow)
-    self.flow_list_box = Listbox(self, height=10, listvariable=self.modulesvar, selectmode=BROWSE)
+    self.flowsvar = StringVar(value=self.flow)
+    self.flow_list_box = Listbox(self, height=10, listvariable=self.flowsvar, selectmode=BROWSE)
 
     self.oper_params_view = OperParamsView(self)
 
@@ -50,9 +47,26 @@ class FlowsView(View):
 
     self.oper_params_view.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
 
+
+    self.flow_tree_view = ttk.Treeview(self, columns=("description"))
+    self.flow_tree_view.heading('#0', text='Operation')
+    self.flow_tree_view.heading('#1', text='Parameters')
+
+    # Inserted at the root, program chooses id:
+    # self.flow_tree_view.insert(parent='', index='end', text='clrs.brgto')
+    # self.flow_tree_view.insert(parent='', index='end', text='blur.gaus')
+    # self.flow_tree_view.insert(parent='', index='end', text='edge.canny')
+    # self.flow_tree_view.insert(parent='', index='end', text='edge.laplacian')
+
+    
+    
+    self.flow_tree_view.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
+
+
+
     # TODO: separate view
     flow_actions = Frame(self)
-    flow_actions.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    flow_actions.grid(row=5, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
 
     self.btn_run = Button(flow_actions, text='Run', width=BTNW)
     self.btn_top = Button(flow_actions, text='Top', width=BTNW)
@@ -66,13 +80,20 @@ class FlowsView(View):
 
 
 
+  def set_tree_flow_meta(self, flow_meta):
+    for item in flow_meta:
+      self.flow_tree_view.insert(parent='', index='end', text=item)
+
+    return
+
   def set_worksheets_names(self, worksheets_names):
     self.names_combo_box['values'] = worksheets_names
     self.names_combo_box.current(0)
 
   def set_flow_meta(self, flow_meta):
-    self.modulesvar.set(flow_meta)
+    self.flowsvar.set(flow_meta)
     self.set_selection()
+    self.set_tree_flow_meta(flow_meta)
 
     return
 
