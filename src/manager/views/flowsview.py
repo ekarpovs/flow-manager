@@ -93,6 +93,7 @@ class FlowsView(View):
       idx = max_idx-1
     self.flow_tree_view.focus_set()
     self.flow_tree_view.selection_set(idx)
+    self.flow_tree_view.focus(idx)
     
     return
 

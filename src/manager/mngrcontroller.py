@@ -249,6 +249,7 @@ class MngrController():
 
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
+    self.view.flows_view.flow_tree_view.focus_set()
 
     return
 
