@@ -94,6 +94,11 @@ class FlowsView(View):
     
     return
 
+  def get_current_selection_tree(self):
+    idx = self.flow_tree_view.selection()
+    idx = int(idx[0])
+    
+    return idx
 
   def set_worksheets_names(self, worksheets_names):
     self.names_combo_box['values'] = worksheets_names

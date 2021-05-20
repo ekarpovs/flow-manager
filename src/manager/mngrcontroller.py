@@ -38,8 +38,7 @@ class MngrController():
 
     self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
     self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
-    self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", 
-      lambda e: self.reset(self.view.flows_view.flow_list_box.curselection()))
+    self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
 
     self.view.flows_view.flow_tree_view.bind('<<TreeviewSelect>>', self.step_selected_tree)
 
@@ -131,8 +130,7 @@ class MngrController():
 
 
   def step_selected_tree(self, event):
-    idx = self.view.flows_view.flow_tree_view.selection()
-    idx = int(idx[0])
+    idx = self.view.flows_view.get_current_selection_tree()
     step = self.flow_meta['steps'][idx]
     module_name, oper_name = step['exec'].split('.')
 
@@ -141,23 +139,15 @@ class MngrController():
     
     orig_image_size = self.model.images_model.get_original_image_size()
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
-    # !!!!!!! MERGE WITH REAL PARAMETERS FROM FLOW META !!!!!!!!
 
     self.view.flows_view.set_operation_params(idx, step['exec'], oper_params)
 
     return
 
 
-
-  def step_update(self, idx):
-    print("update idx", idx[0], self.flow_meta['steps'][idx[0]])
-
-    return    
-
   def add_step_to_flow_meta(self, event):
     # Get destination item position after that will be added new one
-    # cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
-    cur_idx = self.view.flows_view.flow_tree_view.selection()
+    cur_idx = self.view.flows_view.get_current_selection_tree()
 
     # Get source item position from modules view
     operation_meta = self.view.modules_view.get_selected_operation_meta()
@@ -171,8 +161,7 @@ class MngrController():
 
 
   def remove_step_from_flow_meta(self, event):
-    # cur_idx = self.view.flows_view.flow_list_box.curselection()[0]
-    cur_idx = self.view.flows_view.flow_tree_view.selection()
+    cur_idx = self.view.flows_view.get_current_selection_tree()
     new_flow_meta = self.model.flows_model.remove_operation_from_current_flow(cur_idx)
     new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
     self.view.flows_view.set_flow_meta(new_flow_meta)
@@ -181,7 +170,6 @@ class MngrController():
     return
 
   def reset_flow_meta(self, event):
-    # self.flow_meta = self.model.flows_model.reset_flow_meta()
     self.set_selected_flow_meta()
     self.set_top_state()
 
@@ -233,7 +221,7 @@ class MngrController():
   def apply(self, event):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
-    # self.view.flows_view.flow_list_box.focus_set()
+    self.view.flows_view.flow_tree_view.focus_set()
     
     return
 
@@ -244,13 +232,12 @@ class MngrController():
     return
 
 
-  def reset(self, idx):
-    if not idx:
-      return
+  def reset(self, event):
+    idx = self.view.flows_view.get_current_selection_tree()
 
     item = self.view.flows_view.names_combo_box.get()      
     orig_flow_meta = self.model.flows_model.load_worksheet(*self.converter.flows_converter.convert_ws_item(item))
-    step = orig_flow_meta['steps'][idx[0]]
+    step = orig_flow_meta['steps'][idx]
 
     module_name, oper_name = step['exec'].split('.')
     
@@ -258,7 +245,7 @@ class MngrController():
     orig_image_size = self.model.images_model.get_original_image_size()
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
 
-    self.view.flows_view.set_operation_params(idx[0], step['exec'], oper_params)
+    self.view.flows_view.set_operation_params(idx, step['exec'], oper_params)
 
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
