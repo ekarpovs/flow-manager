@@ -92,7 +92,7 @@ class MngrController():
     self.flow_meta = flow_meta
     flow_meta = self.converter.flows_converter.convert_flow_meta(flow_meta)
 
-    self.view.flows_view.set_flow_meta_to_tree(flow_meta)
+    self.view.flows_view.set_flow_meta(flow_meta)
 
     return
 
@@ -155,7 +155,7 @@ class MngrController():
     if operation_meta is not None:
       new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx+1)
       new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
-      self.view.flows_view.set_flow_meta(new_flow_meta)
+      self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx+1)
 
     return
 
@@ -164,7 +164,7 @@ class MngrController():
     cur_idx = self.view.flows_view.get_current_selection_tree()
     new_flow_meta = self.model.flows_model.remove_operation_from_current_flow(cur_idx)
     new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
-    self.view.flows_view.set_flow_meta(new_flow_meta)
+    self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx-1)
 
 
     return
