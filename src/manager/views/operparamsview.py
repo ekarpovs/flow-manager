@@ -76,7 +76,6 @@ class OperParamsView(LabelFrame):
         except ValueError:
           value = entry_value
       elif type(control['control']) is Combobox:
-        # value = control['control'].get().strip()
         value = control['command']()
       elif type(control['control']) is Spinbox:
         value = control['command']()
@@ -119,16 +118,34 @@ class OperParamsView(LabelFrame):
 
     def domain_list(param):
       param_control = Combobox(self)
+
+      def get():
+        value = param_control.get()
+        if type == 'f':
+          value = float(value)
+        elif type == 'n':
+          value = int(value)
+        else:
+          pass
+        return value
+
       param_possible_values = param['p_values']
       param_values_tuple = self.parse_possible_values_list(param_possible_values)
       param_control['values'] = param_values_tuple
 
+      type = param['type']
+      if type == 'f':
+        selected_item = tk.DoubleVar()
+      elif type == 'n':
+        selected_item = tk.IntVar()
+      else:
+        selected_item = tk.StringVar()
+
       param_default_value = param['value']     
       param_control.set(param_default_value)
-      selected_item = tk.StringVar()
 
       param_control.textvariable = selected_item
-      param_command = None
+      param_command = get
 
       return param_command, param_control
 
