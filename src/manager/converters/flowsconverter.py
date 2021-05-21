@@ -33,6 +33,9 @@ class FlowsConverter(Converter):
     if 'steps' in flow_meta:
       steps = flow_meta['steps']
       for step in steps:
-        names.append(step['exec'])
+        if 'exec' in step:
+          names.append(step['exec'])
+        elif 'stm' in step:
+          names.append(step['stm'])
 
     return names

@@ -131,15 +131,19 @@ class MngrController():
   def step_selected_tree(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
     step = self.flow_meta['steps'][idx]
-    module_name, oper_name = step['exec'].split('.')
-
+    if 'exec' in step:
+      step_instance = step['exec'] 
+      module_name, oper_name = step['exec'].split('.')
+    elif 'stm' in step:
+      step_instance = step['stm'] 
+      module_name, oper_name = step['stm'].split('.')
 
     oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
     
     orig_image_size = self.model.images_model.get_original_image_size()
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
 
-    self.view.flows_view.set_operation_params(idx, step['exec'], oper_params)
+    self.view.flows_view.set_operation_params(idx, step_instance, oper_params)
 
     return
 
