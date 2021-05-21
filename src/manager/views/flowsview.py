@@ -79,10 +79,8 @@ class FlowsView(View):
 
   def set_flow_meta(self, flow_meta, idx=0):
     self.clear_flow_tree_view()
-    i = 0
-    for item in flow_meta:
+    for i, item in enumerate(flow_meta):
       self.flow_tree_view.insert(parent='', index='end', iid=i, text=item)
-      i += 1
     self.set_selection_tree(idx)
     
     return
