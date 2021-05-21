@@ -37,7 +37,6 @@ class MngrController():
     self.view.flows_view.btn_top.bind("<Button>", self.top)
 
     self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
-    self.view.flows_view.oper_params_view.btn_save.bind("<Button>", self.save)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
 
     self.view.flows_view.flow_tree_view.bind('<<TreeviewSelect>>', self.step_selected_tree)
@@ -224,13 +223,6 @@ class MngrController():
     self.view.flows_view.flow_tree_view.focus_set()
     
     return
-
-  def save(self, event):
-    # operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
-    # self.model.flows_model.update_current_flow_params(operation_params_item)
-    
-    return
-
 
   def reset(self, event):
     idx = self.view.flows_view.get_current_selection_tree()

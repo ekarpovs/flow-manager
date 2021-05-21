@@ -18,7 +18,6 @@ class OperParamsView(LabelFrame):
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
 
     self.btn_apply = Button(self, text='Apply', width=BTNW)
-    self.btn_save = Button(self, text='Save', width=BTNW)
     self.btn_reset = Button(self, text='Restet', width=BTNW)
 
 
@@ -52,14 +51,11 @@ class OperParamsView(LabelFrame):
     btns_row = len(self.operation_param_controls['param_controls'])
     if btns_row > 0:
       self.btn_apply['state']=NORMAL
-      self.btn_save['state']=NORMAL
       self.btn_reset['state']=NORMAL
       self.btn_apply.grid(row=btns_row, column=0, padx=PADX, pady=PADY, sticky=W + S)
-      self.btn_save.grid(row=btns_row+1, column=0, padx=PADX, pady=PADY, sticky=W + S)
       self.btn_reset.grid(row=btns_row, column=1, padx=PADX, pady=PADY, sticky=W + S)
     else:
       self.btn_apply['state']=DISABLED
-      self.btn_save['state']=DISABLED
       self.btn_reset['state']=DISABLED
 
     return
