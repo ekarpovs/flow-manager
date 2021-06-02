@@ -185,23 +185,23 @@ class MngrController():
 
   def run(self, event):
     # Move to runner
-    counter, cv2image = self.runner.run(self.flow_meta) 
+    step_indexes, cv2image = self.runner.run(self.flow_meta) 
     self.view.images_view.set_result_image(cv2image)
-    self.view.flows_view.set_selection_tree(counter)
+    self.view.flows_view.set_selection_tree(sum(step_indexes))
 
   
   def step(self, event):
-    counter, cv2image = self.runner.run(self.flow_meta, True)
+    step_indexes, cv2image = self.runner.run(self.flow_meta, True)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection_tree(counter)
+      self.view.flows_view.set_selection_tree(sum(step_indexes))
 
 
   def back(self, event):
-    counter, cv2image = self.runner.back()
+    step_indexes, cv2image = self.runner.back()
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection_tree(counter)
+      self.view.flows_view.set_selection_tree(sum(step_indexes))
     else:
       self.view.images_view.reset_result_image()
 
