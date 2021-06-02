@@ -185,27 +185,35 @@ class MngrController():
 
   def run(self, event):
     # Move to runner
-    step_indexes, cv2image = self.runner.run(self.flow_meta) 
+    step_indexes, output = self.runner.run(self.flow_meta) 
+    cv2image = self.get_image_from_output(output)
     self.view.images_view.set_result_image(cv2image)
     self.view.flows_view.set_selection_tree(sum(step_indexes))
 
   
   def step(self, event):
-    step_indexes, cv2image = self.runner.run(self.flow_meta, True)
+    step_indexes, output = self.runner.run(self.flow_meta, True)
+    cv2image = self.get_image_from_output(output)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection_tree(sum(step_indexes))
 
 
   def back(self, event):
-    step_indexes, cv2image = self.runner.back()
+    step_indexes, output = self.runner.back()
+    cv2image = self.get_image_from_output(output)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection_tree(sum(step_indexes))
     else:
       self.view.images_view.reset_result_image()
 
-
+  @staticmethod
+  def get_image_from_output(output):
+    image = None
+    if output is not None:
+      image = output['image']
+    return image
 
   def top(self, event):
     self.set_top_state()
