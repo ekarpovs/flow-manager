@@ -87,6 +87,8 @@ class FlowsView(View):
 
   def set_selection_tree(self, idx=0):
     max_idx = len(self.flow_tree_view.get_children())
+    if max_idx == 0:
+      return
     if idx >= max_idx:
       idx = max_idx-1
     self.flow_tree_view.focus_set()
