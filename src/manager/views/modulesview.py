@@ -44,6 +44,14 @@ class ModulesView(View):
     
     self.tree_view.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=S + W + E + N)
 
+  def open_children(self, parent):
+    self.tree_view.item(parent, open=True)
+    for child in self.tree_view.get_children(parent):
+        self.open_children(child)
+
+  def open_all(self):
+    self.open_children(self.tree_view.focus())
+
 
   def set_modules_meta(self, modules_meta):
     for item in modules_meta:
@@ -57,6 +65,9 @@ class ModulesView(View):
         self.tree_view.insert(parent=parent, index=index, iid=iid, text=text, values=values)
       else:
         self.tree_view.insert(parent=parent, index=index, iid=iid, text=text)
+
+
+
 
   def get_selected_operation_meta(self):
     cur_id = self.tree_view.focus()

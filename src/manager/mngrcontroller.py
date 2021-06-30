@@ -20,6 +20,7 @@ class MngrController():
     self.view = MngrView(self.parent)
 
 # Bind to modules panel
+    self.view.modules_view.tree_view.bind('<<TreeviewOpen>>', self.open_all)
 
 # Bind to flows panel
     self.flows_view_idx = 0
@@ -112,6 +113,11 @@ class MngrController():
 
 # Actions
 # Modules panel' events and commands
+  def open_all(self, event):
+    self.view.modules_view.open_all()
+
+    return
+
 
 # Flows panel's events and commands
   def selected(self, event):
