@@ -1,7 +1,8 @@
 from src.manager.models import model
 from tkinter import image_names
-from flow_runner import Runner
-import operation_loader
+# from flow_runner import Runner
+# import operation_loader
+from runner import Runner
 
 from .mngrmodel import MngrModel  
 from .mngrconverter import MngrConverter  
@@ -14,7 +15,9 @@ class MngrController():
 
     self.cfg = Configuration()
 
-    self.runner = Runner(operation_loader)
+    fsm_cfg = self.cfg.get_fsm_cfg()
+    self.runner = Runner(fsm_cfg)
+
     self.model = MngrModel(self.cfg)
     self.converter = MngrConverter()
     self.view = MngrView(self.parent)
@@ -33,8 +36,9 @@ class MngrController():
     self.view.flows_view.btn_save.bind("<Button>", self.save_flow_meta)
 
     self.view.flows_view.btn_run.bind("<Button>", self.run)
-    self.view.flows_view.btn_step.bind("<Button>", self.step)
-    self.view.flows_view.btn_back.bind("<Button>", self.back)
+    self.view.flows_view.btn_current.bind("<Button>", self.current)
+    self.view.flows_view.btn_next.bind("<Button>", self.next)
+    self.view.flows_view.btn_prev.bind("<Button>", self.prev)
     self.view.flows_view.btn_top.bind("<Button>", self.top)
 
     self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
@@ -91,8 +95,8 @@ class MngrController():
         *self.converter.flows_converter.convert_ws_item(item))
     self.flow_meta = flow_meta
     flow_meta = self.converter.flows_converter.convert_flow_meta(flow_meta)
-
     self.view.flows_view.set_flow_meta(flow_meta)
+    self.runner.set_flow_meta(self.flow_meta)
 
     return
 
@@ -136,7 +140,7 @@ class MngrController():
 
   def step_selected_tree(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
-    step = self.flow_meta['steps'][idx]
+    step = self.flow_meta[idx]
     if 'exec' in step:
       step_instance = step['exec'] 
       module_name, oper_name = step['exec'].split('.')
@@ -196,13 +200,27 @@ class MngrController():
     self.view.images_view.set_result_image(cv2image)
     self.view.flows_view.set_selection_tree(sum(step_indexes))
 
-  
-  def step(self, event):
-    step_indexes, output = self.runner.run(self.flow_meta, True)
-    cv2image = self.get_image_from_output(output)
+
+  def current(self, event):
+    idx, cv2image = self.runner.put_event('repeat')
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection_tree(sum(step_indexes))
+      self.view.flows_view.set_selection_tree(idx)
+
+  
+  def next(self, event):
+    # step_indexes, output = self.runner.run(self.flow_meta, True)
+    idx, cv2image = self.runner.put_event('next')
+    if cv2image is not None:
+      self.view.images_view.set_result_image(cv2image)
+      self.view.flows_view.set_selection_tree(idx)
+
+  def prev(self, event):
+    # step_indexes, output = self.runner.run(self.flow_meta, True)
+    idx, cv2image = self.runner.put_event('prev')
+    if cv2image is not None:
+      self.view.images_view.set_result_image(cv2image)
+      self.view.flows_view.set_selection_tree(idx)
 
 
   def back(self, event):
@@ -227,7 +245,8 @@ class MngrController():
   
 
   def set_top_state(self):
-    self.runner.top()
+    # Create FSM !!!!
+    self.runner.start()
     self.view.images_view.reset_result_image()
     self.view.flows_view.set_selection_tree()
 
@@ -283,7 +302,6 @@ class MngrController():
   def load(self, event):
     idx = self.file_idx
     image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
-
     cv2image = self.model.images_model.get_image(image_full_file_name)
     self.runner.set_input_image(cv2image) 
     self.view.images_view.set_original_image(cv2image)

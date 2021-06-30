@@ -56,9 +56,9 @@ class MngrView(LabelFrame):
     w = self.parent.winfo_reqwidth()
     self['width'] = w -5
     self.modules_view['height'] = h - PADY*2
-    self.modules_view['width'] = int(w/4)
+    self.modules_view['width'] = int((w/4)*0.9)
     self.flows_view['height'] = h - PADY*2
-    self.flows_view['width'] = int(w/4)
+    self.flows_view['width'] = int((w/4)*1.1)
     self.images_view['height'] = h - PADY*2
     self.images_view['width'] = w - int(w/4)*2 - 5
     self.modules_view.grid_propagate(0)

@@ -30,12 +30,10 @@ class FlowsConverter(Converter):
   @staticmethod
   def convert_flow_meta(flow_meta):
     names = []
-    if 'steps' in flow_meta:
-      steps = flow_meta['steps']
-      for step in steps:
-        if 'exec' in step:
-          names.append(step['exec'])
-        elif 'stm' in step:
-          names.append(step['stm'])
+    for step_meta in flow_meta:
+      if 'exec' in step_meta:
+        names.append(step_meta['exec'])
+      elif 'stm' in step:
+        names.append(step_meta['stm'])
 
     return names

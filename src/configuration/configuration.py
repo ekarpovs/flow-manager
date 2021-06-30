@@ -29,3 +29,10 @@ class Configuration():
 
   def get_worksheets_paths(self):
     return self.cfg['worksheets']
+
+  def get_fsm_cfg(self):
+    # Read from config.json
+    ffn = self.cfg['fsm-cfg']
+    with open(ffn, 'rt') as ws:
+      fsm_cfg = json.load(ws)
+    return fsm_cfg
