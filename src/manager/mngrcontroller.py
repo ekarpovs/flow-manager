@@ -36,9 +36,9 @@ class MngrController():
     self.view.flows_view.btn_save.bind("<Button>", self.save_flow_meta)
 
     self.view.flows_view.btn_run.bind("<Button>", self.run)
-    self.view.flows_view.btn_current.bind("<Button>", self.current)
-    self.view.flows_view.btn_next.bind("<Button>", self.next)
-    self.view.flows_view.btn_prev.bind("<Button>", self.prev)
+    self.view.flows_view.btn_current.bind("<Button>", lambda e: self.exec('repeat'))
+    self.view.flows_view.btn_next.bind("<Button>", lambda e: self.exec('next'))
+    self.view.flows_view.btn_prev.bind("<Button>", lambda e: self.exec('prev'))
     self.view.flows_view.btn_top.bind("<Button>", self.top)
 
     self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
@@ -201,23 +201,8 @@ class MngrController():
     self.view.flows_view.set_selection_tree(sum(step_indexes))
 
 
-  def current(self, event):
-    idx, cv2image = self.runner.put_event('repeat')
-    if cv2image is not None:
-      self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection_tree(idx)
-
-  
-  def next(self, event):
-    # step_indexes, output = self.runner.run(self.flow_meta, True)
-    idx, cv2image = self.runner.put_event('next')
-    if cv2image is not None:
-      self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection_tree(idx)
-
-  def prev(self, event):
-    # step_indexes, output = self.runner.run(self.flow_meta, True)
-    idx, cv2image = self.runner.put_event('prev')
+  def exec(self, event):
+    idx, cv2image = self.runner.put_event(event)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection_tree(idx)
