@@ -55,15 +55,13 @@ class FlowsView(View):
 
     self.btn_run = Button(flow_actions, text='Run', width=BTNW)
     self.btn_top = Button(flow_actions, text='Top', width=BTNW)
-    self.btn_current = Button(flow_actions, text='Cur', width=BTNW)
     self.btn_next = Button(flow_actions, text='Next', width=BTNW)
     self.btn_prev = Button(flow_actions, text='Prev', width=BTNW)
 
     self.btn_run.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + N)
-    self.btn_current.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W + N)
-    self.btn_next.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=W + N)
-    self.btn_prev.grid(row=0, column=4, padx=PADX, pady=PADY, sticky=E + N)
-    self.btn_top.grid(row=0, column=5, padx=PADX, pady=PADY, sticky=E + N)
+    self.btn_next.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W + N)
+    self.btn_prev.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=E + N)
+    self.btn_top.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
 
     # Setup widgets layout
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
