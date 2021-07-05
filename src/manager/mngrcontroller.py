@@ -251,7 +251,7 @@ class MngrController():
 
     item = self.view.flows_view.names_combo_box.get()      
     orig_flow_meta = self.model.flows_model.load_worksheet(*self.converter.flows_converter.convert_ws_item(item))
-    step = orig_flow_meta['steps'][idx]
+    step = orig_flow_meta[idx]
 
     module_name, oper_name = step['exec'].split('.')
     
