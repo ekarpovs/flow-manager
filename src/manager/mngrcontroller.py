@@ -204,6 +204,15 @@ class MngrController():
       self.view.flows_view.set_selection_tree(idx)
     return idx
 
+  def current(self):
+    idx = self.view.flows_view.get_current_selection_tree()
+    step_meta = self.flow_meta[idx]
+    idx, cv2image = self.runner.put_event('current', step_meta)
+    if cv2image is not None:
+      self.view.images_view.set_result_image(cv2image)
+      self.view.flows_view.set_selection_tree(idx)
+    return idx
+
 
   def prev(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
@@ -243,7 +252,7 @@ class MngrController():
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
-    
+    self.current()
     return
 
   def reset(self, event):
