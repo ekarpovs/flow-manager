@@ -1,13 +1,8 @@
-from src.manager.models import model
-from tkinter import image_names
-# from flow_runner import Runner
-# import operation_loader
+from ..configuration import Configuration
 from runner import Runner
-
 from .mngrmodel import MngrModel  
 from .mngrconverter import MngrConverter  
 from .mngrview import MngrView  
-from ..configuration import Configuration
 
 class MngrController():
   def __init__(self, parent):
@@ -15,8 +10,8 @@ class MngrController():
 
     self.cfg = Configuration()
 
-    fsm_cfg = self.cfg.get_fsm_cfg()
-    self.runner = Runner(fsm_cfg)
+    # fsm_cfg = self.cfg.get_fsm_cfg()
+    self.runner = Runner()
 
     self.model = MngrModel(self.cfg)
     self.converter = MngrConverter()
@@ -36,9 +31,8 @@ class MngrController():
     self.view.flows_view.btn_save.bind("<Button>", self.save_flow_meta)
 
     self.view.flows_view.btn_run.bind("<Button>", self.run)
-    self.view.flows_view.btn_current.bind("<Button>", lambda e: self.exec('repeat'))
-    self.view.flows_view.btn_next.bind("<Button>", lambda e: self.exec('next'))
-    self.view.flows_view.btn_prev.bind("<Button>", lambda e: self.exec('prev'))
+    self.view.flows_view.btn_next.bind("<Button>", self.next)
+    self.view.flows_view.btn_prev.bind("<Button>", self.prev)
     self.view.flows_view.btn_top.bind("<Button>", self.top)
 
     self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
@@ -96,7 +90,7 @@ class MngrController():
     self.flow_meta = flow_meta
     flow_meta = self.converter.flows_converter.convert_flow_meta(flow_meta)
     self.view.flows_view.set_flow_meta(flow_meta)
-    self.runner.set_flow_meta(self.flow_meta)
+    self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), self.flow_meta)
 
     return
 
@@ -195,27 +189,33 @@ class MngrController():
 
   def run(self, event):
     # Move to runner
-    step_indexes, output = self.runner.run(self.flow_meta) 
-    cv2image = self.get_image_from_output(output)
-    self.view.images_view.set_result_image(cv2image)
-    self.view.flows_view.set_selection_tree(sum(step_indexes))
+    cur = 0
+    last = self.runner.get_number_of_states()-1
+    while(cur < last):
+      cur = self.next("")
+    cur = self.next("")
 
-
-  def exec(self, event):
-    idx, cv2image = self.runner.put_event(event)
+  def next(self, event):
+    idx = self.view.flows_view.get_current_selection_tree()
+    step_meta = self.flow_meta[idx]
+    idx, cv2image = self.runner.put_event('next', step_meta)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection_tree(idx)
+    return idx
 
 
-  def back(self, event):
-    step_indexes, output = self.runner.back()
-    cv2image = self.get_image_from_output(output)
+  def prev(self, event):
+    idx = self.view.flows_view.get_current_selection_tree()
+    if idx is 0:
+      self.view.images_view.reset_result_image()
+      return idx
+    idx, cv2image = self.runner.put_event('prev')
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection_tree(sum(step_indexes))
-    else:
-      self.view.images_view.reset_result_image()
+      self.view.flows_view.set_selection_tree(idx)
+    return idx
+
 
   @staticmethod
   def get_image_from_output(output):
@@ -230,12 +230,12 @@ class MngrController():
   
 
   def set_top_state(self):
-    # Create FSM !!!!
-    self.runner.start()
+    cv2image = self.get_cv2image()
+    self.runner.start(cv2image) 
     self.view.images_view.reset_result_image()
     self.view.flows_view.set_selection_tree()
 
-    return
+    return cv2image
 
 
 # Operation parameters sub panel's commands
@@ -285,9 +285,13 @@ class MngrController():
 
 
   def load(self, event):
-    idx = self.file_idx
-    image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
-    cv2image = self.model.images_model.get_image(image_full_file_name)
-    self.runner.set_input_image(cv2image) 
+    cv2image = self.set_top_state()
     self.view.images_view.set_original_image(cv2image)
-    self.set_top_state()
+
+  def get_cv2image(self):
+    cv2image = None
+    if self.file_idx is not None:
+      idx = self.file_idx
+      image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
+      cv2image = self.model.images_model.get_image(image_full_file_name)
+    return cv2image
