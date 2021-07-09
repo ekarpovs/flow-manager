@@ -103,6 +103,8 @@ class FlowsModel(Model):
   def update_current_flow_params(self, operation_params_item):
     idx = operation_params_item['idx']
     flow_item_to_update = self.flow_meta[idx]
+    if 'params' not in flow_item_to_update:
+      flow_item_to_update['params'] = {}
     # print("before", flow_item_to_update)
     for param in operation_params_item['params']:
       # print(param['name'])
