@@ -130,7 +130,7 @@ class OperParamsView(LabelFrame):
         return value
 
       param_possible_values = param['p_values']
-      param_values_tuple = self.parse_possible_values_list(param_possible_values)
+      param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       param_control['values'] = param_values_tuple
 
       type = param['type']
@@ -180,12 +180,9 @@ class OperParamsView(LabelFrame):
 
       param_type = param['type']
       param_possible_values = param['p_values']     
-      param_keys_tuple = self.parse_possible_values_dict(param_possible_values)
+      param_keys_tuple = self.possible_values_pairs_to_tuple(param_possible_values)
       param_control['values'] = param_keys_tuple
-
-      param_dict = self.parse_possible_values_to_dict(param_possible_values)
-
-
+      param_dict = self.possible_values_pairs_to_dict(param_possible_values)
       param_value = param['value']
       if (type(param_value) is int) or (type(param_value) is float):
         param_value = get_key(param_value)
@@ -199,7 +196,7 @@ class OperParamsView(LabelFrame):
 
     def domain_range(param):
       param_possible_values = param['p_values']
-      param_values_tuple = self.parse_possible_values_range(param_possible_values)
+      param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       from_ = param_values_tuple[0]
       to = param_values_tuple[1]
 
@@ -235,6 +232,8 @@ class OperParamsView(LabelFrame):
 
     return control_builder(param)
 
+  
+# Possible parameters values parsing
   # d = [key1:0,key2:1,key3:2]
   # l = [0,1,2]
   # r = [0,10,1]
@@ -245,47 +244,33 @@ class OperParamsView(LabelFrame):
     param_possible_values = param_possible_values[1:end_idx]
     return param_possible_values.split(',')
 
+  @staticmethod
+  def parse_possible_values_dict_def(param_possible_values):   
+    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
+    return [item for  item in param_possible_values_list]
+
 
   @staticmethod
-  def parse_possible_values_dict(param_possible_values):   
-    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
-    param_key_list = [item.split(':')[0] for  item in param_possible_values_list]
-    
+  def possible_values_pairs_to_tuple(param_possible_values):   
+    pairs_list = OperParamsView.parse_possible_values_dict_def(param_possible_values)
+    param_key_list = [item.split(':')[0] for  item in pairs_list]
     param_keys_tuple = tuple(param_key_list)
-
     return param_keys_tuple
 
   @staticmethod
-  def parse_possible_values_to_dict(param_possible_values):   
-    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
-    pairs_list = [item for  item in param_possible_values_list]
-    
+  def possible_values_pairs_to_dict(param_possible_values):   
+    pairs_list = OperParamsView.parse_possible_values_dict_def(param_possible_values)
     param_dict = {}
     for pair_str in pairs_list:
       kv = pair_str.split(':')
       k = kv[0]
       v = int(kv[1])
       param_dict[k] = v
-
     return param_dict
 
-
-
   @staticmethod
-  def parse_possible_values_list(param_possible_values):
+  def parse_possible_values_list_or_range(param_possible_values):
     param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
-    param_key_list = [item for  item in param_possible_values_list]
-    
+    param_key_list = [item for  item in param_possible_values_list]   
     param_values_tuple = tuple(param_key_list)
-
     return param_values_tuple
-
-
-  @staticmethod
-  def parse_possible_values_range(param_possible_values):   
-    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
-    param_key_list = [item for  item in param_possible_values_list]
-    
-    param_keys_tuple = tuple(param_key_list)
-
-    return param_keys_tuple
