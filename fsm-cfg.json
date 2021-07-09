@@ -9,6 +9,6 @@
     "events": [
       "next",
       "prev",
-      "repeat"
+      "current"
     ]
   }
