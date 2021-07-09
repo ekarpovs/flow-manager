@@ -189,11 +189,9 @@ class MngrController():
 
   def run(self, event):
     # Move to runner
-    cur = 0
-    last = self.runner.get_number_of_states()-1
-    while(cur < last):
+    n = self.runner.get_number_of_states()
+    for i in range(n):
       cur = self.next("")
-    cur = self.next("")
 
   def next(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
