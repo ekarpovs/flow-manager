@@ -108,7 +108,7 @@ class FlowsModel(Model):
       # print(param['name'])
       pn = param['name'].strip() 
       pv = param['value'] 
-      flow_item_to_update[pn] = pv
+      flow_item_to_update['params'][pn] = pv
 
     # print("after", flow_item_to_update)
       
