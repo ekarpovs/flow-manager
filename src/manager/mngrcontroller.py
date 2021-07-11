@@ -1,5 +1,5 @@
 from ..configuration import Configuration
-from runner import Runner
+from flow_runner import Runner
 from .mngrmodel import MngrModel  
 from .mngrconverter import MngrConverter  
 from .mngrview import MngrView  
