@@ -91,6 +91,7 @@ class MngrController():
     flow_meta = self.converter.flows_converter.convert_flow_meta(flow_meta)
     self.view.flows_view.set_flow_meta(flow_meta)
     self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), self.flow_meta)
+    self.runner.start()
 
     return
 
@@ -120,7 +121,6 @@ class MngrController():
 # Flows panel's events and commands
   def selected(self, event):
     self.set_selected_flow_meta()
-    self.set_top_state()
 
     return
 
@@ -178,7 +178,9 @@ class MngrController():
 
   def reset_flow_meta(self, event):
     self.set_selected_flow_meta()
-    self.set_top_state()
+    self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), self.flow_meta)
+    self.runner.start()
+
 
   def save_flow_meta(self, event):
     item = self.view.flows_view.names_combo_box.get()
@@ -214,10 +216,8 @@ class MngrController():
 
   def prev(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
-    if idx is 0:
-      self.view.images_view.reset_result_image()
-      return idx
-    idx, cv2image = self.runner.put_event('prev')
+    step_meta = self.flow_meta[idx]
+    idx, cv2image = self.runner.put_event('prev', step_meta)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection_tree(idx)
@@ -232,17 +232,18 @@ class MngrController():
     return image
 
   def top(self, event):
-    self.set_top_state()
+    idx = self.view.flows_view.get_current_selection_tree()
+    # n = self.runner.get_number_of_states() - idx
+    for i in range(idx+1):
+      cur = self.prev("")
     return
   
 
   def set_top_state(self):
-    cv2image = self.get_cv2image()
-    self.runner.start(cv2image) 
-    self.view.images_view.reset_result_image()
+    self.runner.init_io(self.cv2image) 
+    self.view.images_view.set_result_image(self.cv2image)
     self.view.flows_view.set_selection_tree()
-
-    return cv2image
+    return
 
 
 # Operation parameters sub panel's commands
@@ -292,8 +293,9 @@ class MngrController():
 
 
   def load(self, event):
-    cv2image = self.set_top_state()
-    self.view.images_view.set_original_image(cv2image)
+    self.cv2image = self.get_cv2image()
+    self.view.images_view.set_original_image(self.cv2image)
+    self.set_top_state()
 
   def get_cv2image(self):
     cv2image = None
