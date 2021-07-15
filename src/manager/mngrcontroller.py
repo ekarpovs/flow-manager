@@ -232,9 +232,8 @@ class MngrController():
     return image
 
   def top(self, event):
-    idx = self.view.flows_view.get_current_selection_tree()
-    # n = self.runner.get_number_of_states() - idx
-    for i in range(idx+1):
+    n = self.runner.get_number_of_states()
+    for i in range(n):
       cur = self.prev("")
     return
   
