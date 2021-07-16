@@ -49,7 +49,7 @@ class MngrController():
       lambda e: self.image_file_selected(self.view.images_view.file_names_list_box.curselection()))
 
     self.file_idx = None
-
+    self.cv2image = None
 # Start
     self.start()
     
@@ -198,7 +198,7 @@ class MngrController():
   def next(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
     step_meta = self.flow_meta[idx]
-    idx, cv2image = self.runner.put_event('next', step_meta)
+    idx, cv2image = self.runner.dispatch_event('next', step_meta)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection_tree(idx)
@@ -207,7 +207,7 @@ class MngrController():
   def current(self):
     idx = self.view.flows_view.get_current_selection_tree()
     step_meta = self.flow_meta[idx]
-    idx, cv2image = self.runner.put_event('current', step_meta)
+    idx, cv2image = self.runner.dispatch_event('current', step_meta)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection_tree(idx)
@@ -217,7 +217,7 @@ class MngrController():
   def prev(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
     step_meta = self.flow_meta[idx]
-    idx, cv2image = self.runner.put_event('prev', step_meta)
+    idx, cv2image = self.runner.dispatch_event('prev', step_meta)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection_tree(idx)
@@ -250,7 +250,8 @@ class MngrController():
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
-    self.current()
+    if self.cv2image:
+      self.current()
     return
 
   def reset(self, event):
@@ -259,14 +260,17 @@ class MngrController():
     item = self.view.flows_view.names_combo_box.get()      
     orig_flow_meta = self.model.flows_model.load_worksheet(*self.converter.flows_converter.convert_ws_item(item))
     step = orig_flow_meta[idx]
-
-    module_name, oper_name = step['exec'].split('.')
+    if 'stm' in step:
+      module = step['stm']
+    else:
+      module = step['exec']
+    module_name, oper_name = module.split('.')
     
     oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
     orig_image_size = self.model.images_model.get_original_image_size()
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
 
-    self.view.flows_view.set_operation_params(idx, step['exec'], oper_params)
+    self.view.flows_view.set_operation_params(idx, module, oper_params)
 
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
