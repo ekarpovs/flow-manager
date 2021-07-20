@@ -195,34 +195,23 @@ class MngrController():
     for i in range(n):
       cur = self.next("")
 
-  def next(self, event):
+  def step(self, event_name):
     idx = self.view.flows_view.get_current_selection_tree()
     step_meta = self.flow_meta[idx]
-    idx, cv2image = self.runner.dispatch_event('next', step_meta)
+    idx, cv2image = self.runner.dispatch_event(event_name, step_meta)
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
       self.view.flows_view.set_selection_tree(idx)
     return idx
+
+  def next(self, event):
+    return self.step('next')
 
   def current(self):
-    idx = self.view.flows_view.get_current_selection_tree()
-    step_meta = self.flow_meta[idx]
-    idx, cv2image = self.runner.dispatch_event('current', step_meta)
-    if cv2image is not None:
-      self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection_tree(idx)
-    return idx
-
+    return self.step('current')
 
   def prev(self, event):
-    idx = self.view.flows_view.get_current_selection_tree()
-    step_meta = self.flow_meta[idx]
-    idx, cv2image = self.runner.dispatch_event('prev', step_meta)
-    if cv2image is not None:
-      self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection_tree(idx)
-    return idx
-
+    return self.step('prev')
 
   @staticmethod
   def get_image_from_output(output):
