@@ -1,5 +1,6 @@
 from ..configuration import Configuration
 from flow_runner import Runner
+from flow_converter import FlowConverter 
 from .mngrmodel import MngrModel  
 from .mngrconverter import MngrConverter  
 from .mngrview import MngrView  
@@ -59,7 +60,6 @@ class MngrController():
     self.update_modules_view()
     self.update_flows_view()
     self.update_images_view()
-
     return
 
 
@@ -68,9 +68,7 @@ class MngrController():
     self.model.modules_model.load_modules_meta_from_all_paths()
     modules_meta_conv = self.converter.modules_converter.convert_meta(
       self.model.modules_model.get_modules_meta())
-
     self.view.modules_view.set_modules_meta(modules_meta_conv)
-
     return
 
 
@@ -79,9 +77,7 @@ class MngrController():
     self.model.flows_model.load_worksheets_from_all_paths()
     worksheets_names = self.converter.flows_converter.convert_worksheets_names(
       self.model.flows_model.get_worksheets_names_from_all_paths())
-
     self.view.flows_view.set_worksheets_names(worksheets_names)
-
     return
 
   def update_flow_meta(self, item):
@@ -90,23 +86,25 @@ class MngrController():
     self.flow_meta = flow_meta
     flow_meta = self.converter.flows_converter.convert_flow_meta(flow_meta)
     self.view.flows_view.set_flow_meta(flow_meta)
-    self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), self.flow_meta)
-    self.runner.start()
-
+    self.rerun_fsm()
     return
 
+  def rerun_fsm(self):
+    fc = FlowConverter(self.flow_meta)
+    fsm_def = fc.convert()
+    self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), fsm_def)
+    self.runner.start()
+    return
 
   def update_images_view(self):
     paths = self.model.images_model.get_input_paths()
     self.view.images_view.set_input_paths(paths)
-
     return
 
 
   def update_images_file_names_list(self, path):
     file_names_list = self.model.images_model.get_images_file_names_list(path)
     self.view.images_view.set_file_names_list(file_names_list)
-
     return
 
 
@@ -114,21 +112,18 @@ class MngrController():
 # Modules panel' events and commands
   def open_all(self, event):
     self.view.modules_view.open_all()
-
     return
 
 
 # Flows panel's events and commands
   def selected(self, event):
     self.set_selected_flow_meta()
-
     return
 
   def set_selected_flow_meta(self):
     item = self.view.flows_view.names_combo_box.get()
     self.update_flow_meta(item)
     self.view.flows_view.clear_operation_params()
-
     return
 
 
@@ -143,12 +138,9 @@ class MngrController():
       module_name, oper_name = step['stm'].split('.')
 
     oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
-    
     orig_image_size = self.model.images_model.get_original_image_size()
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
-
     self.view.flows_view.set_operation_params(idx, step_instance, oper_params)
-
     return
 
 
@@ -163,7 +155,6 @@ class MngrController():
       new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx+1)
       new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
       self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx+1)
-
     return
 
 
@@ -172,20 +163,18 @@ class MngrController():
     new_flow_meta = self.model.flows_model.remove_operation_from_current_flow(cur_idx)
     new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
     self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx-1)
-
-
     return
 
   def reset_flow_meta(self, event):
     self.set_selected_flow_meta()
-    self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), self.flow_meta)
-    self.runner.start()
-
+    self.rerun_fsm()
+    return
 
   def save_flow_meta(self, event):
     item = self.view.flows_view.names_combo_box.get()
     self.model.flows_model.save_current_flow_meta(
         *self.converter.flows_converter.convert_ws_item(item), self.flow_meta)
+    return
 
 
 
@@ -264,23 +253,20 @@ class MngrController():
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
-
     return
 
 
 # Images panel's commands
   def selected_path(self, event):
     item = self.view.images_view.names_combo_box.get()
-    self.update_images_file_names_list(item)
-    
+    self.update_images_file_names_list(item)   
     return
 
 
   def image_file_selected(self, idx):
     if not idx:
       return
-    self.file_idx = idx[0]
-    
+    self.file_idx = idx[0] 
     return
 
 
@@ -288,6 +274,7 @@ class MngrController():
     self.cv2image = self.get_cv2image()
     self.view.images_view.set_original_image(self.cv2image)
     self.set_top_state()
+    return
 
   def get_cv2image(self):
     cv2image = None
