@@ -8,24 +8,17 @@ from .mngrview import MngrView
 class MngrController():
   def __init__(self, parent):
     self.parent = parent
-
     self.cfg = Configuration()
-
-    # fsm_cfg = self.cfg.get_fsm_cfg()
     self.runner = Runner()
-
     self.model = MngrModel(self.cfg)
     self.converter = MngrConverter()
     self.view = MngrView(self.parent)
 
 # Bind to modules panel
     self.view.modules_view.tree_view.bind('<<TreeviewOpen>>', self.open_all)
-
 # Bind to flows panel
-    self.flows_view_idx = 0
-    
+    self.flows_view_idx = 0  
     self.view.flows_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
-
     self.view.flows_view.btn_add.bind("<Button>", self.add_step_to_flow_meta)
     self.view.flows_view.btn_remove.bind("<Button>", self.remove_step_from_flow_meta)
     self.view.flows_view.btn_reset.bind("<Button>", self.reset_flow_meta)
@@ -41,8 +34,6 @@ class MngrController():
 
     self.view.flows_view.flow_tree_view.bind('<<TreeviewSelect>>', self.step_selected_tree)
 
-
-
 # Bind to images panel
     self.view.images_view.btn_load.bind("<Button>", self.load)
     self.view.images_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)
@@ -51,17 +42,14 @@ class MngrController():
 
     self.file_idx = None
     self.cv2image = None
-# Start
     self.start()
     
-
 # Initialization
   def start(self):
     self.update_modules_view()
     self.update_flows_view()
     self.update_images_view()
     return
-
 
   def update_modules_view(self):
     # TODO: add wrappers to MngrModel & MngrConverter
@@ -70,7 +58,6 @@ class MngrController():
       self.model.modules_model.get_modules_meta())
     self.view.modules_view.set_modules_meta(modules_meta_conv)
     return
-
 
   def update_flows_view(self):
     # TODO: add wrappers to MngrModel & MngrConverter
@@ -101,19 +88,16 @@ class MngrController():
     self.view.images_view.set_input_paths(paths)
     return
 
-
   def update_images_file_names_list(self, path):
     file_names_list = self.model.images_model.get_images_file_names_list(path)
     self.view.images_view.set_file_names_list(file_names_list)
     return
-
 
 # Actions
 # Modules panel' events and commands
   def open_all(self, event):
     self.view.modules_view.open_all()
     return
-
 
 # Flows panel's events and commands
   def selected(self, event):
@@ -125,7 +109,6 @@ class MngrController():
     self.update_flow_meta(item)
     self.view.flows_view.clear_operation_params()
     return
-
 
   def step_selected_tree(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
@@ -143,7 +126,6 @@ class MngrController():
     self.view.flows_view.set_operation_params(idx, step_instance, oper_params)
     return
 
-
   def add_step_to_flow_meta(self, event):
     # Get destination item position after that will be added new one
     cur_idx = self.view.flows_view.get_current_selection_tree()
@@ -156,7 +138,6 @@ class MngrController():
       new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
       self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx+1)
     return
-
 
   def remove_step_from_flow_meta(self, event):
     cur_idx = self.view.flows_view.get_current_selection_tree()
@@ -176,13 +157,13 @@ class MngrController():
         *self.converter.flows_converter.convert_ws_item(item), self.flow_meta)
     return
 
-
-
   def run(self, event):
     # Move to runner
     n = self.runner.get_number_of_states()
-    for i in range(n):
-      cur = self.next("")
+    idx = 0
+    while (idx < n-1):
+      idx = self.next("")
+    return
 
   def step(self, event_name):
     idx = self.view.flows_view.get_current_selection_tree()
@@ -215,20 +196,18 @@ class MngrController():
       cur = self.prev("")
     return
   
-
   def set_top_state(self):
     self.runner.init_io(self.cv2image) 
     self.view.images_view.set_result_image(self.cv2image)
     self.view.flows_view.set_selection_tree()
     return
 
-
 # Operation parameters sub panel's commands
   def apply(self, event):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
-    if self.cv2image:
+    if self.cv2image is not None:
       self.current()
     return
 
@@ -242,19 +221,15 @@ class MngrController():
       module = step['stm']
     else:
       module = step['exec']
-    module_name, oper_name = module.split('.')
-    
+    module_name, oper_name = module.split('.')   
     oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
     orig_image_size = self.model.images_model.get_original_image_size()
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
-
     self.view.flows_view.set_operation_params(idx, module, oper_params)
-
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
     return
-
 
 # Images panel's commands
   def selected_path(self, event):
@@ -262,13 +237,11 @@ class MngrController():
     self.update_images_file_names_list(item)   
     return
 
-
   def image_file_selected(self, idx):
     if not idx:
       return
     self.file_idx = idx[0] 
     return
-
 
   def load(self, event):
     self.cv2image = self.get_cv2image()
