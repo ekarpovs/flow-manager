@@ -166,6 +166,8 @@ class MngrController():
     return
 
   def step(self, event_name):
+    if self.cv2image is None:
+      return 0
     idx = self.view.flows_view.get_current_selection_tree()
     step_meta = self.flow_meta[idx]
     idx, cv2image = self.runner.dispatch_event(event_name, step_meta)
@@ -207,8 +209,7 @@ class MngrController():
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
-    if self.cv2image is not None:
-      self.current()
+    self.current()
     return
 
   def reset(self, event):
@@ -229,6 +230,7 @@ class MngrController():
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
+    self.current()
     return
 
 # Images panel's commands
