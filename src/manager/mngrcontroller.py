@@ -67,11 +67,14 @@ class MngrController():
     self.view.flows_view.set_worksheets_names(worksheets_names)
     return
 
+  def convert_flow_meta(self, meta):
+    return self.converter.flows_converter.convert_flow_meta(meta)
+
   def update_flow_meta(self, item):
     flow_meta = self.model.flows_model.load_flow_meta(
         *self.converter.flows_converter.convert_ws_item(item))
     self.flow_meta = flow_meta
-    flow_meta = self.converter.flows_converter.convert_flow_meta(flow_meta)
+    flow_meta = self.convert_flow_meta(flow_meta)
     self.view.flows_view.set_flow_meta(flow_meta)
     self.rerun_fsm()
     return
@@ -110,20 +113,23 @@ class MngrController():
     self.view.flows_view.clear_operation_params()
     return
 
-  def step_selected_tree(self, event):
-    idx = self.view.flows_view.get_current_selection_tree()
-    step = self.flow_meta[idx]
+
+  def set_operation_params(self, meta, idx):    
+    step = meta[idx]
     if 'exec' in step:
       step_instance = step['exec'] 
-      module_name, oper_name = step['exec'].split('.')
     elif 'stm' in step:
       step_instance = step['stm'] 
-      module_name, oper_name = step['stm'].split('.')
-
+    module_name, oper_name = step_instance.split('.')
     oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
     orig_image_size = self.model.images_model.get_original_image_size()
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
     self.view.flows_view.set_operation_params(idx, step_instance, oper_params)
+    return
+
+  def step_selected_tree(self, event):
+    idx = self.view.flows_view.get_current_selection_tree()
+    self.set_operation_params(self.flow_meta, idx)
     return
 
   def add_step_to_flow_meta(self, event):
@@ -135,7 +141,7 @@ class MngrController():
     # Perform if operation only selected
     if operation_meta is not None:
       new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx+1)
-      new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
+      new_flow_meta = self.convert_flow_meta(new_flow_meta)
       self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx+1)
     self.rerun_fsm()
     return
@@ -143,7 +149,7 @@ class MngrController():
   def remove_step_from_flow_meta(self, event):
     cur_idx = self.view.flows_view.get_current_selection_tree()
     new_flow_meta = self.model.flows_model.remove_operation_from_current_flow(cur_idx)
-    new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
+    new_flow_meta = self.convert_flow_meta(new_flow_meta)
     self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx-1)
     self.rerun_fsm()
     return
@@ -207,32 +213,23 @@ class MngrController():
     return
 
 # Operation parameters sub panel's commands
-  def apply(self, event):
+  def update_current_flow_params(self):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
     self.current()
     return
 
+  def apply(self, event):
+    self.update_current_flow_params()
+    return
+
   def reset(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
-
     item = self.view.flows_view.names_combo_box.get()      
     orig_flow_meta = self.model.flows_model.load_worksheet(*self.converter.flows_converter.convert_ws_item(item))
-    step = orig_flow_meta[idx]
-    if 'stm' in step:
-      module = step['stm']
-    else:
-      module = step['exec']
-    module_name, oper_name = module.split('.')   
-    oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
-    orig_image_size = self.model.images_model.get_original_image_size()
-    oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
-    self.view.flows_view.set_operation_params(idx, module, oper_params)
-    operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
-    self.model.flows_model.update_current_flow_params(operation_params_item)
-    self.view.flows_view.flow_tree_view.focus_set()
-    self.current()
+    self.set_operation_params(orig_flow_meta, idx)
+    self.update_current_flow_params()   
     return
 
 # Images panel's commands
