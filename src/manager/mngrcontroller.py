@@ -137,6 +137,7 @@ class MngrController():
       new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx+1)
       new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
       self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx+1)
+    self.rerun_fsm()
     return
 
   def remove_step_from_flow_meta(self, event):
@@ -144,6 +145,7 @@ class MngrController():
     new_flow_meta = self.model.flows_model.remove_operation_from_current_flow(cur_idx)
     new_flow_meta = self.converter.flows_converter.convert_flow_meta(new_flow_meta)
     self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx-1)
+    self.rerun_fsm()
     return
 
   def reset_flow_meta(self, event):
