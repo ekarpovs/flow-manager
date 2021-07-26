@@ -29,10 +29,10 @@ class MainActions(Frame):
     bfr = Frame(self)
     bfr.grid(row=0, column=4, padx=PADX, pady=PADY, sticky=E)
 
-    self.btn_clear = Button(bfr, text='Clear', width=BTNW, command=self.clear)
+    self.btn_clear = ttk.Button(bfr, text='Clear', width=BTNW, command=self.clear)
     self.btn_clear.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=E)
   
-    self.btn_exit = Button(bfr, text='Exit', width=BTNW)
+    self.btn_exit = ttk.Button(bfr, text='Exit', width=BTNW)
     self.btn_exit.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=E)
 
         

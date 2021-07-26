@@ -37,7 +37,7 @@ class ImagesView(View):
     self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar)
     self.names_combo_box['state'] = 'readonly'
 
-    self.btn_load = Button(self, text='Load', width=BTNW)
+    self.btn_load = ttk.Button(self, text='Load', width=BTNW)
 
     self.paths = []
     self.modulesvar = StringVar(value=self.paths)

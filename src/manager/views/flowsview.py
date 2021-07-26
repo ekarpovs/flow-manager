@@ -38,10 +38,10 @@ class FlowsView(View):
 
     # Setup operation parameters buttons
     oper_actions = Frame(self)
-    self.btn_add = Button(oper_actions, text='Add', width=BTNW)
-    self.btn_remove = Button(oper_actions, text='Remove', width=BTNW)
-    self.btn_reset = Button(oper_actions, text='Reset', width=BTNW)
-    self.btn_save = Button(oper_actions, text='Save', width=BTNW)
+    self.btn_add = ttk.Button(oper_actions, text='Add', width=BTNW)
+    self.btn_remove = ttk.Button(oper_actions, text='Remove', width=BTNW)
+    self.btn_reset = ttk.Button(oper_actions, text='Reset', width=BTNW)
+    self.btn_save = ttk.Button(oper_actions, text='Save', width=BTNW)
 
     self.btn_add.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + N)   
     self.btn_remove.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=E + N)
@@ -53,10 +53,10 @@ class FlowsView(View):
     # TODO: separate view
     flow_actions = Frame(self)
 
-    self.btn_run = Button(flow_actions, text='Run', width=BTNW)
-    self.btn_top = Button(flow_actions, text='Top', width=BTNW)
-    self.btn_next = Button(flow_actions, text='Next', width=BTNW)
-    self.btn_prev = Button(flow_actions, text='Prev', width=BTNW)
+    self.btn_run = ttk.Button(flow_actions, text='Run', width=BTNW)
+    self.btn_top = ttk.Button(flow_actions, text='Top', width=BTNW)
+    self.btn_next = ttk.Button(flow_actions, text='Next', width=BTNW)
+    self.btn_prev = ttk.Button(flow_actions, text='Prev', width=BTNW)
 
     self.btn_run.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + N)
     self.btn_next.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W + N)

@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import * 
-from tkinter.ttk import Combobox, Spinbox
+from tkinter.ttk import Combobox, Spinbox, Button
 from ...uiconst import *
 
 class OperParamsView(LabelFrame):
