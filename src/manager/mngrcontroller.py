@@ -1,3 +1,9 @@
+import json
+
+
+import json
+from tkinter.filedialog import asksaveasfilename
+
 from ..configuration import Configuration
 from flow_runner import Runner
 from flow_converter import FlowConverter 
@@ -161,8 +167,15 @@ class MngrController():
 
   def save_flow_meta(self, event):
     item = self.view.flows_view.names_combo_box.get()
-    self.model.flows_model.save_current_flow_meta(
-        *self.converter.flows_converter.convert_ws_item(item), self.flow_meta)
+    # self.model.flows_model.save_current_flow_meta(
+    #     *self.converter.flows_converter.convert_ws_item(item), self.flow_meta)
+    path, name = self.converter.flows_converter.convert_ws_item(item)
+    f = asksaveasfilename(initialfile = '{}.json'.format(name),
+      initialdir = path,
+      defaultextension=".json",filetypes=[("All Files","*.*"),("Json Documents","*.json")])
+    if f is not None:
+      with open(f, 'w') as fp:
+        json.dump(self.flow_meta, fp)
     return
 
   def run(self, event):
