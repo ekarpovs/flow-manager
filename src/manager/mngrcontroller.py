@@ -1,6 +1,4 @@
-import json
-
-
+# import tkinter as tk
 import json
 from tkinter.filedialog import asksaveasfilename
 
@@ -173,7 +171,7 @@ class MngrController():
     f = asksaveasfilename(initialfile = '{}.json'.format(name),
       initialdir = path,
       defaultextension=".json",filetypes=[("All Files","*.*"),("Json Documents","*.json")])
-    if f is not None:
+    if f is not '':
       with open(f, 'w') as fp:
         json.dump(self.flow_meta, fp)
     return
