@@ -79,6 +79,8 @@ class MngrController():
         *self.converter.flows_converter.convert_ws_item(item))
     self.flow_meta = flow_meta
     flow_meta = self.convert_flow_meta(flow_meta)
+    # Add eng flow marker 
+    flow_meta.append("glbstm.end")
     self.view.flows_view.set_flow_meta(flow_meta)
     self.rerun_fsm()
     return
@@ -182,7 +184,8 @@ class MngrController():
     idx = 0
     while (idx < n-1):
       idx = self.next("")
-    return
+    self.next("")
+    return 
 
   def step(self, event_name):
     if self.cv2image is None:
