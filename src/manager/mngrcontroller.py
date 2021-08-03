@@ -46,6 +46,7 @@ class MngrController():
 
     self.file_idx = None
     self.cv2image = None
+    self.flow_meta = None
     self.start()
     
 # Initialization
@@ -86,10 +87,12 @@ class MngrController():
     return
 
   def rerun_fsm(self):
-    fc = FlowConverter(self.flow_meta)
-    fsm_def = fc.convert()
-    self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), fsm_def)
-    self.runner.start()
+    if self.flow_meta:
+      fc = FlowConverter(self.flow_meta)
+      fsm_def = fc.convert()
+      self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), fsm_def)
+      self.runner.start()
+    self.set_top_state()
     return
 
   def update_images_view(self):
@@ -261,7 +264,7 @@ class MngrController():
   def load(self, event):
     self.cv2image = self.get_cv2image()
     self.view.images_view.set_original_image(self.cv2image)
-    self.set_top_state()
+    self.rerun_fsm()
     return
 
   def get_cv2image(self):
