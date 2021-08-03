@@ -263,7 +263,6 @@ class MngrController():
 
   def load(self, event):
     self.cv2image = self.get_cv2image()
-    self.view.images_view.set_original_image(self.cv2image)
     self.rerun_fsm()
     return
 
