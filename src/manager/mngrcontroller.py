@@ -80,7 +80,7 @@ class MngrController():
         *self.converter.flows_converter.convert_ws_item(item))
     self.flow_meta = flow_meta
     flow_meta = self.convert_flow_meta(flow_meta)
-    # Add eng flow marker 
+    # Add eng flow marker
     flow_meta.append("glbstm.end")
     self.view.flows_view.set_flow_meta(flow_meta)
     self.rerun_fsm()
@@ -224,9 +224,10 @@ class MngrController():
     return
   
   def set_top_state(self):
-    self.runner.init_io(self.cv2image) 
-    self.view.images_view.set_result_image(self.cv2image)
-    self.view.flows_view.set_selection_tree()
+    if self.cv2image is not None:
+      self.runner.init_io(self.cv2image) 
+      self.view.images_view.set_result_image(self.cv2image)
+      self.view.flows_view.set_selection_tree()
     return
 
 # Operation parameters sub panel's commands
