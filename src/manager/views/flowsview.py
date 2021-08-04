@@ -10,10 +10,8 @@ class FlowsView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
-
     self['bg'] = "mint cream"
     self['text'] = 'Flows panel'
-
 
     self.grid()
     self.rowconfigure(1, weight=1)
@@ -48,7 +46,6 @@ class FlowsView(View):
     self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=E + N)
     self.btn_save.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
 
-
     # Setup flow actions buttons
     # TODO: separate view
     flow_actions = Frame(self)
@@ -71,18 +68,16 @@ class FlowsView(View):
     flow_actions.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
 
 
-
   def clear_flow_tree_view(self):
     for item in self.flow_tree_view.get_children():
       self.flow_tree_view.delete(item)
-
+    return
 
   def set_flow_meta(self, flow_meta, idx=0):
     self.clear_flow_tree_view()
     for i, item in enumerate(flow_meta):
       self.flow_tree_view.insert(parent='', index='end', iid=i, text=item)
-    self.set_selection_tree(idx)
-    
+    self.set_selection_tree(idx)  
     return
 
   def set_selection_tree(self, idx=0):
@@ -93,29 +88,24 @@ class FlowsView(View):
       idx = max_idx-1
     self.flow_tree_view.focus_set()
     self.flow_tree_view.selection_set(idx)
-    self.flow_tree_view.focus(idx)
-    
+    self.flow_tree_view.focus(idx)   
     return
 
   def get_current_selection_tree(self):
     idx = self.flow_tree_view.selection()
     idx = int(idx[0])
-    
     return idx
 
   def set_worksheets_names(self, worksheets_names):
     self.names_combo_box['values'] = worksheets_names
     self.names_combo_box.current(0)
-
     return
 
 
   def set_operation_params(self, idx, exec, oper_params):
     self.oper_params_view.set_operation_params(idx, exec, oper_params)
-
     return
 
   def clear_operation_params(self):
     self.oper_params_view.clear_operation_params()
-
     return
