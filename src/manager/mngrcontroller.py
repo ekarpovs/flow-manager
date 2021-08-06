@@ -185,20 +185,19 @@ class MngrController():
     # Move to runner
     n = self.runner.get_number_of_states()
     idx = 0
-    while (idx < n-1):
+    while (idx < n-2):
       idx = self.next("")
-    self.next("")
+    # self.next("")
     return 
 
   def step(self, event_name):
-    if self.cv2image is None:
-      return 0
     idx = self.view.flows_view.get_current_selection_tree()
-    step_meta = self.flow_meta[idx]
-    idx, cv2image = self.runner.dispatch_event(event_name, step_meta)
-    if cv2image is not None:
-      self.view.images_view.set_result_image(cv2image)
-      self.view.flows_view.set_selection_tree(idx)
+    if self.cv2image is not None:
+      step_meta = self.flow_meta[idx]
+      idx, cv2image = self.runner.dispatch_event(event_name, step_meta)
+      if cv2image is not None:
+        self.view.images_view.set_result_image(cv2image)
+        self.view.flows_view.set_selection_tree(idx)
     return idx
 
   def next(self, event):
@@ -235,7 +234,8 @@ class MngrController():
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
-    self.current()
+    if self.cv2image is not None:
+      self.current()
     return
 
   def apply(self, event):
