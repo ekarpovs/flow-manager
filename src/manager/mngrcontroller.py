@@ -192,7 +192,7 @@ class MngrController():
 
   def step(self, event_name):
     idx = self.view.flows_view.get_current_selection_tree()
-    if self.cv2image is not None:
+    if self.image_loaded():
       step_meta = self.flow_meta[idx]
       idx, cv2image = self.runner.dispatch_event(event_name, step_meta)
       if cv2image is not None:
@@ -223,7 +223,7 @@ class MngrController():
     return
   
   def set_top_state(self):
-    if self.cv2image is not None:
+    if self.image_loaded():
       self.runner.init_io(self.cv2image) 
       self.view.images_view.set_result_image(self.cv2image)
       self.view.flows_view.set_selection_tree()
@@ -234,9 +234,12 @@ class MngrController():
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
     self.view.flows_view.flow_tree_view.focus_set()
-    if self.cv2image is not None:
+    if self.image_loaded():
       self.current()
     return
+
+  def image_loaded(self):
+    return self.cv2image is not None
 
   def apply(self, event):
     self.update_current_flow_params()
