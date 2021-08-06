@@ -187,7 +187,7 @@ class MngrController():
     idx = 0
     while (idx < n-2):
       idx = self.next("")
-    # self.next("")
+    self.next("")
     return 
 
   def step(self, event_name):
