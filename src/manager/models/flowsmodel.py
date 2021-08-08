@@ -13,7 +13,7 @@ class FlowsModel(Model):
     self.worksheets_from_all_paths = []
 
     # Current flow
-    self.flow_meta = {}
+    self.flow_meta = []
 
 
 # Loaders - model initialization
@@ -77,12 +77,14 @@ class FlowsModel(Model):
       ws = self.get_worksheet(path, name)
       self.flow_meta = copy.deepcopy(ws)
     else:
-      self.flow_meta = {}
+      self.flow_meta = []
 
     return self.flow_meta
 
   def add_opearation_to_current_flow(self, oper, idx):
     new_oper = {'exec': oper}
+    if len(self.flow_meta) <= 0:
+      idx = 0  
     self.flow_meta.insert(idx, new_oper)
 
     return self.flow_meta

@@ -80,8 +80,6 @@ class MngrController():
         *self.converter.flows_converter.convert_ws_item(item))
     self.flow_meta = flow_meta
     flow_meta = self.convert_flow_meta(flow_meta)
-    # Add eng flow marker
-    flow_meta.append("glbstm.end")
     self.view.flows_view.set_flow_meta(flow_meta)
     self.rerun_fsm()
     return
@@ -123,17 +121,18 @@ class MngrController():
     return
 
 
-  def set_operation_params(self, meta, idx):    
-    step = meta[idx]
-    if 'exec' in step:
-      step_instance = step['exec'] 
-    elif 'stm' in step:
-      step_instance = step['stm'] 
-    module_name, oper_name = step_instance.split('.')
-    oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
-    orig_image_size = self.model.images_model.get_original_image_size()
-    oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
-    self.view.flows_view.set_operation_params(idx, step_instance, oper_params)
+  def set_operation_params(self, meta, idx):
+    if len(meta) > 0:   
+      step = meta[idx]
+      if 'exec' in step:
+        step_instance = step['exec'] 
+      elif 'stm' in step:
+        step_instance = step['stm'] 
+      module_name, oper_name = step_instance.split('.')
+      oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
+      orig_image_size = self.model.images_model.get_original_image_size()
+      oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
+      self.view.flows_view.set_operation_params(idx, step_instance, oper_params)
     return
 
   def step_selected_tree(self, event):
@@ -152,6 +151,7 @@ class MngrController():
       new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx+1)
       new_flow_meta = self.convert_flow_meta(new_flow_meta)
       self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx+1)
+
     self.rerun_fsm()
     return
 

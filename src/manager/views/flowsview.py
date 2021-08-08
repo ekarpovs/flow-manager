@@ -77,6 +77,9 @@ class FlowsView(View):
     self.clear_flow_tree_view()
     for i, item in enumerate(flow_meta):
       self.flow_tree_view.insert(parent='', index='end', iid=i, text=item)
+    max_idx = len(self.flow_tree_view.get_children())
+    # Add eng flow marker
+    self.flow_tree_view.insert(parent='', index='end', iid=max_idx, text="glbstm.end")
     self.set_selection_tree(idx)  
     return
 
