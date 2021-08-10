@@ -4,6 +4,8 @@ import copy
 
 from .model import Model
 
+END_FLOW_MARKER = {"stm": "glbstm.end"}
+
 class FlowsModel(Model):
   def __init__(self, parent):
     super().__init__()
@@ -40,7 +42,7 @@ class FlowsModel(Model):
     ffn = "{}/{}.json".format(path, worksheets_names)
     with open(ffn, 'rt') as ws:
       worksheet = json.load(ws)
-
+    worksheet.append(END_FLOW_MARKER)
     return worksheet
 
 

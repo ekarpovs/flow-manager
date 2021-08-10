@@ -170,8 +170,6 @@ class MngrController():
 
   def save_flow_meta(self, event):
     item = self.view.flows_view.names_combo_box.get()
-    # self.model.flows_model.save_current_flow_meta(
-    #     *self.converter.flows_converter.convert_ws_item(item), self.flow_meta)
     path, name = self.converter.flows_converter.convert_ws_item(item)
     f = asksaveasfilename(initialfile = '{}.json'.format(name),
       initialdir = path,
@@ -183,11 +181,12 @@ class MngrController():
 
   def run(self, event):
     # Move to runner
-    n = self.runner.get_number_of_states()
-    idx = 0
-    while (idx < n-2):
-      idx = self.next("")
-    self.next("")
+    if self.image_loaded():
+      n = self.runner.get_number_of_states()
+      idx = 0
+      while (idx < n-2):
+        idx = self.next("")
+      self.next("")
     return 
 
   def step(self, event_name):
@@ -248,7 +247,7 @@ class MngrController():
   def reset(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
     item = self.view.flows_view.names_combo_box.get()      
-    orig_flow_meta = self.model.flows_model.load_worksheet(*self.converter.flows_converter.convert_ws_item(item))
+    orig_flow_meta = self.model.flows_model.get_worksheet(*self.converter.flows_converter.convert_ws_item(item))
     self.set_operation_params(orig_flow_meta, idx)
     self.update_current_flow_params()   
     return
