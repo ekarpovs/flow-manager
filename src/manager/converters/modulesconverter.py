@@ -81,5 +81,12 @@ class ModulesConverter(Converter):
         p_value = df
 
       oper_params.append({"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l})
+    
+    if ('params' in step) and ('useorig' in step['params']):
+      d = 'f'
+      l = 'useorig: use original image like input'
+      p_name = 'useorig'
+      p_value = step['params']['useorig']
+      oper_params.append({"type": '', "domain": d, "p_values": '', "name": p_name, "value": p_value, "label": l})
 
     return oper_params
