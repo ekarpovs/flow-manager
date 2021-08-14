@@ -52,12 +52,13 @@ class OperParamsView(LabelFrame):
     if btns_row > 0:
       self.btn_apply['state']=NORMAL
       self.btn_reset['state']=NORMAL
-      self.btn_apply.grid(row=btns_row, column=0, padx=PADX, pady=PADY, sticky=W + S)
-      self.btn_reset.grid(row=btns_row, column=1, padx=PADX, pady=PADY, sticky=W + S)
     else:
       self.btn_apply['state']=DISABLED
       self.btn_reset['state']=DISABLED
-
+  
+    self.btn_apply.grid(row=btns_row, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.btn_reset.grid(row=btns_row, column=1, padx=PADX, pady=PADY, sticky=W + S)
+  
     return
 
   def get_operation_params_item(self):
