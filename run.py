@@ -14,6 +14,7 @@ if __name__ == '__main__':
   # root.defaultFont.configure(size=12)
 
   root.title("Flow Manager")
+  root.iconbitmap()
   # root.state('zoomed')
   sw = root.winfo_screenwidth ()
   sh = root.winfo_screenheight()
