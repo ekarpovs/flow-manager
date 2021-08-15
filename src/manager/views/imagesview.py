@@ -2,7 +2,10 @@ from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import ttk
 import cv2
-
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.figure import Figure
 from ...uiconst import *
 from .view import View
 
@@ -18,10 +21,9 @@ class ImagesView(View):
     
     self.grid()
     self.rowconfigure(0, weight=1)
-    # self.rowconfigure(1, weight=1)
+    self.rowconfigure(1, minsize=40)
     self.rowconfigure(2, minsize=40)
     self.columnconfigure(0, weight=1)
-    # self.columnconfigure(1, weight=1)
 
     # Init the original image holder
     self.image_label = Label(self, text='Image', image=None, borderwidth=2, relief="solid")
@@ -38,9 +40,9 @@ class ImagesView(View):
     self.modulesvar = StringVar(value=self.paths)
     self.file_names_list_box = Listbox(self, height=10, listvariable=self.modulesvar, selectmode=BROWSE)
 
-    self.names_combo_box.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
-    self.btn_load.grid(row=1, column=1, padx=PADX, pady=PADY, sticky=W + S)
-    self.file_names_list_box.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=N+S+W+E)
+    self.names_combo_box.grid(row=2, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
+    self.btn_load.grid(row=2, column=1, padx=PADX, pady=PADY, sticky=W + S)
+    self.file_names_list_box.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=N+S+W+E)
 
 
   def set_input_paths(self, paths):
@@ -52,8 +54,6 @@ class ImagesView(View):
     self.modulesvar.set(file_names_list)
     self.set_selection()
     return
-  
-  
 
   def set_selection(self, idx=0):
     self.file_names_list_box.focus_set()
@@ -63,7 +63,6 @@ class ImagesView(View):
     self.file_names_list_box.selection_clear(cur_idx, cur_idx)
     self.select_list_item(idx)   
     return
-
 
   def select_list_item(self, idx):
     self.file_names_list_box.activate(idx)
@@ -85,24 +84,39 @@ class ImagesView(View):
     self.w = w
     return
 
-
   def fit_image_to_panel(self, image):
     self.calculate_new_size(image)   
     dim = (self.w, self.h)
     image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
     return image
 
-
   def set_result_image(self, cv2image):
     cv2image = self.fit_image_to_panel(cv2image)
-    image = Image.fromarray(cv2image)
-    imagetk = ImageTk.PhotoImage(image=image)
-    # Show the image
-    self.set_content(self.image_label, 0, 0, imagetk)
+    figure = Figure(figsize=(5,5), dpi=100)
+    splot = figure.add_subplot(111)
+    splot.imshow(cv2image,  cmap='gray')  
+
+    canvas = FigureCanvasTkAgg(figure, self)
+    canvas.draw()
+    wdg = canvas.get_tk_widget()
+    wdg.grid(row=0, column=0, padx=PADX, pady=PADY, columnspan=2, sticky=W + E + N + S)
+
+    toolbar = NavigationToolbar2Tk(canvas, wdg)
+    toolbar.update()
+    wdg = canvas.get_tk_widget()
     return
 
-  def set_content(self, label, r, c, imagetk):
-    label = Label(self, text='Image', image=imagetk, borderwidth=2, relief="solid")
-    label.image = imagetk
-    label.grid(row=r, column=c, padx=PADX, pady=PADY, columnspan=2, sticky=W + E + N + S)
-    return
+
+  # def set_result_image_orig(self, cv2image):
+  #   cv2image = self.fit_image_to_panel(cv2image)
+  #   image = Image.fromarray(cv2image)
+  #   imagetk = ImageTk.PhotoImage(image=image)
+  #   # Show the image
+  #   self.set_content(self.image_label, 0, 0, imagetk)
+  #   return
+
+  # def set_content(self, label, r, c, imagetk):
+  #   label = Label(self, text='Image', image=imagetk, borderwidth=2, relief="solid")
+  #   label.image = imagetk
+  #   label.grid(row=r, column=c, padx=PADX, pady=PADY, columnspan=2, sticky=W + E + N + S)
+  #   return
