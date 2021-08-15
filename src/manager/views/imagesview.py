@@ -84,14 +84,7 @@ class ImagesView(View):
     self.w = w
     return
 
-  def fit_image_to_panel(self, image):
-    self.calculate_new_size(image)   
-    dim = (self.w, self.h)
-    image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
-    return image
-
   def set_result_image(self, cv2image):
-    cv2image = self.fit_image_to_panel(cv2image)
     figure = Figure(figsize=(5,5), dpi=100)
     splot = figure.add_subplot(111)
     splot.imshow(cv2image,  cmap='gray')  
@@ -106,6 +99,11 @@ class ImagesView(View):
     wdg = canvas.get_tk_widget()
     return
 
+  # def fit_image_to_panel(self, image):
+  #   self.calculate_new_size(image)   
+  #   dim = (self.w, self.h)
+  #   image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+  #   return image
 
   # def set_result_image_orig(self, cv2image):
   #   cv2image = self.fit_image_to_panel(cv2image)
