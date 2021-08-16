@@ -44,10 +44,6 @@ class ImagesView(View):
     self.btn_load.grid(row=2, column=1, padx=PADX, pady=PADY, sticky=W + S)
     self.file_names_list_box.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=N+S+W+E)
 
-    self.figure = Figure(figsize=(5,5), dpi=100)
-    self.splot = self.figure.add_subplot(111)
-
-
 
   def set_input_paths(self, paths):
     self.names_combo_box['values'] = paths
@@ -89,16 +85,17 @@ class ImagesView(View):
     return
 
   def set_result_image(self, cv2image):
-    canvas = FigureCanvasTkAgg(self.figure, self)
+    figure = Figure(figsize=(5,5), dpi=100)
+    # Adds a subplot at the 1st position
+    splot = figure.add_subplot(111)
+    canvas = FigureCanvasTkAgg(figure, self)
     canvas.draw()
     wdg = canvas.get_tk_widget()
     wdg.grid(row=0, column=0, padx=PADX, pady=PADY, columnspan=2, sticky=W + E + N + S)
 
     toolbar = NavigationToolbar2Tk(canvas, wdg)
     toolbar.update()
-
-    self.splot.clear()
-    self.splot.imshow(cv2image,  cmap='gray')  
+    splot.imshow(cv2image,  cmap='gray')
     return
 
   # def fit_image_to_panel(self, image):
