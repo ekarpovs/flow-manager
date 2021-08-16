@@ -184,9 +184,11 @@ class MngrController():
     if self.image_loaded():
       n = self.runner.get_number_of_states()
       idx = 0
-      while (idx < n-2):
+      while (idx < n-1):
         idx = self.next("")
-      self.next("")
+        print("idx", idx)
+      idx = self.next("")
+      print("idx end", idx)
     return 
 
   def step(self, event_name):
