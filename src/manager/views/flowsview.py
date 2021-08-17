@@ -95,7 +95,10 @@ class FlowsView(View):
 
   def get_current_selection_tree(self):
     idx = self.flow_tree_view.selection()
-    idx = int(idx[0])
+    if len(idx) > 0:
+      idx = int(idx[0])
+    else:
+      idx = 0
     return idx
 
   def set_worksheets_names(self, worksheets_names):
