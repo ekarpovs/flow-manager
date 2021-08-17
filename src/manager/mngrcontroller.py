@@ -181,17 +181,16 @@ class MngrController():
 
   def run(self, event):
     # Move to runner
-    if self.image_loaded():
+    if self.ready():
       n = self.runner.get_number_of_states()
       idx = 0
       while (idx < n-1):
         idx = self.next("")
-      idx = self.next("")
     return 
 
   def step(self, event_name):
     idx = self.view.flows_view.get_current_selection_tree()
-    if self.image_loaded():
+    if self.ready():
       step_meta = self.flow_meta[idx]
       idx, cv2image = self.runner.dispatch_event(event_name, step_meta)
       if cv2image is not None:
@@ -216,16 +215,18 @@ class MngrController():
     return image
 
   def top(self, event):
-    n = self.runner.get_number_of_states()
-    for i in range(n):
-      cur = self.prev("")
+    if self.ready():
+      n = self.runner.get_number_of_states()
+      for i in range(n):
+        cur = self.prev("")
     return
   
   def set_top_state(self):
     if self.image_loaded():
-      self.runner.init_io(self.cv2image) 
       self.view.images_view.set_result_image(self.cv2image)
+    if self.ready():
       self.view.flows_view.set_selection_tree()
+      self.runner.init_io(self.cv2image) 
     return
 
 # Operation parameters sub panel's commands
@@ -239,6 +240,9 @@ class MngrController():
 
   def image_loaded(self):
     return self.cv2image is not None
+
+  def ready(self):
+    return self.image_loaded() and self.runner.initialized()
 
   def apply(self, event):
     self.update_current_flow_params()
