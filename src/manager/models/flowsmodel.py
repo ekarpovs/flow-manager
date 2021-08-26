@@ -79,6 +79,7 @@ class FlowsModel(Model):
   def add_opearation_to_current_flow(self, oper, idx):
     new_oper = {'exec': oper}
     if len(self.flow_meta) <= 0:
+      self.flow_meta.append(END_FLOW_MARKER)
       idx = 0  
     self.flow_meta.insert(idx, new_oper)
     return self.flow_meta
