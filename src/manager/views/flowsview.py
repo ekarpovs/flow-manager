@@ -31,6 +31,10 @@ class FlowsView(View):
 
     self.flow_tree_view.column('#0', minwidth=70, width=80)
 
+    self.tree_view_scrollbar = ttk.Scrollbar(self, orient=VERTICAL, command=self.flow_tree_view.yview)
+    self.tree_view_scrollbar.grid(row=1, column=1, sticky=N+S)
+    self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar.set)
+
     # Setup operation parameters view
     self.oper_params_view = OperParamsView(self)
 
