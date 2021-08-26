@@ -90,7 +90,7 @@ class MngrController():
       fsm_def = fc.convert()
       self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), fsm_def)
       self.runner.start()
-    self.set_top_state()
+      self.set_top_state()
     return
 
   def update_images_view(self):
@@ -179,23 +179,25 @@ class MngrController():
         json.dump(self.flow_meta, fp)
     return
 
+  def set_result(self, idx, cv2image):
+    if cv2image is not None:
+      self.view.images_view.set_result_image(cv2image)
+    self.view.flows_view.set_selection_tree(idx)
+    return
+
   def run(self, event):
-    # Move to runner
+    idx = 0
     if self.ready():
-      n = self.runner.get_number_of_states()
-      idx = 0
-      while (idx < n-1):
-        idx = self.next("")
-    return 
+      idx, cv2image = self.runner.run_all(self.flow_meta)
+      self.set_result(idx, cv2image)
+    return idx
 
   def step(self, event_name):
     idx = self.view.flows_view.get_current_selection_tree()
     if self.ready():
       step_meta = self.flow_meta[idx]
-      idx, cv2image = self.runner.dispatch_event(event_name, step_meta)
-      if cv2image is not None:
-        self.view.images_view.set_result_image(cv2image)
-        self.view.flows_view.set_selection_tree(idx)
+      idx, cv2image = self.runner.run_step(event_name, step_meta)
+      self.set_result(idx, cv2image)
     return idx
 
   def next(self, event):
@@ -216,9 +218,8 @@ class MngrController():
 
   def top(self, event):
     if self.ready():
-      n = self.runner.get_number_of_states()
-      for i in range(n):
-        cur = self.prev("")
+      self.runner.start()
+      self.set_top_state()
     return
   
   def set_top_state(self):
