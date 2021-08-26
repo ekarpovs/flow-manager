@@ -178,7 +178,10 @@ class MngrController():
       defaultextension=".json",filetypes=[("All Files","*.*"),("Json Documents","*.json")])
     if f is not '':
       with open(f, 'w') as fp:
-        json.dump(self.flow_meta, fp)
+        meta = self.flow_meta
+        if meta[-1].get('stm') == 'glbstm.end':
+          meta.pop(-1)
+        json.dump(meta, fp)
     return
 
   def set_result(self, idx, cv2image):
