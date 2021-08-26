@@ -10,10 +10,8 @@ class FlowsModel(Model):
   def __init__(self, parent):
     super().__init__()
     self.parent = parent 
-  
 
     self.worksheets_from_all_paths = []
-
     # Current flow
     self.flow_meta = []
 
@@ -21,19 +19,17 @@ class FlowsModel(Model):
 # Loaders - model initialization
   def read_worksheets_names(self, path):
     worksheets_names = [f[:-5] for f in os.listdir(path) if f.endswith('.json')]
-
     return worksheets_names
   
   def load_worksheets_from_all_paths(self):
     worksheets_paths = self.parent.get_worksheets_paths()
     for path in worksheets_paths:
       self.worksheets_from_all_paths.append(self.load_worksheets(path))
-       
+    return  
 
   def load_worksheets(self, path):
     worksheets_names = self.read_worksheets_names(path)
     worksheets = {"path": path, "worksheets": [{"name": wsn,  "content": self.load_worksheet(path, wsn)} for wsn in worksheets_names]}
-
     return worksheets
 
 
@@ -44,7 +40,6 @@ class FlowsModel(Model):
       worksheet = json.load(ws)
     worksheet.append(END_FLOW_MARKER)
     return worksheet
-
 
 
 # Getters
@@ -59,7 +54,6 @@ class FlowsModel(Model):
       path = set['path']
       for wss in set['worksheets']:
         worksheets_names.append({"name":wss['name'], "path": path})    
-
     return worksheets_names
 
 # by path
@@ -80,7 +74,6 @@ class FlowsModel(Model):
       self.flow_meta = copy.deepcopy(ws)
     else:
       self.flow_meta = []
-
     return self.flow_meta
 
   def add_opearation_to_current_flow(self, oper, idx):
@@ -88,21 +81,13 @@ class FlowsModel(Model):
     if len(self.flow_meta) <= 0:
       idx = 0  
     self.flow_meta.insert(idx, new_oper)
-
     return self.flow_meta
 
 
   def remove_operation_from_current_flow(self, idx):
-    self.flow_meta.pop(idx)
-
+    if len(self.flow_meta) > 0:
+      self.flow_meta.pop(idx)
     return self.flow_meta
-
-  def save_current_flow_meta(self, path, name, meta):
-    print("path", path)
-    print("name", name)
-    print("meta", meta)
-    pass
-
 
   def update_current_flow_params(self, operation_params_item):
     idx = operation_params_item['idx']
@@ -115,7 +100,5 @@ class FlowsModel(Model):
       pn = param['name'].strip() 
       pv = param['value'] 
       flow_item_to_update['params'][pn] = pv
-
-    # print("after", flow_item_to_update)
-      
+    # print("after", flow_item_to_update)    
     return flow_item_to_update
