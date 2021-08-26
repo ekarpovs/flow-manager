@@ -51,21 +51,23 @@ class FlowsView(View):
     flow_actions = Frame(self)
 
     self.btn_run = ttk.Button(flow_actions, text='Run', width=BTNW)
-    self.btn_top = ttk.Button(flow_actions, text='Top', width=BTNW)
     self.btn_next = ttk.Button(flow_actions, text='Next', width=BTNW)
     self.btn_prev = ttk.Button(flow_actions, text='Prev', width=BTNW)
+    self.btn_top = ttk.Button(flow_actions, text='Top', width=BTNW)
 
     self.btn_run.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + N)
     self.btn_next.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W + N)
     self.btn_prev.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=E + N)
     self.btn_top.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
-
     # Setup widgets layout
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
     self.flow_tree_view.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
     oper_actions.grid(row=2, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
     self.oper_params_view.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
     flow_actions.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    # Set the buttons initial state
+    self.activate_buttons()
+    return
 
 
   def clear_flow_tree_view(self):
@@ -73,7 +75,6 @@ class FlowsView(View):
     for item in items:
       self.flow_tree_view.delete(item)
     return
-
     
   def set_flow_meta(self, flow_meta, idx=0):
     self.clear_flow_tree_view()
@@ -106,11 +107,20 @@ class FlowsView(View):
     self.names_combo_box.current(0)
     return
 
-
   def set_operation_params(self, idx, exec, oper_params):
     self.oper_params_view.set_operation_params(idx, exec, oper_params)
     return
 
   def clear_operation_params(self):
     self.oper_params_view.clear_operation_params()
+    return
+
+  def activate_buttons(self, activate=False):
+    state = DISABLED
+    if activate:
+      state = NORMAL
+    self.btn_run['state']=state
+    self.btn_next['state']=state
+    self.btn_prev['state']=state
+    self.btn_top['state']=state
     return

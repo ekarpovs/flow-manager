@@ -76,6 +76,7 @@ class MngrController():
     return self.converter.flows_converter.convert_flow_meta(meta)
 
   def update_flow_meta(self, item):
+    self.view.flows_view.activate_buttons()
     flow_meta = self.model.flows_model.load_flow_meta(
         *self.converter.flows_converter.convert_ws_item(item))
     self.flow_meta = flow_meta
@@ -148,18 +149,19 @@ class MngrController():
     operation_meta = self.view.modules_view.get_selected_operation_meta()
     # Perform if operation only selected
     if operation_meta is not None:
-      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx+1)
+      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx)
+      self.flow_meta = new_flow_meta
       new_flow_meta = self.convert_flow_meta(new_flow_meta)
       self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx+1)
-
     self.rerun_fsm()
     return
 
   def remove_step_from_flow_meta(self, event):
     cur_idx = self.view.flows_view.get_current_selection_tree()
     new_flow_meta = self.model.flows_model.remove_operation_from_current_flow(cur_idx)
+    self.flow_meta = new_flow_meta
     new_flow_meta = self.convert_flow_meta(new_flow_meta)
-    self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx-1)
+    self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx)
     self.rerun_fsm()
     return
 
@@ -243,7 +245,12 @@ class MngrController():
     return self.cv2image is not None
 
   def ready(self):
-    return self.image_loaded() and self.runner.initialized()
+    if self.image_loaded() and self.runner.initialized() and len(self.flow_meta) > 0:
+      self.view.flows_view.activate_buttons(True)
+      return True
+    else:
+      self.view.flows_view.activate_buttons()
+      return False
 
   def apply(self, event):
     self.update_current_flow_params()
