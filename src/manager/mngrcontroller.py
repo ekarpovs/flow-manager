@@ -121,19 +121,26 @@ class MngrController():
     self.view.flows_view.clear_operation_params()
     return
 
+  def get_operation_params(self, step):
+    if type(step) is dict:
+      if 'exec' in step:
+        step_def = step['exec'] 
+      elif 'stm' in step:
+        step_def = step['stm']
+    else:
+      step_def = step   
+
+    module_name, oper_name = step_def.split('.')
+    orig_image_size = self.model.images_model.get_original_image_size()
+    oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
+    oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
+    return step_def, oper_params
 
   def set_operation_params(self, meta, idx):
-    if len(meta) > 0:   
+    if len(meta) > 0:
       step = meta[idx]
-      if 'exec' in step:
-        step_instance = step['exec'] 
-      elif 'stm' in step:
-        step_instance = step['stm'] 
-      module_name, oper_name = step_instance.split('.')
-      oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
-      orig_image_size = self.model.images_model.get_original_image_size()
-      oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
-      self.view.flows_view.set_operation_params(idx, step_instance, oper_params)
+      step_def, oper_params = self.get_operation_params(step)
+      self.view.flows_view.set_operation_params(idx, step_def, oper_params)
     return
 
   def step_selected_tree(self, event):
@@ -144,17 +151,12 @@ class MngrController():
   def add_step_to_flow_meta(self, event):
     # Get destination item position after that will be added new one
     cur_idx = self.view.flows_view.get_current_selection_tree()
-
     # Get source item position from modules view
-    operation_meta = self.view.modules_view.get_selected_operation_meta()
-    
-    module_name, oper_name = operation_meta.split('.')
-    oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
-    oper_params = self.converter.modules_converter.convert_params_defenition_to_params(operation_meta, oper_params_defenition, [0,0])
-    
+    operation_meta = self.view.modules_view.get_selected_operation_meta()   
     # Perform if operation only selected
-    if operation_meta is not None:
-      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, oper_params, cur_idx)
+    if operation_meta is not None:     
+      step_def, oper_params = self.get_operation_params(operation_meta)
+      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(step_def, oper_params, cur_idx)
       self.flow_meta = new_flow_meta
       new_flow_meta = self.convert_flow_meta(new_flow_meta)
       self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx+1)
