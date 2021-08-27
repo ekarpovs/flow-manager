@@ -147,9 +147,14 @@ class MngrController():
 
     # Get source item position from modules view
     operation_meta = self.view.modules_view.get_selected_operation_meta()
+    
+    module_name, oper_name = operation_meta.split('.')
+    oper_params_defenition = self.model.modules_model.read_operation_params_defenition(module_name, oper_name)
+    oper_params = self.converter.modules_converter.convert_params_defenition_to_params(operation_meta, oper_params_defenition, [0,0])
+    
     # Perform if operation only selected
     if operation_meta is not None:
-      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, cur_idx)
+      new_flow_meta = self.model.flows_model.add_opearation_to_current_flow(operation_meta, oper_params, cur_idx)
       self.flow_meta = new_flow_meta
       new_flow_meta = self.convert_flow_meta(new_flow_meta)
       self.view.flows_view.set_flow_meta(new_flow_meta, cur_idx+1)

@@ -76,8 +76,20 @@ class FlowsModel(Model):
       self.flow_meta = []
     return self.flow_meta
 
-  def add_opearation_to_current_flow(self, oper, idx):
-    new_oper = {'exec': oper}
+  def add_opearation_to_current_flow(self, oper, oper_params, idx):
+    if oper.split('.')[0] == 'glbstm':
+      new_oper = {'stm': oper, "params": {}}
+      params = new_oper.get('params')
+      for p in oper_params:
+        # {"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l}
+        value = p.get('value')
+        print(type(value))
+        if p.get('type') == 'n':
+          value = int(value)
+        params[p.get('name')] = value
+      # 
+    else:
+      new_oper = {'exec': oper}
     if len(self.flow_meta) <= 0:
       self.flow_meta.append(END_FLOW_MARKER)
       idx = 0  
