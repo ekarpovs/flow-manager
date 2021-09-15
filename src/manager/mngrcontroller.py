@@ -1,4 +1,4 @@
-# import tkinter as tk
+import numpy as np
 import json
 from tkinter.filedialog import asksaveasfilename
 
@@ -39,11 +39,16 @@ class MngrController():
     self.view.flows_view.flow_tree_view.bind('<<TreeviewSelect>>', self.step_selected_tree)
 
 # Bind to images panel
+    self.view.images_view.without_check_button.bind('<<CheckbuttonChecked>>', self.without_checked)
+    self.view.images_view.without_check_button.bind('<<CheckbuttonUnChecked>>', self.without_unchecked)
+
     self.view.images_view.btn_load.bind("<Button>", self.load)
     self.view.images_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)
+    
     self.view.images_view.file_names_list_box.bind('<<ListboxSelect>>', 
       lambda e: self.image_file_selected(self.view.images_view.file_names_list_box.curselection()))
 
+    self.use_without = False
     self.file_idx = None
     self.cv2image = None
     self.flow_meta = None
@@ -91,7 +96,7 @@ class MngrController():
       fsm_def = fc.convert()
       self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), fsm_def)
       self.runner.start()
-      self.set_top_state()
+    self.set_top_state()
     return
 
   def update_images_view(self):
@@ -255,7 +260,7 @@ class MngrController():
     return self.cv2image is not None
 
   def ready(self):
-    if self.image_loaded() and self.runner.initialized() and len(self.flow_meta) > 0:
+    if (self.use_without or self.image_loaded()) and self.runner.initialized() and len(self.flow_meta) > 0:
       self.view.flows_view.activate_buttons(True)
       return True
     else:
@@ -288,7 +293,8 @@ class MngrController():
 
   def load(self, event):
     self.cv2image = self.get_cv2image()
-    self.rerun_fsm()
+    # self.rerun_fsm()
+    self.set_top_state()
     return
 
   def get_cv2image(self):
@@ -298,3 +304,20 @@ class MngrController():
       image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
       cv2image = self.model.images_model.get_image(image_full_file_name)
     return cv2image
+
+  def without_checked(self, event):
+    print('Use without an image checked')
+    self.use_without = True
+    self.cv2image = np.ones((10, 10, 3), dtype="uint8")*255
+    self.view.images_view.set_result_image(self.cv2image)
+    self.view.images_view.activate_controls()
+    self.set_top_state()
+    return
+
+  def without_unchecked(self, event):
+    print('Use without an image unchecked')
+    self.use_without = False
+    self.cv2image = None
+    self.view.images_view.activate_controls(True)
+    self.set_top_state()
+    return

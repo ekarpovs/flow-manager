@@ -26,12 +26,17 @@ class ImagesView(View):
     self.rowconfigure(0, weight=1)
     self.rowconfigure(1, minsize=40)
     self.rowconfigure(2, minsize=40)
+    self.rowconfigure(3, minsize=40)
     self.columnconfigure(0, weight=1)
 
     # Init the original image holder
     self.image_label = Label(self, text='Image', image=None, borderwidth=2, relief="solid")
     self.image_label.image = None
     self.image_label.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + N + S)
+
+    self.withoutvar = BooleanVar()
+    self.without_check_button = ttk.Checkbutton(self, text = "Use without input", variable=self.withoutvar, onvalue=True, offvalue=False, command=self.without)
+    self.without_check_button.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + S)
 
     self.namesvar = StringVar()
     self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar)
@@ -88,3 +93,18 @@ class ImagesView(View):
     plt.imshow(cv2image, cmap='gray')
     return
 
+  def without(self):
+    if self.withoutvar.get():
+      self.without_check_button.event_generate("<<CheckbuttonChecked>>")
+    else:
+      self.without_check_button.event_generate("<<CheckbuttonUnChecked>>")
+    return
+
+  def activate_controls(self, activate=False):
+    state = DISABLED
+    if activate:
+      state = NORMAL
+    self.names_combo_box['state']=state
+    self.file_names_list_box['state']=state
+    self.btn_load['state']=state
+    return
