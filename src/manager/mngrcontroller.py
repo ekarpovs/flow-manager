@@ -49,8 +49,10 @@ class MngrController():
       lambda e: self.image_file_selected(self.view.images_view.file_names_list_box.curselection()))
 
     self.use_without = False
+    self.init_mage = np.ones((10, 10, 3), dtype="uint8")*255
+    self.cv2image = self.init_mage
+    self.view.images_view.set_result_image(self.cv2image)
     self.file_idx = None
-    self.cv2image = None
     self.flow_meta = None
     self.start()
     
@@ -306,18 +308,17 @@ class MngrController():
     return cv2image
 
   def without_checked(self, event):
-    print('Use without an image checked')
-    self.use_without = True
-    self.cv2image = np.ones((10, 10, 3), dtype="uint8")*255
-    self.view.images_view.set_result_image(self.cv2image)
-    self.view.images_view.activate_controls()
-    self.set_top_state()
+    self.without_changed(True)
     return
 
   def without_unchecked(self, event):
-    print('Use without an image unchecked')
-    self.use_without = False
-    self.cv2image = None
-    self.view.images_view.activate_controls(True)
+    self.without_changed(False)
+    return
+
+  def without_changed(self, new_state):
+    self.use_without = new_state
+    self.cv2image = self.init_mage
+    self.view.images_view.set_result_image(self.cv2image)
+    self.view.images_view.activate_controls(not new_state)
     self.set_top_state()
     return
