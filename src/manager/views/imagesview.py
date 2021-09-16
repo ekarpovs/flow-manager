@@ -17,8 +17,8 @@ class ImagesView(View):
     super().__init__(parent)
     self.parent = parent 
 
-    self['bg'] = "snow2"
-    self['text'] = 'Images panel'
+    # self['bg'] = "snow2"
+    self['text'] = 'Input/Output'
 
     self.panel_height, self.panel_width = get_panel_size(parent)
     
@@ -39,7 +39,7 @@ class ImagesView(View):
     self.without_check_button.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + S)
 
     self.namesvar = StringVar()
-    self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar)
+    self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar, font=("TkDefaultFont"))
     self.names_combo_box['state'] = 'readonly'
 
     self.btn_load = ttk.Button(self, text='Load', width=BTNW)

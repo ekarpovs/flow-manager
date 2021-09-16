@@ -10,8 +10,8 @@ class FlowsView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
-    self['bg'] = "mint cream"
-    self['text'] = 'Flows panel'
+    # self['bg'] = "mint cream"
+    self['text'] = 'Flows'
 
     self.grid()
     self.rowconfigure(1, weight=1)
@@ -20,7 +20,7 @@ class FlowsView(View):
 
     # Setup combobox
     self.namesvar = StringVar()
-    self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar)
+    self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar, font=("TkDefaultFont"))
     self.names_combo_box['state'] = 'readonly'
 
     # Setup Treeview

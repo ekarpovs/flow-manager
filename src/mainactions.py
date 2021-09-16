@@ -10,7 +10,7 @@ class MainActions(Frame):
     super().__init__(parent)
     self.parent = parent 
 
-    self["bg"] = "green"
+    # self["bg"] = "green"
 
     self.grid()
     self.columnconfigure(0, weight=1)

@@ -19,8 +19,8 @@ class ModulesView(View):
     super().__init__(parent)
     self.parent = parent 
 
-    self['bg'] = "light yellow"
-    self['text'] = 'Modules panel'
+    # self['bg'] = "light yellow"
+    self['text'] = 'Modules'
 
     # height, width = get_panel_size(parent)
     # print("modules panel size", height, width)
