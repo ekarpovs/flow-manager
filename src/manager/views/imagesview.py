@@ -34,9 +34,9 @@ class ImagesView(View):
     self.image_label.image = None
     self.image_label.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + N + S)
 
-    self.withoutvar = BooleanVar()
-    self.without_check_button = ttk.Checkbutton(self, text = "Use without input", variable=self.withoutvar, onvalue=True, offvalue=False, command=self.without)
-    self.without_check_button.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + S)
+    self.autoinputvar = BooleanVar()
+    self.auto_input_check_button = ttk.Checkbutton(self, text = "Use auto loaded input image", variable=self.autoinputvar, onvalue=True, offvalue=False, command=self.auto_input)
+    self.auto_input_check_button.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + S)
 
     self.namesvar = StringVar()
     self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar, font=("TkDefaultFont"))
@@ -93,11 +93,11 @@ class ImagesView(View):
     plt.imshow(cv2image, cmap='gray')
     return
 
-  def without(self):
-    if self.withoutvar.get():
-      self.without_check_button.event_generate("<<CheckbuttonChecked>>")
+  def auto_input(self):
+    if self.autoinputvar.get():
+      self.auto_input_check_button.event_generate("<<CheckbuttonChecked>>")
     else:
-      self.without_check_button.event_generate("<<CheckbuttonUnChecked>>")
+      self.auto_input_check_button.event_generate("<<CheckbuttonUnChecked>>")
     return
 
   def activate_controls(self, activate=False):
