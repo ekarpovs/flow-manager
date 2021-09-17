@@ -65,22 +65,8 @@ class OperParamsView(LabelFrame):
     params = []
     for control in self.operation_param_controls['param_controls']:
       name = control['label']['text'].split(':')[0]
-      if type(control['control']) is Entry:
-        entry_value = control['control'].get().strip()
-        if entry_value == '':
-          entry_value = '0'
-        try:
-          if '.' in entry_value:
-            value = float(entry_value)
-          else:  
-            value = int(entry_value)
-        except ValueError:
-          value = entry_value
-      elif type(control['control']) is Combobox:
-        value = control['command']()
-      elif type(control['control']) is Spinbox:
-        value = control['command']()
-      elif type(control['control']) is Checkbutton:
+      t = type(control['control'])
+      if t in [Entry, Combobox, Spinbox, Checkbutton]:
         value = control['command']()
       else:
         print("wrong control type", type(control['control']))
@@ -103,18 +89,25 @@ class OperParamsView(LabelFrame):
 
   
   def create_param_control(self, param):
-    param_domain = param['domain']
+    param_domain = param.get('domain')
 
     def domain_single(param):
-      param_value = param['value']
-      if param_value == '':
-        param_value = 0
-      item = tk.StringVar()
-  
-      param_control = Entry(self, textvariable=item)
-      item.set(param_value)
-      param_command = None
+      def get():
+        value = param_control.get()
+        if param_type == 'f':
+          value = float(value)
+        elif param_type == 'n':
+          value = int(value)
+        else:
+          pass
+        return value
 
+      param_value = param.get('value')
+      param_type = param.get('type')
+      var = self.get_var_by_type(param_type)  
+      var.set(param_value)
+      param_control = Entry(self, textvariable=var)
+      param_command = get
       return param_command, param_control
 
     def domain_list(param):
@@ -122,9 +115,9 @@ class OperParamsView(LabelFrame):
 
       def get():
         value = param_control.get()
-        if type == 'f':
+        if param_type == 'f':
           value = float(value)
-        elif type == 'n':
+        elif param_type == 'n':
           value = int(value)
         else:
           pass
@@ -134,18 +127,13 @@ class OperParamsView(LabelFrame):
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       param_control['values'] = param_values_tuple
 
-      type = param['type']
-      if type == 'f':
-        selected_item = tk.DoubleVar()
-      elif type == 'n':
-        selected_item = tk.IntVar()
-      else:
-        selected_item = tk.StringVar()
+      param_type = param.get('type')
+      var = self.get_var_by_type(param_type)  
 
       param_default_value = param['value']     
       param_control.set(param_default_value)
 
-      param_control.textvariable = selected_item
+      param_control.textvariable = var
       param_command = get
 
       return param_command, param_control
@@ -189,8 +177,8 @@ class OperParamsView(LabelFrame):
         param_value = get_key(param_value)
 
       param_control.set(param_value)
-      selected_item = tk.StringVar()
-      param_control.textvariable = selected_item
+      item = tk.StringVar()
+      param_control.textvariable = item
       param_command = get
 
       return param_command, param_control
@@ -201,24 +189,23 @@ class OperParamsView(LabelFrame):
       from_ = param_values_tuple[0]
       to = param_values_tuple[1]
 
-      type = param['type']
-      if type == 'f':
-        item = tk.DoubleVar()
-      elif type == 'n':
-        item = tk.IntVar()
-      else:
-        item = tk.StringVar()
+      param_type = param.get('type')
+      var = self.get_var_by_type(param_type)  
 
       def get():
-        return item.get()
-
-      param_control = Spinbox(self, from_=from_, to=to, textvariable=item, wrap=True, command=get)
+        value = var.get()
+        if param_type == 'f':
+          value = float(value)
+        elif param_type == 'n':
+          value = int(value)
+        else:
+          pass
+        return value
 
       param_value = param['value']     
-      item.set(param_value)
-
+      var.set(param_value)
+      param_control = Spinbox(self, from_=from_, to=to, textvariable=var, wrap=True, command=get)
       param_command = get
-
       return param_command, param_control
 
     domain_switcher = {
@@ -233,6 +220,15 @@ class OperParamsView(LabelFrame):
 
     return control_builder(param)
 
+  @staticmethod
+  def get_var_by_type(type):
+    if type == 'f':
+      var = tk.DoubleVar()
+    elif type == 'n':
+      var = tk.IntVar()
+    else:
+      var = tk.StringVar()
+    return var
   
 # Possible parameters values parsing
   # d = [key1:0,key2:1,key3:2]
