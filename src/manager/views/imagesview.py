@@ -26,17 +26,12 @@ class ImagesView(View):
     self.rowconfigure(0, weight=1)
     self.rowconfigure(1, minsize=40)
     self.rowconfigure(2, minsize=40)
-    self.rowconfigure(3, minsize=40)
     self.columnconfigure(0, weight=1)
 
     # Init the original image holder
     self.image_label = Label(self, text='Image', image=None, borderwidth=2, relief="solid")
     self.image_label.image = None
     self.image_label.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + N + S)
-
-    self.autoinputvar = BooleanVar()
-    self.auto_input_check_button = ttk.Checkbutton(self, text = "Use auto loaded input image", variable=self.autoinputvar, onvalue=True, offvalue=False, command=self.auto_input)
-    self.auto_input_check_button.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + S)
 
     self.namesvar = StringVar()
     self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar, font=("TkDefaultFont"))
@@ -48,9 +43,9 @@ class ImagesView(View):
     self.modulesvar = StringVar(value=self.paths)
     self.file_names_list_box = Listbox(self, height=10, listvariable=self.modulesvar, selectmode=BROWSE)
 
-    self.names_combo_box.grid(row=2, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
-    self.btn_load.grid(row=2, column=1, padx=PADX, pady=PADY, sticky=W + S)
-    self.file_names_list_box.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=N+S+W+E)
+    self.names_combo_box.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
+    self.btn_load.grid(row=1, column=1, padx=PADX, pady=PADY, sticky=W + S)
+    self.file_names_list_box.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=N+S+W+E)
     
 
   def set_input_paths(self, paths):
@@ -93,12 +88,12 @@ class ImagesView(View):
     plt.imshow(cv2image, cmap='gray')
     return
 
-  def auto_input(self):
-    if self.autoinputvar.get():
-      self.auto_input_check_button.event_generate("<<CheckbuttonChecked>>")
-    else:
-      self.auto_input_check_button.event_generate("<<CheckbuttonUnChecked>>")
-    return
+  # def auto_input(self):
+  #   if self.autoinputvar.get():
+  #     self.auto_input_check_button.event_generate("<<CheckbuttonChecked>>")
+  #   else:
+  #     self.auto_input_check_button.event_generate("<<CheckbuttonUnChecked>>")
+  #   return
 
   def activate_controls(self, activate=False):
     state = DISABLED

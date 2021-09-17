@@ -35,22 +35,18 @@ class MngrController():
 
     self.view.flows_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
     self.view.flows_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
-
     self.view.flows_view.flow_tree_view.bind('<<TreeviewSelect>>', self.step_selected_tree)
 
 # Bind to images panel
-    self.view.images_view.auto_input_check_button.bind('<<CheckbuttonChecked>>', lambda e: self.auto_input_changed(True))
-    self.view.images_view.auto_input_check_button.bind('<<CheckbuttonUnChecked>>', lambda e: self.auto_input_changed())
-
+    # self.view.images_view.auto_input_check_button.bind('<<CheckbuttonChecked>>', lambda e: self.auto_input_changed(True))
+    # self.view.images_view.auto_input_check_button.bind('<<CheckbuttonUnChecked>>', lambda e: self.auto_input_changed())
     self.view.images_view.btn_load.bind("<Button>", self.load)
-    self.view.images_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)
-    
+
+    self.view.images_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)  
     self.view.images_view.file_names_list_box.bind('<<ListboxSelect>>', 
       lambda e: self.image_file_selected(self.view.images_view.file_names_list_box.curselection()))
 
-    self.use_auto_input = False
-    self.init_mage = np.ones((10, 10, 3), dtype="uint8")*255
-    self.cv2image = self.init_mage
+    self.cv2image = np.ones((10, 10, 3), dtype="uint8")*255
     self.view.images_view.set_result_image(self.cv2image)
     self.file_idx = None
     self.flow_meta = None
@@ -262,7 +258,7 @@ class MngrController():
     return self.cv2image is not None
 
   def ready(self):
-    if (self.use_auto_input or self.image_loaded()) and self.runner.initialized() and len(self.flow_meta) > 0:
+    if self.image_loaded() and self.runner.initialized() and len(self.flow_meta) > 0:
       self.view.flows_view.activate_buttons(True)
       return True
     else:
@@ -307,10 +303,10 @@ class MngrController():
       cv2image = self.model.images_model.get_image(image_full_file_name)
     return cv2image
 
-  def auto_input_changed(self, new_state=False):
-    self.use_auto_input = new_state
-    self.cv2image = self.init_mage
-    self.view.images_view.set_result_image(self.cv2image)
-    self.view.images_view.activate_controls(not new_state)
-    self.set_top_state()
-    return
+  # def auto_input_changed(self, new_state=False):
+  #   self.use_auto_input = new_state
+  #   self.cv2image = self.init_mage
+  #   self.view.images_view.set_result_image(self.cv2image)
+  #   self.view.images_view.activate_controls(not new_state)
+  #   self.set_top_state()
+  #   return
