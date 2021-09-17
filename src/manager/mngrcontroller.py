@@ -41,12 +41,14 @@ class MngrController():
     # self.view.images_view.auto_input_check_button.bind('<<CheckbuttonChecked>>', lambda e: self.auto_input_changed(True))
     # self.view.images_view.auto_input_check_button.bind('<<CheckbuttonUnChecked>>', lambda e: self.auto_input_changed())
     self.view.images_view.btn_load.bind("<Button>", self.load)
+    self.view.images_view.btn_clear.bind("<Button>", self.clear)
 
     self.view.images_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)  
     self.view.images_view.file_names_list_box.bind('<<ListboxSelect>>', 
       lambda e: self.image_file_selected(self.view.images_view.file_names_list_box.curselection()))
 
-    self.cv2image = np.ones((10, 10, 3), dtype="uint8")*255
+    self.init_mage = np.ones((10, 10, 3), dtype="uint8")*255 
+    self.cv2image = self.init_mage
     self.view.images_view.set_result_image(self.cv2image)
     self.file_idx = None
     self.flow_meta = None
@@ -292,6 +294,12 @@ class MngrController():
   def load(self, event):
     self.cv2image = self.get_cv2image()
     # self.rerun_fsm()
+    self.set_top_state()
+    return
+
+  def clear(self, event):
+    self.cv2image = self.init_mage
+    self.view.images_view.set_result_image(self.cv2image)
     self.set_top_state()
     return
 
