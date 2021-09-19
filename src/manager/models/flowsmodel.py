@@ -1,5 +1,6 @@
 import os
 import json
+from tkinter.filedialog import asksaveasfilename
 import copy
 
 from .model import Model
@@ -64,7 +65,6 @@ class FlowsModel(Model):
   def get_worksheets_names(self, path):
     return [ws['name'] for ws in self.get_worksheets(path)]
 
-
   def get_worksheet(self, path, name):
     return [ws['content'] for ws in self.get_worksheets(path) if ws['name'] == name][0]
 
@@ -75,6 +75,20 @@ class FlowsModel(Model):
     else:
       self.flow_meta = []
     return self.flow_meta
+
+  def store_flow_meta(self, path, name, meta):
+    f = asksaveasfilename(initialfile = '{}.json'.format(name),
+      initialdir = path,
+      defaultextension=".json",filetypes=[("All Files","*.*"),("Json Documents","*.json")])
+    if f is not '':
+      with open(f, 'w') as fp:
+        if meta[-1].get('stm') == 'glbstm.end':
+          meta.pop(-1)
+        json.dump(meta, fp)
+      self.worksheets_from_all_paths = []    
+      self.load_worksheets_from_all_paths()
+    return
+
 
   def add_opearation_to_current_flow(self, oper, oper_params, idx):
     if oper.split('.')[0] == 'glbstm':
@@ -95,7 +109,6 @@ class FlowsModel(Model):
       idx = 0  
     self.flow_meta.insert(idx, new_oper)
     return self.flow_meta
-
 
   def remove_operation_from_current_flow(self, idx):
     if len(self.flow_meta) > 0:

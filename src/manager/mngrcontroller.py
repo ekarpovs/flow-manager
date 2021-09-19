@@ -1,6 +1,4 @@
 import numpy as np
-import json
-from tkinter.filedialog import asksaveasfilename
 
 from ..configuration import Configuration
 from flow_runner import Runner
@@ -26,7 +24,7 @@ class MngrController():
     self.view.flows_view.btn_add.bind("<Button>", self.add_step_to_flow_meta)
     self.view.flows_view.btn_remove.bind("<Button>", self.remove_step_from_flow_meta)
     self.view.flows_view.btn_reset.bind("<Button>", self.reset_flow_meta)
-    self.view.flows_view.btn_save.bind("<Button>", self.save_flow_meta)
+    self.view.flows_view.btn_save.bind("<Button>", self.store_flow_meta)
 
     self.view.flows_view.btn_run.bind("<Button>", self.run)
     self.view.flows_view.btn_next.bind("<Button>", self.next)
@@ -182,20 +180,15 @@ class MngrController():
     self.rerun_fsm()
     return
 
-  def save_flow_meta(self, event):
+  def store_flow_meta(self, event):
     item = self.view.flows_view.names_combo_box.get()
     path, name = self.converter.flows_converter.convert_ws_item(item)
-    f = asksaveasfilename(initialfile = '{}.json'.format(name),
-      initialdir = path,
-      defaultextension=".json",filetypes=[("All Files","*.*"),("Json Documents","*.json")])
-    if f is not '':
-      with open(f, 'w') as fp:
-        meta = self.flow_meta
-        if meta[-1].get('stm') == 'glbstm.end':
-          meta.pop(-1)
-        json.dump(meta, fp)
+    self.model.flows_model.store_flow_meta(path, name, self.flow_meta)
+    self.update_flow_meta(item)
+    self.set_top_state()
     return
 
+# Execution commands
   def set_result(self, idx, cv2image):
     if cv2image is not None:
       self.view.images_view.set_result_image(cv2image)
