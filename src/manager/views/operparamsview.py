@@ -3,13 +3,12 @@ from tkinter import *
 from tkinter.ttk import Combobox, Spinbox, Button
 from ...uiconst import *
 
-class OperParamsView(LabelFrame):
+class OperParamsView(Frame):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
     self['bd'] = 2
     self['relief'] = RIDGE
-    self['text'] = 'Selected operation parameters'
 
     self.grid()
     self.columnconfigure(0, weight=1)
@@ -261,6 +260,7 @@ class OperParamsView(LabelFrame):
     for pair_str in pairs_list:
       kv = pair_str.split(':')
       k = kv[0]
+      # v = kv[1]
       v = int(kv[1])
       param_dict[k] = v
     return param_dict
