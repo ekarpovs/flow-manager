@@ -7,12 +7,13 @@ class OperParamsView(Frame):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
-    self['bd'] = 2
-    self['relief'] = RIDGE
+    # self['bd'] = 2
+    # self['relief'] = RIDGE
 
     self.grid()
     self.columnconfigure(0, weight=1)
-    self.columnconfigure(1, weight=2)
+    self.columnconfigure(1, weight=1)
+    self.columnconfigure(2, weight=1)
 
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
 
@@ -38,26 +39,22 @@ class OperParamsView(Frame):
   def set_operation_params(self, idx, exec, oper_params):
     self.clear_operation_params()
     self.init_operation_params(idx, exec)
+    self.btn_apply['state']=DISABLED
+    self.btn_reset['state']=DISABLED 
+    self.btn_apply.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
+    self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
 
     for i, param in enumerate(oper_params):
       param_command, param_control, param_label = self.controls_factory(param)
       self.operation_param_controls['idx'] = idx
       self.operation_param_controls['param_controls'].append({"command": param_command, "control": param_control,"label": param_label})
 
-      param_control.grid(row=i, column=0, padx=PADX, pady=PADY, sticky=W+N)
-      param_label.grid(row=i, column=1, padx=PADX, pady=PADY, sticky=W+S)
-    
-    btns_row = len(self.operation_param_controls['param_controls'])
-    if btns_row > 0:
+      param_control.grid(row=i+1, column=0, padx=PADX, pady=PADY, sticky=W+N)
+      param_label.grid(row=i+1, column=1, columnspan=2, padx=PADX, pady=PADY, sticky=W+S)
+
+    if len(oper_params) > 0:
       self.btn_apply['state']=NORMAL
-      self.btn_reset['state']=NORMAL
-    else:
-      self.btn_apply['state']=DISABLED
-      self.btn_reset['state']=DISABLED
-  
-    self.btn_apply.grid(row=btns_row, column=0, padx=PADX, pady=PADY, sticky=W + S)
-    self.btn_reset.grid(row=btns_row, column=1, padx=PADX, pady=PADY, sticky=W + S)
-  
+      self.btn_reset['state']=NORMAL    
     return
 
   def get_operation_params_item(self):
