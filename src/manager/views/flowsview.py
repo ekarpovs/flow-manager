@@ -1,10 +1,10 @@
-from os import read
-from src.manager.views.operparamsview import OperParamsView
 from tkinter import *
 from tkinter import ttk
+from tkscrolledframe import ScrolledFrame
 
 from ...uiconst import *
 from .view import View
+from src.manager.views.operparamsview import OperParamsView
 
 class FlowsView(View):
   def __init__(self, parent):
@@ -36,9 +36,15 @@ class FlowsView(View):
     self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar.set)
 
     # Setup operation parameters view
-    self.oper_params_view = OperParamsView(self)
+    # Create a ScrolledFrame widget
+    sf = ScrolledFrame(self)
+    # Bind the arrow keys and scroll wheel
+    sf.bind_arrow_keys(self)
+    sf.bind_scroll_wheel(self)
+    # Create a frame within the ScrolledFrame
+    self.oper_params_view = sf.display_widget(OperParamsView)
 
-    # Setup operation parameters buttons
+    # Setup operation buttons
     oper_actions = Frame(self)
     self.btn_add = ttk.Button(oper_actions, text='Add', width=BTNW)
     self.btn_remove = ttk.Button(oper_actions, text='Remove', width=BTNW)
@@ -67,7 +73,7 @@ class FlowsView(View):
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
     self.flow_tree_view.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
     oper_actions.grid(row=2, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
-    self.oper_params_view.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
+    sf.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
     flow_actions.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
     # Set the buttons initial state
     self.activate_buttons()

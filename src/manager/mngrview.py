@@ -1,6 +1,7 @@
 
 from tkinter import *
 from tkinter import ttk
+from tkscrolledframe import ScrolledFrame
 
 from ..uiconst import *
 from .views import *
