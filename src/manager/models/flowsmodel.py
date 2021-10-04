@@ -76,6 +76,9 @@ class FlowsModel(Model):
       self.flow_meta = []
     return self.flow_meta
 
+  # If indent is a non-negative integer, then JSON array elements and object members 
+  # will be pretty-printed with that indent level. An indent level of 0, or negative, 
+  # will only insert newlines. None (the default) selects the most compact representation.
   def store_flow_meta(self, path, name, meta):
     f = asksaveasfilename(initialfile = '{}.json'.format(name),
       initialdir = path,
@@ -84,7 +87,7 @@ class FlowsModel(Model):
       with open(f, 'w') as fp:
         if meta[-1].get('stm') == 'glbstm.end':
           meta.pop(-1)
-        json.dump(meta, fp)
+        json.dump(meta, fp, indent=2)
       self.worksheets_from_all_paths = []    
       self.load_worksheets_from_all_paths()
     return
