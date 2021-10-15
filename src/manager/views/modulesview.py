@@ -36,14 +36,16 @@ class ModulesView(View):
     self.tree_view.heading('#1', text='Index', anchor=W)  
     self.tree_view.heading('#2', text='Description', anchor=W)    
     
-    self.tree_view.column('#1', minwidth=30, width=50)
+    self.tree_view.column('#0', minwidth=100, width=160, anchor=W)
+    self.tree_view.column('#1', minwidth=30, width=50, anchor=W)
+    self.tree_view.column('#2', minwidth=200, width=400, anchor=W)
 
     self.tree_view_scrollbar_y = ttk.Scrollbar(self, orient=VERTICAL, command=self.tree_view.yview)
     self.tree_view_scrollbar_y.grid(row=0, column=2, sticky=N+S)
     self.tree_view.configure(yscrollcommand=self.tree_view_scrollbar_y.set)
 
     self.tree_view_scrollbar_x = ttk.Scrollbar(self, orient=HORIZONTAL, command=self.tree_view.xview)
-    self.tree_view_scrollbar_x.grid(row=1, column=0, columnspan=3, sticky=W+E)
+    self.tree_view_scrollbar_x.grid(row=1, column=0, columnspan=2, sticky=W+E)
     self.tree_view.configure(xscrollcommand=self.tree_view_scrollbar_x.set)
 
     self.tree_view.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=S + W + E + N)
