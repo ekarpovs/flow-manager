@@ -1,29 +1,40 @@
 # from tkinter import filedialog as fd
-import sys
+from typing import List
+from flow_model import FlowModel
 from .models import *
+from .models.flow import FlowModelList
 from ..configuration import Configuration
 
 class MngrModel():
-  def __init__(self, cfg):
+  def __init__(self, cfg: Configuration):
 
-    self.cfg = cfg
-
+    self._cfg = cfg
     # Create models
     self.modules_model = ModulesModel(self)
-    self.flows_model = FlowsModel(self)
+    # self.flows_model = FlowsModel(self)
     self.images_model = ImagesModel(self)
+    self._flows_model = FlowModelList(self, self.worksheets_paths)
 
-
-  def get_modules_paths(self):
-    return self.cfg.get_modules_paths()
+  @property
+  def modules_paths(self):
+    return self._cfg.modules_paths
   
-  def get_worksheets_paths(self):
-    return self.cfg.get_worksheets_paths()
+  @property
+  def worksheets_paths(self):
+    return self._cfg.worksheets_paths
 
-  def get_input_paths(self):
-    return self.cfg.get_input_paths()
+  @property
+  def input_paths(self):
+    return self._cfg.input_paths
 
 
-  def get_factory(self):
-    return self.cfg.get_factory()
+  @property
+  def factory(self):
+    return self._cfg.get_factory()
 
+  @property
+  def flowmodellist(self) -> List[FlowModel]:
+    return self._flows_model._flowmodellist
+
+  def flowmodel(self, path: str, name: str) -> FlowModel:
+    return self._flows_model.flowmodel(path, name)

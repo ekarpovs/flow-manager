@@ -11,10 +11,6 @@ class ImagesModel(Model):
     self.images_files_list = []
     self.cv2image = None
 
-  def get_input_paths(self):
-
-    return self.parent.get_input_paths()
-
 
   def get_images_file_names_list(self, path):
     

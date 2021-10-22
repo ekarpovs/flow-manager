@@ -1,39 +1,37 @@
-from tkinter.constants import S
-from .converter import Converter
+from typing import List, Dict, Tuple
 
-class FlowsConverter(Converter):
-  def __init__(self, parent):
-    super().__init__()
-    self.parent = parent 
+from flow_model import FlowModel, FlowItemModel, FlowItemType
 
+from ..models import FlowModelList
+
+
+class FlowsConverter():
+  def __init__(self):
+    pass
 
   @staticmethod
-  def convert_worksheets_names(worksheets_names):
+  def flowlist_to_flows_names(flowlist: FlowModelList) ->List[str]:
     names = []
-    worksheets_names = [{'name': 'new', 'path': ''}, *worksheets_names]
-    for wsn in worksheets_names:
-      name = "{} <{}>".format(wsn['name'], wsn['path'])
+    names.append(f'new <>')
+    for flow in flowlist:
+      name = flow.name
+      path = flow.path
+      name = f'{name} <{path}>'
       names.append(name)
-
     return names
 
 
   @staticmethod
-  def convert_ws_item(item):
-    name, path = item.split('<')
+  def flow_name_to_path_name(flow_name) -> Tuple[str, str]:
+    name, path = flow_name.split('<')
     name = name[:-1]
     path =  path[:-1]
-
-    return path, name
+    return (path, name)
     
 
   @staticmethod
-  def convert_flow_meta(flow_meta):
+  def flow_model_to_module_names(flow_model: FlowModel):
     names = []
-    for step_meta in flow_meta:
-      if 'exec' in step_meta:
-        names.append(step_meta['exec'])
-      elif 'stm' in step_meta:
-        names.append(step_meta['stm'])
-
+    for item in flow_model.items:
+      names.append(item.name)
     return names

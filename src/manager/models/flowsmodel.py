@@ -5,6 +5,7 @@ import copy
 
 from .model import Model
 
+BEGIN_FLOW_MARKER = {"stm": "glbstm.begin"}
 END_FLOW_MARKER = {"stm": "glbstm.end"}
 
 class FlowsModel(Model):
@@ -18,27 +19,28 @@ class FlowsModel(Model):
 
 
 # Loaders - model initialization
-  def read_worksheets_names(self, path):
-    worksheets_names = [f[:-5] for f in os.listdir(path) if f.endswith('.json')]
-    return worksheets_names
-  
   def load_worksheets_from_all_paths(self):
-    worksheets_paths = self.parent.get_worksheets_paths()
+    worksheets_paths = self.parent.worksheets_paths
     for path in worksheets_paths:
       self.worksheets_from_all_paths.append(self.load_worksheets(path))
     return  
 
+  def read_worksheets_names(self, path):
+    worksheets_names = [f[:-5] for f in os.listdir(path) if f.endswith('.json')]
+    return worksheets_names
+  
   def load_worksheets(self, path):
     worksheets_names = self.read_worksheets_names(path)
     worksheets = {"path": path, "worksheets": [{"name": wsn,  "content": self.load_worksheet(path, wsn)} for wsn in worksheets_names]}
     return worksheets
 
 
-  def load_worksheet(self, path, worksheets_names):  
+  def load_worksheet(self, path, worksheet_name):  
     worksheet = {}
-    ffn = "{}/{}.json".format(path, worksheets_names)
+    ffn = "{}/{}.json".format(path, worksheet_name)
     with open(ffn, 'rt') as ws:
       worksheet = json.load(ws)
+    worksheet.insert(0, BEGIN_FLOW_MARKER)
     worksheet.append(END_FLOW_MARKER)
     return worksheet
 
@@ -85,7 +87,9 @@ class FlowsModel(Model):
       defaultextension=".json",filetypes=[("All Files","*.*"),("Json Documents","*.json")])
     if f is not '':
       with open(f, 'w') as fp:
-        if meta[-1].get('stm') == 'glbstm.end':
+        if meta[0] == BEGIN_FLOW_MARKER:
+          meta.pop(0)
+        if meta[-1] == END_FLOW_MARKER:
           meta.pop(-1)
         json.dump(meta, fp, indent=2)
       self.worksheets_from_all_paths = []    
@@ -108,6 +112,7 @@ class FlowsModel(Model):
     else:
       new_oper = {'exec': oper}
     if len(self.flow_meta) <= 0:
+      self.flow_meta.append(BEGIN_FLOW_MARKER)
       self.flow_meta.append(END_FLOW_MARKER)
       idx = 0  
     self.flow_meta.insert(idx, new_oper)

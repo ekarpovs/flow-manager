@@ -74,7 +74,7 @@ class ImagesView(View):
   def set_result_image(self, cv2image):
     # !!! Memory leak
     plt.clf()
-
+    plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
     canvas = FigureCanvasTkAgg(self.figure, self)
     canvas.draw()
     canvas.get_tk_widget().grid(row=0, column=0, padx=PADX, pady=PADY, columnspan=3, sticky=W + E + N + S)

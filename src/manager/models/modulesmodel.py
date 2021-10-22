@@ -21,7 +21,7 @@ class ModulesModel(Model):
 
   
   def load_modules_meta_from_all_paths(self):
-    modules_paths = self.parent.get_modules_paths()
+    modules_paths = self.parent.modules_paths
     for path in modules_paths:
       self.modules_meta_from_all_paths.append(self.load_modules_meta(path))
        

@@ -1,38 +1,45 @@
 import sys
 import json
+from typing import List, Dict, Tuple
 
 class Configuration():
   def __init__(self):
-    self.load_configuration()
-
+    (self._cfg, self._cfg_fsm) = self._load()
+    
 
   # Loaders
-  def load_configuration(self):
+  @staticmethod
+  def _load() ->Tuple[Dict, Dict]:
     # Read from config.json
     ffn = "{}.json".format('config')
     with open(ffn, 'rt') as ws:
-      self.cfg = json.load(ws)
-
-    # Set paths for access modules outside of the application
-    for path in self.cfg['modules']:
-      sys.path.append(path)
-    
-
-  def get_input_paths(self):
-    return self.cfg['images']
-
-  def get_result_path(self):
-    return self.cfg['results']
-
-  def get_modules_paths(self):
-    return self.cfg['modules']
-
-  def get_worksheets_paths(self):
-    return self.cfg['worksheets']
-
-  def get_fsm_cfg(self):
-    # Read from config.json
-    ffn = self.cfg['fsm-cfg']
+      cfg = json.load(ws)
+    ffn = cfg.get('fsm-cfg', './fsm-cfg.json')
     with open(ffn, 'rt') as ws:
-      fsm_cfg = json.load(ws)
-    return fsm_cfg
+      cfg_fsm = json.load(ws)
+    # Set paths for access to modules outside of the application
+    # without the modules installation
+    for path in cfg.get('modules', '.'):
+      sys.path.append(path)
+    return (cfg, cfg_fsm)
+
+
+  @property
+  def input_paths(self) ->List[str]:
+    return self._cfg.get('images', '.')
+
+  @property
+  def result_path(self) ->str:
+    return self._cfg.get('results', '.')
+
+  @property
+  def modules_paths(self) ->List[str]:
+    return self._cfg.get('modules', '.')
+
+  @property
+  def worksheets_paths(self) ->List[str]:
+    return self._cfg.get('worksheets', '.')
+
+  @property
+  def cfg_fsm(self) ->Dict:
+    return self._cfg_fsm

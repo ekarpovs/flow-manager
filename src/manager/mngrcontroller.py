@@ -1,5 +1,7 @@
 import numpy as np
 
+from flow_model import FlowModel
+
 from ..configuration import Configuration
 from flow_runner import Runner
 from flow_converter import FlowConverter 
@@ -68,38 +70,34 @@ class MngrController():
     return
 
   def update_flows_view(self):
-    # TODO: add wrappers to MngrModel & MngrConverter
-    self.model.flows_model.load_worksheets_from_all_paths()
-    worksheets_names = self.converter.flows_converter.convert_worksheets_names(
-      self.model.flows_model.get_worksheets_names_from_all_paths())
-    self.view.flows_view.set_worksheets_names(worksheets_names)
+    flows_names = self.converter.flowlist_to_flows_names(
+      self.model.flowmodellist)
+    self.view.flows_names = flows_names
     return
 
-  def convert_flow_meta(self, meta):
-    return self.converter.flows_converter.convert_flow_meta(meta)
 
   def update_flow_meta(self, item):
     self.view.flows_view.activate_buttons()
-    flow_meta = self.model.flows_model.load_flow_meta(
-        *self.converter.flows_converter.convert_ws_item(item))
-    self.flow_meta = flow_meta
-    flow_meta = self.convert_flow_meta(flow_meta)
-    self.view.flows_view.set_flow_meta(flow_meta)
+    flow_model = self.model.flowmodel(
+        *self.converter.flow_name_to_path_name(item))
+    self.flow_model = flow_model
+
+    flow_names = self.converter.flow_model_to_module_names(flow_model)
+    self.view.flows_view.set_flow_names(flow_names)
     self.rerun_fsm()
     return
 
   def rerun_fsm(self):
-    if self.flow_meta:
-      fc = FlowConverter(self.flow_meta)
+    if self.flow_model:
+      fc = FlowConverter(self.flow_model)
       fsm_def = fc.convert()
-      self.runner.init_fsm_engine(self.cfg.get_fsm_cfg(), fsm_def)
+      self.runner.create_frfsm(self.cfg.cfg_fsm, fsm_def)
       self.runner.start()
     self.set_top_state()
     return
 
   def update_images_view(self):
-    paths = self.model.images_model.get_input_paths()
-    self.view.images_view.set_input_paths(paths)
+    self.view.images_view.set_input_paths(self.cfg.input_paths)
     return
 
   def update_images_file_names_list(self, path):
@@ -185,6 +183,7 @@ class MngrController():
     path, name = self.converter.flows_converter.convert_ws_item(item)
     self.model.flows_model.store_flow_meta(path, name, self.flow_meta)
     self.update_flow_meta(item)
+    # self.update_flows_view()
     self.set_top_state()
     return
 
@@ -237,14 +236,14 @@ class MngrController():
       self.view.images_view.set_result_image(self.cv2image)
     if self.ready():
       self.view.flows_view.set_selection_tree()
-      self.runner.init_io(self.cv2image) 
+      self.runner.init_storage(self.cv2image) 
     return
 
 # Operation parameters sub panel's commands
   def update_current_flow_params(self):
     operation_params_item = self.view.flows_view.oper_params_view.get_operation_params_item()
     self.model.flows_model.update_current_flow_params(operation_params_item)
-    self.view.flows_view.flow_tree_view.focus_set()
+    # self.view.flows_view.flow_tree_view.focus_set()
     if self.image_loaded():
       self.current()
     return
@@ -253,7 +252,7 @@ class MngrController():
     return self.cv2image is not None
 
   def ready(self):
-    if self.image_loaded() and self.runner.initialized() and len(self.flow_meta) > 0:
+    if self.image_loaded() and self.runner.initialized and len(self.flow_meta) > 0:
       self.view.flows_view.activate_buttons(True)
       return True
     else:

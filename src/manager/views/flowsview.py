@@ -1,3 +1,4 @@
+from typing import List, Dict
 from tkinter import *
 from tkinter import ttk
 from tkscrolledframe import ScrolledFrame
@@ -86,10 +87,10 @@ class FlowsView(View):
       self.flow_tree_view.delete(item)
     return
     
-  def set_flow_meta(self, flow_meta, idx=0):
+  def set_flow_names(self, flow_names, idx=0):
     self.clear_flow_tree_view()
-    for i, item in enumerate(flow_meta):
-      self.flow_tree_view.insert(parent='', index='end', iid=i, text=item)
+    for i, name in enumerate(flow_names):
+      self.flow_tree_view.insert(parent='', index='end', iid=i, text=name)
     self.set_selection_tree(idx)  
     return
 
@@ -112,8 +113,13 @@ class FlowsView(View):
       idx = 0
     return idx
 
-  def set_worksheets_names(self, worksheets_names):
-    self.names_combo_box['values'] = worksheets_names
+  @property
+  def flows_names(self) -> List[str]:
+    return self.names_combo_box.get('values')
+
+  @flows_names.setter
+  def flows_names(self, flows_names: List[str]) ->None:
+    self.names_combo_box['values'] = flows_names
     self.names_combo_box.current(0)
     return
 

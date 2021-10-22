@@ -32,17 +32,20 @@ class MngrView(LabelFrame):
 
 
 # Show Meta data
-  def show_modules_meta(self, modules_meta):
+  def set_modules_meta(self, modules_meta):
     self.modules_view.set_modules_meta(modules_meta)
 
+  @property
+  def flows_names(self):
+    return self.flows_view.flows_names
 
-  def show_work_sheet_names(self, work_sheet_names):
-    self.flows_view.set_work_sheet_names(work_sheet_names)
-
+  @flows_names.setter
+  def flows_names(self, flows_names):
+    self.flows_view.flows_names = flows_names
     return
 
-  def show_work_sheet(self, work_sheet):
-    self.flows_view.set_work_sheet(work_sheet)
+  def set(self, flow_module_name):
+    self.flows_view.set_flow_module_name(flow_module_name)
 
     return
 
