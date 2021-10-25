@@ -3,13 +3,10 @@ import json
 
 import operation_loader
 
-from .model import Model
 
-class ModulesModel(Model):
+class ModulesModel():
   def __init__(self, parent):
-    super().__init__()
     self.parent = parent 
-
     self.modules_meta_from_all_paths = []
 
 # Metadata
@@ -35,7 +32,7 @@ class ModulesModel(Model):
 
 
   def load_module_meta(self, module_name):
-    module_meta = operation_loader.get_module_meta(module_name)
+    module_meta = operation_loader.get_module_meta(module_name) # > {'descr': mod.__doc__, 'func': func_names, 'meta': func_metas}
 
     module_meta = self.format_module_meta(module_meta)
     self.store_module_meta(module_name, module_meta)

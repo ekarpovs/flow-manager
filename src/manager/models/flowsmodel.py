@@ -3,14 +3,12 @@ import json
 from tkinter.filedialog import asksaveasfilename
 import copy
 
-from .model import Model
 
 BEGIN_FLOW_MARKER = {"stm": "glbstm.begin"}
 END_FLOW_MARKER = {"stm": "glbstm.end"}
 
-class FlowsModel(Model):
+class FlowsModel():
   def __init__(self, parent):
-    super().__init__()
     self.parent = parent 
 
     self.worksheets_from_all_paths = []

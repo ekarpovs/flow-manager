@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from typing import List
 
 from ...uiconst import *
 from .view import View
@@ -59,20 +60,24 @@ class ModulesView(View):
     self.open_children(self.tree_view.focus())
 
 
-  def set_modules_meta(self, modules_meta):
-    for item in modules_meta:
-      # print(modules_meta)
-      parent = item['parent']
-      index = item['index']
-      iid = item['iid']
-      text = item['text']
-      if 'values' in item:
-        values = (item['values'][0], item['values'][1])
-        self.tree_view.insert(parent=parent, index=index, iid=iid, text=text, values=values)
+  @property
+  def modules_defs(self) -> List[str]:
+    cur_id = self.tree_view.focus()
+    return self.tree_view.get_children(cur_id)
+
+  @modules_defs.setter
+  def modules_defs(self, modules_defs: List[str]) ->None:
+    for mdef in modules_defs:
+      parent = mdef.get('parent')
+      index = mdef.get('index')
+      iid = mdef.get('iid')
+      text = mdef.get('text')
+      if 'values' in mdef:
+        values = mdef.get('values')
+        self.tree_view.insert(parent=parent, index=index, iid=iid, text=text, values=(values[0], values[1]))
       else:
         self.tree_view.insert(parent=parent, index=index, iid=iid, text=text)
-
-
+    return
 
 
   def get_selected_operation_meta(self):

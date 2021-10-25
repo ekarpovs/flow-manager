@@ -10,7 +10,7 @@ class FlowsConverter():
     pass
 
   @staticmethod
-  def flowlist_to_flows_names(flowlist: FlowModelList) ->List[str]:
+  def flowlist_to_flow_names(flowlist: FlowModelList) ->List[str]:
     names = []
     names.append(f'new <>')
     for flow in flowlist:

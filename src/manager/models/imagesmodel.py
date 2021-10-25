@@ -1,10 +1,8 @@
 import cv2
 import os
-from .model import Model
 
-class ImagesModel(Model):
+class ImagesModel():
   def __init__(self, parent):
-    super().__init__()
     self.parent = parent 
 
     self.path = ''

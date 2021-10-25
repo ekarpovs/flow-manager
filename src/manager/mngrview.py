@@ -1,7 +1,6 @@
 
 from tkinter import *
 from tkinter import ttk
-from tkscrolledframe import ScrolledFrame
 
 from ..uiconst import *
 from .views import *
@@ -19,9 +18,7 @@ class MngrView(LabelFrame):
 
 
     self.modules_view = ModulesView(self)
-
     self.flows_view = FlowsView(self)
-
     self.images_view = ImagesView(self)
 
     self.divide_view()
@@ -46,7 +43,15 @@ class MngrView(LabelFrame):
 
   def set(self, flow_module_name):
     self.flows_view.set_flow_module_name(flow_module_name)
+    return
 
+  @property
+  def modules_defs(self):
+    return self.modules_view.modules_defs
+
+  @modules_defs.setter
+  def modules_defs(self, modules_defs):
+    self.modules_view.modules_defs = modules_defs
     return
 
 

@@ -1,7 +1,5 @@
 import numpy as np
 
-from flow_model import FlowModel
-
 from ..configuration import Configuration
 from flow_runner import Runner
 from flow_converter import FlowConverter 
@@ -23,7 +21,7 @@ class MngrController():
 # Bind to flows panel
     self.flows_view_idx = 0  
     self.view.flows_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
-    self.view.flows_view.btn_add.bind("<Button>", self.add_step_to_flow_meta)
+    self.view.flows_view.btn_add.bind("<Button>", self.add_step_to_flow_model)
     self.view.flows_view.btn_remove.bind("<Button>", self.remove_step_from_flow_meta)
     self.view.flows_view.btn_reset.bind("<Button>", self.reset_flow_meta)
     self.view.flows_view.btn_save.bind("<Button>", self.store_flow_meta)
@@ -62,26 +60,21 @@ class MngrController():
     return
 
   def update_modules_view(self):
-    # TODO: add wrappers to MngrModel & MngrConverter
-    self.model.modules_model.load_modules_meta_from_all_paths()
-    modules_meta_conv = self.converter.modules_converter.convert_meta(
-      self.model.modules_model.get_modules_meta())
-    self.view.modules_view.set_modules_meta(modules_meta_conv)
+    modules_defs = self.converter.modulelist_to_module_defs(self.model.modulemodellists)
+    self.view.modules_defs = modules_defs
     return
 
   def update_flows_view(self):
-    flows_names = self.converter.flowlist_to_flows_names(
-      self.model.flowmodellist)
+    flows_names = self.converter.flowlist_to_flow_names(self.model.flowmodellist)
     self.view.flows_names = flows_names
     return
 
 
-  def update_flow_meta(self, item):
+  def update_flow_model(self, model_name):
     self.view.flows_view.activate_buttons()
     flow_model = self.model.flowmodel(
-        *self.converter.flow_name_to_path_name(item))
+        *self.converter.flow_name_to_path_name(model_name))
     self.flow_model = flow_model
-
     flow_names = self.converter.flow_model_to_module_names(flow_model)
     self.view.flows_view.set_flow_names(flow_names)
     self.rerun_fsm()
@@ -113,14 +106,16 @@ class MngrController():
 
 # Flows panel's events and commands
   def selected(self, event):
-    self.set_selected_flow_meta()
+    self.set_selected_flow_model()
     return
 
-  def set_selected_flow_meta(self):
-    item = self.view.flows_view.names_combo_box.get()
-    self.update_flow_meta(item)
+  def set_selected_flow_model(self):
+    flow_name = self.view.flows_view.names_combo_box.get()
+    self.update_flow_model(flow_name)
     self.view.flows_view.clear_operation_params()
     return
+
+# !!! Parameters 
 
   def get_operation_params(self, step):
     if type(step) is dict:
@@ -137,19 +132,20 @@ class MngrController():
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
     return step_def, oper_params
 
-  def set_operation_params(self, meta, idx):
-    if len(meta) > 0:
-      step = meta[idx]
-      step_def, oper_params = self.get_operation_params(step)
-      self.view.flows_view.set_operation_params(idx, step_def, oper_params)
+  def set_operation_params(self, model, idx):
+    if len(model) > 0:
+      print('model.name', model.name)
+      # step = meta[idx]
+      # step_def, oper_params = self.get_operation_params(step)
+      # self.view.flows_view.set_operation_params(idx, step_def, oper_params)
     return
 
   def step_selected_tree(self, event):
     idx = self.view.flows_view.get_current_selection_tree()
-    self.set_operation_params(self.flow_meta, idx)
+    # self.set_operation_params(self.flow_model, idx)
     return
 
-  def add_step_to_flow_meta(self, event):
+  def add_step_to_flow_model(self, event):
     # Get destination item position after that will be added new one
     cur_idx = self.view.flows_view.get_current_selection_tree()
     # Get source item position from modules view
@@ -179,10 +175,10 @@ class MngrController():
     return
 
   def store_flow_meta(self, event):
-    item = self.view.flows_view.names_combo_box.get()
-    path, name = self.converter.flows_converter.convert_ws_item(item)
+    flow_name = self.view.flows_view.names_combo_box.get()
+    path, name = self.converter.flows_converter.convert_ws_item(flow_name)
     self.model.flows_model.store_flow_meta(path, name, self.flow_meta)
-    self.update_flow_meta(item)
+    self.update_flow_model(flow_name)
     # self.update_flows_view()
     self.set_top_state()
     return
@@ -197,15 +193,15 @@ class MngrController():
   def run(self, event):
     idx = 0
     if self.ready():
-      idx, cv2image = self.runner.run_all(self.flow_meta)
+      idx, cv2image = self.runner.run_all(self.flow_model.items)
       self.set_result(idx, cv2image)
     return idx
 
   def step(self, event_name):
     idx = self.view.flows_view.get_current_selection_tree()
     if self.ready():
-      step_meta = self.flow_meta[idx]
-      idx, cv2image = self.runner.run_step(event_name, step_meta)
+      flow_item = self.flow_model.items[idx]
+      idx, cv2image = self.runner.run_step(event_name, flow_item)
       self.set_result(idx, cv2image)
     return idx
 
@@ -232,7 +228,7 @@ class MngrController():
     return
   
   def set_top_state(self):
-    if self.image_loaded():
+    if self.image_loaded:
       self.view.images_view.set_result_image(self.cv2image)
     if self.ready():
       self.view.flows_view.set_selection_tree()
@@ -248,11 +244,12 @@ class MngrController():
       self.current()
     return
 
-  def image_loaded(self):
+  @property
+  def image_loaded(self) ->bool:
     return self.cv2image is not None
 
   def ready(self):
-    if self.image_loaded() and self.runner.initialized and len(self.flow_meta) > 0:
+    if self.image_loaded and self.runner.initialized and self.flow_model.loaded:
       self.view.flows_view.activate_buttons(True)
       return True
     else:

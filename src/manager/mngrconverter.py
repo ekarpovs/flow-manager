@@ -1,7 +1,7 @@
 from typing import List, Dict, Tuple
 from flow_model import FlowModel
 
-from src.manager.models.flow.flowmodellist import FlowModelList
+from .models import *
 from .converters import *
 from ..configuration import Configuration
 
@@ -23,11 +23,14 @@ class MngrConverter():
     return self._modules_converter
 
 
-  def flowlist_to_flows_names(self, flowmodellist: FlowModelList) ->List[str]:
-    return self._flows_converter.flowlist_to_flows_names(flowmodellist)
+  def flowlist_to_flow_names(self, flowmodellist: FlowModelList) ->List[str]:
+    return self._flows_converter.flowlist_to_flow_names(flowmodellist)
 
   def flow_name_to_path_name(self, flow_name) -> Tuple[str, str]:
     return self._flows_converter.flow_name_to_path_name(flow_name)
 
   def flow_model_to_module_names(self, flow_model: FlowModel):
     return self._flows_converter.flow_model_to_module_names(flow_model)
+
+  def modulelist_to_module_defs(self, modulemodellists: ModuleModelLists) ->List[str]:
+    return self._modules_converter.modulelist_to_module_defs(modulemodellists)
