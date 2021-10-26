@@ -5,6 +5,7 @@ src/manager/__pycache__
 src/manager/views/__pycache__
 src/manager/models/__pycache__
 src/manager/models/flow/__pycache__
+src/manager/models/module/__pycache__
 src/manager/converters/__pycache__
 config.json
 .vscode

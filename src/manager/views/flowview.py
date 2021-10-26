@@ -7,7 +7,7 @@ from ...uiconst import *
 from .view import View
 from src.manager.views.operparamsview import OperParamsView
 
-class FlowsView(View):
+class FlowView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
@@ -114,11 +114,11 @@ class FlowsView(View):
     return idx
 
   @property
-  def flows_names(self) -> List[str]:
+  def flow_names(self) -> List[str]:
     return self.names_combo_box.get('values')
 
-  @flows_names.setter
-  def flows_names(self, flows_names: List[str]) ->None:
+  @flow_names.setter
+  def flow_names(self, flows_names: List[str]) ->None:
     self.names_combo_box['values'] = flows_names
     self.names_combo_box.current(0)
     return

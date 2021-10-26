@@ -1,3 +1,3 @@
-from .modulesview import ModulesView
-from .flowsview import FlowsView
-from .imagesview import ImagesView
+from .moduleview import ModuleView
+from .flowview import FlowView
+from .imageview import ImageView

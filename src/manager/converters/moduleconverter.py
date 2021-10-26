@@ -1,16 +1,14 @@
-'''
-'''
-
 import re
 from typing import Dict, List
 
-from .converter import Converter
 from ..models.module import *
 
 
-class ModulesConverter(Converter):
+class ModuleConverter():
+  '''
+  Maps data from module model to module view and versa
+  '''
   def __init__(self, parent):
-    super().__init__()
     self.parent = parent 
 
 

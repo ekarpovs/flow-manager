@@ -15,7 +15,7 @@ self.tree_view.insert(parent="bsc", index="end", iid="crop", text="crop", values
 self.tree_view.insert(parent="bsc", index="end", iid="flip", text="flip", values=("01.02","Flips an image"))
 '''
 
-class ModulesView(View):
+class ModuleView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
@@ -61,12 +61,12 @@ class ModulesView(View):
 
 
   @property
-  def modules_defs(self) -> List[str]:
+  def module_defs(self) -> List[str]:
     cur_id = self.tree_view.focus()
     return self.tree_view.get_children(cur_id)
 
-  @modules_defs.setter
-  def modules_defs(self, modules_defs: List[str]) ->None:
+  @module_defs.setter
+  def module_defs(self, modules_defs: List[str]) ->None:
     for mdef in modules_defs:
       parent = mdef.get('parent')
       index = mdef.get('index')

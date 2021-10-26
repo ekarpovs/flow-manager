@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from ...uiconst import *
 from .view import View
 
-class ImagesView(View):
+class ImageView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 

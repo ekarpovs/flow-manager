@@ -3,20 +3,15 @@ from flow_model import FlowModel
 
 from .models import *
 from .converters import *
-from ..configuration import Configuration
 
 class MngrConverter():
+  '''
+  Fasade for converters 
+  '''
   def __init__(self):
-
-    cfg = Configuration()
-    self._modules_paths = cfg.modules_paths
-    self._worksheets_paths = cfg.worksheets_paths
-    self._input_paths = cfg.input_paths
-    self._result_path = cfg.result_path
-
     # Create converters
-    self._modules_converter = ModulesConverter(self)
-    self._flows_converter = FlowsConverter()
+    self._modules_converter = ModuleConverter(self)
+    self._flows_converter = FlowConverter()
 
   @property
   def modules_converter(self):

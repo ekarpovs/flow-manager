@@ -5,7 +5,10 @@ from flow_model import FlowModel, FlowItemModel, FlowItemType
 from ..models import FlowModelList
 
 
-class FlowsConverter():
+class FlowConverter():
+  '''
+  Maps data from flow model to flow view and versa
+  '''
   def __init__(self):
     pass
 

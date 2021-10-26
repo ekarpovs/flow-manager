@@ -1,6 +1,3 @@
-'''
-'''
-
 from typing import List
 
 from ..configuration import Configuration
@@ -9,6 +6,9 @@ from flow_model import FlowModel
 from .models import *
 
 class MngrModel():
+  '''
+  Fasade for models 
+  '''
   def __init__(self, cfg: Configuration):
 
     self._cfg = cfg
@@ -34,16 +34,16 @@ class MngrModel():
     return self._cfg.get_factory()
 
   @property
-  def flowmodellist(self) -> List[FlowModel]:
-    return self._flow_model._flowmodellist
-
-  def flowmodel(self, path: str, name: str) -> FlowModel:
-    return self._flow_model.flowmodel(path, name)
-
-  @property
   def modulemodellists(self) -> List[ModuleModelList]:
     return self._module_model._modulemodellists
 
   def get_modulemodellist(self, path: str) -> ModuleModelList:
     return self._module_model.get_modulemodellist(path)
+
+  @property
+  def flowmodellist(self) -> List[FlowModel]:
+    return self._flow_model._flowmodellist
+
+  def flowmodel(self, path: str, name: str) -> FlowModel:
+    return self._flow_model.flowmodel(path, name)
 

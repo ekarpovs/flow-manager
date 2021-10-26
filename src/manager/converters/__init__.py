@@ -1,3 +1,3 @@
-from .modulesconverter import ModulesConverter
-from .flowsconverter import FlowsConverter
+from .moduleconverter import ModuleConverter
+from .flowconverter import FlowConverter
 
