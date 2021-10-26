@@ -16,13 +16,12 @@ class FlowConverter():
   def flowlist_to_flow_names(flowlist: FlowModelList) ->List[str]:
     names = []
     names.append(f'new <>')
-    for flow in flowlist:
+    for flow in flowlist.flowmodellist:
       name = flow.name
       path = flow.path
       name = f'{name} <{path}>'
       names.append(name)
     return names
-
 
   @staticmethod
   def flow_name_to_path_name(flow_name) -> Tuple[str, str]:
@@ -31,7 +30,6 @@ class FlowConverter():
     path =  path[:-1]
     return (path, name)
     
-
   @staticmethod
   def flow_model_to_module_names(flow_model: FlowModel):
     names = []

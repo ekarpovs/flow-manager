@@ -56,24 +56,24 @@ class MngrController():
     return
 
   def update_module_view(self) -> None:
-    modules_defs = self.converter.modulelist_to_module_defs(self.model.module)
-    self.view.module_defs = modules_defs
+    module_defs = self.converter.modulelist_to_module_defs(self.model.module)
+    self.view.module_defs = module_defs
     return
 
   def update_flow_view(self) -> None:
-    flow_names = self.converter.flowlist_to_flow_names(self.model.flowmodellist)
-    self.view.flow_names = flow_names
+    names = self.converter.flowlist_to_flow_names(self.model.flow)
+    self.view.flow_names = names
     return
 
 
   def update_flow_model(self, model_name) -> None:
     self.view.flow.activate_buttons()
-    flow_model = self.model.flowmodel(
+    model = self.model.flowmodel(
         *self.converter.flow_name_to_path_name(model_name))
     # Create active flow model
-    self.flow_model = copy.deepcopy(flow_model)
-    flow_names = self.converter.flow_model_to_module_names(self.flow_model)
-    self.view.flow.set_flow_names(flow_names)
+    self.flow_model = copy.deepcopy(model)
+    names = self.converter.flow_model_to_module_names(self.flow_model)
+    self.view.flow.set_flow_names(names)
     # Merge active flow model operations with operations definitions from module models
     
     self.rerun_fsm()
