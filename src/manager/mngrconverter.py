@@ -1,4 +1,5 @@
 from typing import List, Dict, Tuple
+
 from flow_model import FlowModel
 
 from .models import *
@@ -10,22 +11,25 @@ class MngrConverter():
   '''
   def __init__(self):
     # Create converters
-    self._modules_converter = ModuleConverter(self)
-    self._flows_converter = FlowConverter()
+    self._module = ModuleConverter()
+    self._flow = FlowConverter()
 
   @property
-  def modules_converter(self):
-    return self._modules_converter
+  def module(self) -> ModuleConverter:
+    return self._module
 
+  @property
+  def flow(self) -> FlowConverter:
+    return self._flow
 
   def flowlist_to_flow_names(self, flowmodellist: FlowModelList) ->List[str]:
-    return self._flows_converter.flowlist_to_flow_names(flowmodellist)
+    return self.flow.flowlist_to_flow_names(flowmodellist)
 
   def flow_name_to_path_name(self, flow_name) -> Tuple[str, str]:
-    return self._flows_converter.flow_name_to_path_name(flow_name)
+    return self.flow.flow_name_to_path_name(flow_name)
 
   def flow_model_to_module_names(self, flow_model: FlowModel):
-    return self._flows_converter.flow_model_to_module_names(flow_model)
+    return self.flow.flow_model_to_module_names(flow_model)
 
   def modulelist_to_module_defs(self, modulemodellist: ModuleModelList) ->List[str]:
-    return self._modules_converter.modulelist_to_module_defs(modulemodellist)
+    return self.module.modulelist_to_module_defs(modulemodellist)

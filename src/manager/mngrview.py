@@ -19,55 +19,66 @@ class MngrView(LabelFrame):
     self.columnconfigure(2, weight=2)
 
 
-    self.module = ModuleView(self)
-    self.flow = FlowView(self)
-    self.image = ImageView(self)
+    self._module = ModuleView(self)
+    self._flow = FlowView(self)
+    self._image = ImageView(self)
 
     self._divide_view()
 
-    self.module.grid(row=0, column=0)
-    self.flow.grid(row=0, column=1)
-    self.image.grid(row=0, column=2)
+    self._module.grid(row=0, column=0)
+    self._flow.grid(row=0, column=1)
+    self._image.grid(row=0, column=2)
+
+
+  @property
+  def module(self) -> ModuleView:
+    return self._module
+
+  @property
+  def flow(self) -> FlowView:
+    return self._flow
+
+  @property
+  def image(self) -> ImageView:
+    return self._image
 
 
   @property
   def flow_names(self):
-    return self.flow.flow_names
+    return self._flow.flow_names
 
   @flow_names.setter
   def flow_names(self, flows_names):
-    self.flow.flow_names = flows_names
+    self._flow.flow_names = flows_names
     return
 
   def set(self, flow_module_name):
-    self.flow.set_flow_module_name(flow_module_name)
+    self._flow.set_flow_module_name(flow_module_name)
     return
 
   @property
   def module_defs(self):
-    return self.module.module_defs
+    return self._module.module_defs
 
   @module_defs.setter
   def module_defs(self, modules_defs):
-    self.module.module_defs = modules_defs
+    self._module.module_defs = modules_defs
     return
 
 
-# View state
-
-
+# View layout
 ################### Local methods ###########################
   def _divide_view(self):
     self.parent.update()
     h = self.parent.winfo_reqheight()
     w = self.parent.winfo_reqwidth()
     self['width'] = w -5
-    self.module['height'] = h - PADY*2
-    self.module['width'] = int((w/4)*0.9)
-    self.flow['height'] = h - PADY*2
-    self.flow['width'] = int((w/4)*1.02)
-    self.image['height'] = h - PADY*2
-    self.image['width'] = w - self.module['width'] - self.flow['width']
-    self.module.grid_propagate(0)
-    self.flow.grid_propagate(0)
-    self.image.grid_propagate(0)
+    self._module['height'] = h - PADY*2
+    self._module['width'] = int((w/4)*0.9)
+    self._flow['height'] = h - PADY*2
+    self._flow['width'] = int((w/4)*1.02)
+    self._image['height'] = h - PADY*2
+    self._image['width'] = w - self._module['width'] - self._flow['width']
+    self._module.grid_propagate(0)
+    self._flow.grid_propagate(0)
+    self._image.grid_propagate(0)

@@ -1,8 +1,8 @@
 from typing import List
 
-from ..configuration import Configuration
 from flow_model import FlowModel
 
+from ..configuration import Configuration
 from .models import *
 
 class MngrModel():
@@ -18,15 +18,15 @@ class MngrModel():
     self._module = ModuleModelList(self.modules_paths)
 
   @property
-  def modules_paths(self):
+  def modules_paths(self) -> List[str]:
     return self._cfg.modules_paths
   
   @property
-  def worksheets_paths(self):
+  def worksheets_paths(self) -> List[str]:
     return self._cfg.worksheets_paths
 
   @property
-  def input_paths(self):
+  def input_paths(self) -> List[str]:
     return self._cfg.input_paths
 
   @property
@@ -34,30 +34,21 @@ class MngrModel():
     return self._cfg.get_factory()
 
   @property
-  def image(self):
+  def image(self) -> ImagesModel:
     return self._image
 
 # Module
   @property
-  def module(self):
+  def module(self) -> ModuleModelList:
     return self._module
 
   @property
   def modulemodellist(self) -> List[ModuleModel]:
     return self.module.modulemodellist
 
-  # def get_modulemodellist(self, path: str) -> ModuleModelList:
-  #   return self._module.get_modulemodellist(path)
-
-  # def get_modulemodel(self, path: str, name) -> ModuleModel:
-  #   return self._module.get_modulemodellist(path).get_model(path, name)
-
-  # def get_moduleitemmodel(self, path: str, name, iname) -> ModuleItemModel:
-  #   return self.get_modulemodel(path, name).get_item(iname)
-
 # Flow 
   @property
-  def flow(self):
+  def flow(self) -> FlowModelList:
     return self._flow
 
   @property
