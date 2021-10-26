@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 from ..configuration import Configuration
 from flow_runner import Runner
@@ -14,65 +15,67 @@ class MngrController():
     self.model = MngrModel(self.cfg)
     self.converter = MngrConverter()
     self.view = MngrView(parent)
-
 # Bind to modules panel
-    self.view.module_view.tree_view.bind('<<TreeviewOpen>>', self.open_all)
+    self.view.module.tree_view.bind('<<TreeviewOpen>>', self.open_all)
 # Bind to flows panel
     self.flows_view_idx = 0  
-    self.view.flow_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
-    self.view.flow_view.btn_add.bind("<Button>", self.add_operation_to_flow_model)
-    self.view.flow_view.btn_remove.bind("<Button>", self.remove_operation_from_flow_model)
-    self.view.flow_view.btn_reset.bind("<Button>", self.reset_flow_model)
-    self.view.flow_view.btn_save.bind("<Button>", self.store_flow_model)
-    self.view.flow_view.btn_run.bind("<Button>", self.run)
-    self.view.flow_view.btn_next.bind("<Button>", self.next)
-    self.view.flow_view.btn_prev.bind("<Button>", self.prev)
-    self.view.flow_view.btn_top.bind("<Button>", self.top)
-    self.view.flow_view.oper_params_view.btn_apply.bind("<Button>", self.apply)
-    self.view.flow_view.oper_params_view.btn_reset.bind("<Button>", self.reset)
-    self.view.flow_view.flow_tree_view.bind('<<TreeviewSelect>>', self.tree_selection_changed)
+    self.view.flow.names_combo_box.bind('<<ComboboxSelected>>', self.selected)
+    self.view.flow.btn_add.bind("<Button>", self.add_operation_to_flow_model)
+    self.view.flow.btn_remove.bind("<Button>", self.remove_operation_from_flow_model)
+    self.view.flow.btn_reset.bind("<Button>", self.reset_flow_model)
+    self.view.flow.btn_save.bind("<Button>", self.store_flow_model)
+    self.view.flow.btn_run.bind("<Button>", self.run)
+    self.view.flow.btn_next.bind("<Button>", self.next)
+    self.view.flow.btn_prev.bind("<Button>", self.prev)
+    self.view.flow.btn_top.bind("<Button>", self.top)
+    self.view.flow.oper_params_view.btn_apply.bind("<Button>", self.apply)
+    self.view.flow.oper_params_view.btn_reset.bind("<Button>", self.reset)
+    self.view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self.tree_selection_changed)
 
 # Bind to images panel
     # self.view.images_view.auto_input_check_button.bind('<<CheckbuttonChecked>>', lambda e: self.auto_input_changed(True))
     # self.view.images_view.auto_input_check_button.bind('<<CheckbuttonUnChecked>>', lambda e: self.auto_input_changed())
-    self.view.image_view.btn_load.bind("<Button>", self.load)
-    self.view.image_view.btn_clear.bind("<Button>", self.clear)
-    self.view.image_view.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)  
-    self.view.image_view.file_names_list_box.bind('<<ListboxSelect>>', 
-      lambda e: self.image_file_selected(self.view.image_view.file_names_list_box.curselection()))
+    self.view.image.btn_load.bind("<Button>", self.load)
+    self.view.image.btn_clear.bind("<Button>", self.clear)
+    self.view.image.names_combo_box.bind('<<ComboboxSelected>>', self.selected_path)  
+    self.view.image.file_names_list_box.bind('<<ListboxSelect>>', 
+      lambda e: self.image_file_selected(self.view.image.file_names_list_box.curselection()))
 
     self.init_mage = np.ones((10, 10, 3), dtype="uint8")*255 
     self.cv2image = self.init_mage
-    self.view.image_view.set_result_image(self.cv2image)
+    self.view.image.set_result_image(self.cv2image)
     self.file_idx = None
     self.flow_model = None
     self.start()
     
 # Initialization
   def start(self) -> None:
-    self.update_modules_view()
-    self.update_flows_view()
-    self.update_images_view()
+    self.update_module_view()
+    self.update_flow_view()
+    self.update_image_view()
     return
 
-  def update_modules_view(self) -> None:
-    modules_defs = self.converter.modulelist_to_module_defs(self.model.modulemodellists)
+  def update_module_view(self) -> None:
+    modules_defs = self.converter.modulelist_to_module_defs(self.model.module)
     self.view.module_defs = modules_defs
     return
 
-  def update_flows_view(self) -> None:
+  def update_flow_view(self) -> None:
     flow_names = self.converter.flowlist_to_flow_names(self.model.flowmodellist)
     self.view.flow_names = flow_names
     return
 
 
   def update_flow_model(self, model_name) -> None:
-    self.view.flow_view.activate_buttons()
+    self.view.flow.activate_buttons()
     flow_model = self.model.flowmodel(
         *self.converter.flow_name_to_path_name(model_name))
-    self.flow_model = flow_model
-    flow_names = self.converter.flow_model_to_module_names(flow_model)
-    self.view.flow_view.set_flow_names(flow_names)
+    # Create active flow model
+    self.flow_model = copy.deepcopy(flow_model)
+    flow_names = self.converter.flow_model_to_module_names(self.flow_model)
+    self.view.flow.set_flow_names(flow_names)
+    # Merge active flow model operations with operations definitions from module models
+    
     self.rerun_fsm()
     return
 
@@ -85,19 +88,19 @@ class MngrController():
     self.set_top_state()
     return
 
-  def update_images_view(self) -> None:
-    self.view.image_view.set_input_paths(self.cfg.input_paths)
+  def update_image_view(self) -> None:
+    self.view.image.set_input_paths(self.cfg.input_paths)
     return
 
   def update_images_file_names_list(self, path) -> None:
-    file_names_list = self.model.images_model.get_images_file_names_list(path)
-    self.view.image_view.set_file_names_list(file_names_list)
+    file_names_list = self.model.image.get_images_file_names_list(path)
+    self.view.image.set_file_names_list(file_names_list)
     return
 
 # Actions
 # Modules panel' events and commands
   def open_all(self, event) -> None:
-    self.view.module_view.open_all()
+    self.view.module.open_all()
     return
 
 # Flows panel's events and commands
@@ -106,9 +109,9 @@ class MngrController():
     return
 
   def set_selected_flow_model(self) -> None:
-    flow_name = self.view.flow_view.names_combo_box.get()
+    flow_name = self.view.flow.names_combo_box.get()
     self.update_flow_model(flow_name)
-    self.view.flow_view.clear_operation_params()
+    self.view.flow.clear_operation_params()
     return
 
 # !!! Parameters 
@@ -122,8 +125,8 @@ class MngrController():
       step_def = step   
 
     module_name, oper_name = step_def.split('.')
-    orig_image_size = self.model.images_model.get_original_image_size()
-    oper_params_defenition = self.model.module_model.read_operation_params_defenition(module_name, oper_name)
+    orig_image_size = self.model.image.get_original_image_size()
+    oper_params_defenition = self.model.module.read_operation_params_defenition(module_name, oper_name)
     oper_params = self.converter.modules_converter.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
     return step_def, oper_params
 
@@ -136,15 +139,15 @@ class MngrController():
     return
 
   def tree_selection_changed(self, event) -> None:
-    idx = self.view.flow_view.get_current_selection_tree()
+    idx = self.view.flow.get_current_selection_tree()
     # self.set_operation_params(self.flow_model, idx)
     return
 
   def add_operation_to_flow_model(self, event):
     # Get destination item position after that will be added new one
-    cur_idx = self.view.flow_view.get_current_selection_tree()
+    cur_idx = self.view.flow.get_current_selection_tree()
     # Get source item position from modules view
-    operation_name = self.view.module_view.get_selected_operation_meta()   
+    operation_name = self.view.module.get_selected_operation_meta()   
     # Perform if operation only selected
     # if operation_name is not None:     
     #   step_def, oper_params = self.get_operation_params(operation_name)
@@ -156,11 +159,11 @@ class MngrController():
     return
 
   def remove_operation_from_flow_model(self, event):
-    cur_idx = self.view.flow_view.get_current_selection_tree()
-    new_flow_model = self.model.flow_model.remove_operation_from_current_flow(cur_idx)
+    cur_idx = self.view.flow.get_current_selection_tree()
+    new_flow_model = self.model.flow.remove_operation_from_current_flow(cur_idx)
     self.flow_model = new_flow_model
     new_flow_model = self.convert_flow_model(new_flow_model)
-    self.view.flow_view.set_flow_model(new_flow_model, cur_idx)
+    self.view.flow.set_flow_model(new_flow_model, cur_idx)
     self.rerun_fsm()
     return
 
@@ -170,9 +173,9 @@ class MngrController():
     return
 
   def store_flow_model(self, event):
-    flow_name = self.view.flow_view.names_combo_box.get()
-    path, name = self.converter.flow_converter.convert_ws_item(flow_name)
-    self.model.flow_model.store_flow_model(path, name, self.flow_model)
+    flow_name = self.view.flow.names_combo_box.get()
+    path, name = self.converter.flow.convert_ws_item(flow_name)
+    self.model.flow.store_flow_model(path, name, self.flow_model)
     self.update_flow_model(flow_name)
     self.set_top_state()
     return
@@ -180,8 +183,8 @@ class MngrController():
 # Execution commands
   def set_result(self, idx, cv2image) -> None:
     if cv2image is not None:
-      self.view.image_view.set_result_image(cv2image)
-    self.view.flow_view.set_selection_tree(idx)
+      self.view.image.set_result_image(cv2image)
+    self.view.flow.set_selection_tree(idx)
     return
 
   def run(self, event) -> int:
@@ -192,7 +195,7 @@ class MngrController():
     return idx
 
   def step(self, event_name) -> int:
-    idx = self.view.flow_view.get_current_selection_tree()
+    idx = self.view.flow.get_current_selection_tree()
     if self.ready():
       flow_item = self.flow_model.items[idx]
       idx, cv2image = self.runner.run_step(event_name, flow_item)
@@ -223,16 +226,16 @@ class MngrController():
   
   def set_top_state(self) -> None:
     if self.image_loaded:
-      self.view.image_view.set_result_image(self.cv2image)
+      self.view.image.set_result_image(self.cv2image)
     if self.ready():
-      self.view.flow_view.set_selection_tree()
+      self.view.flow.set_selection_tree()
       self.runner.init_storage(self.cv2image) 
     return
 
 # Operation parameters sub panel's commands
   def update_current_flow_params(self):
-    operation_params_item = self.view.flow_view.oper_params_view.get_operation_params_item()
-    self.model.flow_model.update_current_flow_params(operation_params_item)
+    operation_params_item = self.view.flow.oper_params_view.get_operation_params_item()
+    self.model.flow.update_current_flow_params(operation_params_item)
     # self.view.flows_view.flow_tree_view.focus_set()
     if self.image_loaded():
       self.current()
@@ -240,10 +243,10 @@ class MngrController():
 
   def ready(self) -> bool:
     if self.image_loaded and self.runner.initialized and self.flow_model.loaded:
-      self.view.flow_view.activate_buttons(True)
+      self.view.flow.activate_buttons(True)
       return True
     else:
-      self.view.flow_view.activate_buttons()
+      self.view.flow.activate_buttons()
       return False
 
   def apply(self, event):
@@ -251,9 +254,9 @@ class MngrController():
     return
 
   def reset(self, event):
-    idx = self.view.flow_view.get_current_selection_tree()
-    item = self.view.flow_view.names_combo_box.get()      
-    orig_flow_model = self.model.flow_model.get_worksheet(*self.converter.flow_converter.convert_ws_item(item))
+    idx = self.view.flow.get_current_selection_tree()
+    item = self.view.flow.names_combo_box.get()      
+    orig_flow_model = self.model.flow.get_worksheet(*self.converter.flow.convert_ws_item(item))
     self.set_operation_params(orig_flow_model, idx)
     self.update_current_flow_params()   
     return
@@ -264,7 +267,7 @@ class MngrController():
     return self.cv2image is not None
 
   def selected_path(self, event) -> None:
-    item = self.view.image_view.names_combo_box.get()
+    item = self.view.image.names_combo_box.get()
     self.update_images_file_names_list(item)   
     return
 
@@ -276,13 +279,12 @@ class MngrController():
 
   def load(self, event) -> None:
     self.cv2image = self.get_cv2image()
-    # self.rerun_fsm()
     self.set_top_state()
     return
 
   def clear(self, event) -> None:
     self.cv2image = self.init_mage
-    self.view.images_view.set_result_image(self.cv2image)
+    self.view.image.set_result_image(self.cv2image)
     self.set_top_state()
     return
 
@@ -290,6 +292,6 @@ class MngrController():
     cv2image = None
     if self.file_idx is not None:
       idx = self.file_idx
-      image_full_file_name = self.model.images_model.get_selected_file_full_name(idx)
-      cv2image = self.model.images_model.get_image(image_full_file_name)
+      image_full_file_name = self.model.image.get_selected_file_full_name(idx)
+      cv2image = self.model.image.get_image(image_full_file_name)
     return cv2image

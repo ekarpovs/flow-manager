@@ -27,5 +27,5 @@ class MngrConverter():
   def flow_model_to_module_names(self, flow_model: FlowModel):
     return self._flows_converter.flow_model_to_module_names(flow_model)
 
-  def modulelist_to_module_defs(self, modulemodellists: ModuleModelLists) ->List[str]:
-    return self._modules_converter.modulelist_to_module_defs(modulemodellists)
+  def modulelist_to_module_defs(self, modulemodellist: ModuleModelList) ->List[str]:
+    return self._modules_converter.modulelist_to_module_defs(modulemodellist)

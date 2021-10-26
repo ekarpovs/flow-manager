@@ -7,8 +7,7 @@ from flow_model import FlowModel
 
 
 class FlowModelList():
-  def __init__(self, parent, paths: List[str]) -> None:
-    self._parent = parent
+  def __init__(self, paths: List[str]) -> None:
     self._paths: List[str] = paths
     self._flowmodellist: List[FlowModel] = []
     self._load_worksheets()

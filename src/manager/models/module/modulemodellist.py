@@ -8,14 +8,15 @@ from .modulemodel import ModuleModel
 
 
 class ModuleModelList():
-  def __init__(self, path: str) -> None:
-    self._path: str = path
+  def __init__(self, paths: List[str]) -> None:
+    self._paths: List[str] = paths
     self._modulemodellist: List[ModuleModel] = []
+    self._load()
     return
 
   @property
-  def path(self) -> str:
-    return self._path
+  def paths(self) -> str:
+    return self._paths
 
   @property
   def modulemodellist(self) -> List[ModuleModel]:
@@ -26,25 +27,30 @@ class ModuleModelList():
     self._modulemodellist.append(model)
     return
 
+  def get_models_by_path(self, path: str) -> List[ModuleModel]:
+    models = []
+    for model in self.modulemodellist:
+      if model.path == path:
+        models.append(model)
+    return models
 
   def get_model(self, path: str, name: str) -> ModuleModel:
-    for model in self.modulemodellist:
-      if model.path == path and model.name == name:
+    models = self.get_models_by_path(path)
+    for model in models:
+      if model.name == name:
         return model
     return ModuleModel()
   
-
   # Initialization 
-  def load(self) -> None:
-    names = self._names(self._path)
-    for name in names:
-      model = ModuleModel(self._path)
-      model.load(name)
-      self.modulemodellist = model
+  def _load(self) -> None:
+    for path in self.paths:
+      names = self._names(path)
+      for name in names:
+        model = ModuleModel(path)
+        model.load(name)
+        self.modulemodellist = model
     return
 
-
-  # Initialization 
   def _names(self, path):
     names = [f[:-3] for f in os.listdir(path)
                   if f.endswith('.py') and f != '__init__.py' and f != 'tester.py']

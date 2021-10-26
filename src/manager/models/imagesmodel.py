@@ -2,9 +2,7 @@ import cv2
 import os
 
 class ImagesModel():
-  def __init__(self, parent):
-    self.parent = parent 
-
+  def __init__(self):
     self.path = ''
     self.images_files_list = []
     self.cv2image = None

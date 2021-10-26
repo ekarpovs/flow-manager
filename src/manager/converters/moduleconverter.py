@@ -12,13 +12,15 @@ class ModuleConverter():
     self.parent = parent 
 
 
-  def modulelist_to_module_defs(self, modulemodellists: ModuleModelLists) -> List[Dict]:
+  def modulelist_to_module_defs(self, modulelist: ModuleModelList) -> List[Dict]:
     definitions = []
-    for i, mlist in enumerate(modulemodellists):
+    paths = modulelist.paths
+    for i, path in enumerate(paths):
       iid = f'p{i}'
-      list_def = self.list_level_item(iid, mlist)
+      list_def = self.list_level_item(iid, path)
       definitions.append(list_def)
-      for j, module in enumerate(mlist.modulemodellist):
+      mlist = modulelist.get_models_by_path(path)
+      for j, module in enumerate(mlist):
         module_def = self.module_level_item(iid, str(j), module)
         definitions.append(module_def)
         for n, operation in enumerate(module.items):
@@ -27,8 +29,8 @@ class ModuleConverter():
     return definitions
 
   @staticmethod
-  def list_level_item(iid, mlist: ModuleModelList) -> Dict:
-    return {"parent":"", "index":"end", "iid":iid, "text":mlist.path}
+  def list_level_item(iid, path: str) -> Dict:
+    return {"parent":"", "index":"end", "iid":iid, "text":path}
 
   @staticmethod
   def module_level_item(parent_iid, v1: str, module: ModuleModel) -> Dict:
