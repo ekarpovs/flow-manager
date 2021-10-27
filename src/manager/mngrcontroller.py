@@ -51,7 +51,7 @@ class MngrController():
 # Initialization
   def start(self) -> None:
     self.update_module_view()
-    self.update_flow_view()
+    self.update_worksheet_list()
     self.update_image_view()
     return
 
@@ -60,19 +60,22 @@ class MngrController():
     self._view.module_defs = module_defs
     return
 
-  def update_flow_view(self) -> None:
-    names = self._converter.flowlist_to_flow_names(self._model.flow)
-    self._view.flow_names = names
+  def update_worksheet_list(self) -> None:
+    names = self._model._worksheet.workseetnames
+    names.insert(0, 'new <>')
+    self._view.ws_names = names
     return
 
 
-  def update_flow_model(self, model_name) -> None:
+  def update_flow_model(self, ws_name) -> None:
     self._view.flow.activate_buttons()
-    model = self._model.flowmodel(
-        *self._converter.flow_name_to_path_name(model_name))
+    (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
+    # read worksheet
+    ws = self._model._worksheet.read(ws_path, ws_name)
     # Create active flow model
-    self.flow_model = copy.deepcopy(model)
-    names = self._converter.flow_model_to_module_names(self.flow_model)
+    self._model.create_active_flow_model(ws_path, ws_name, ws)
+    self._model.flow
+    names = self._model.flow.names()
     self._view.flow.set_flow_names(names)
     # Merge active flow model's operations with operations definitions from module models
     
@@ -80,8 +83,8 @@ class MngrController():
     return
 
   def rerun_fsm(self) -> None:
-    if self.flow_model:
-      fc = FlowConverter(self.flow_model)
+    if self._model.flow:
+      fc = FlowConverter(self._model.flow.active)
       fsm_def = fc.convert()
       self._runner.create_frfsm(self.cfg.cfg_fsm, fsm_def)
       self._runner.start()
@@ -190,14 +193,14 @@ class MngrController():
   def run(self, event) -> int:
     idx = 0
     if self.ready():
-      idx, cv2image = self._runner.run_all(self.flow_model.items)
+      idx, cv2image = self._runner.run_all(self._model.flow.active.items)
       self.set_result(idx, cv2image)
     return idx
 
   def step(self, event_name) -> int:
     idx = self._view.flow.get_current_selection_tree()
     if self.ready():
-      flow_item = self.flow_model.items[idx]
+      flow_item = self._model.flow.active.items[idx]
       idx, cv2image = self._runner.run_step(event_name, flow_item)
       self.set_result(idx, cv2image)
     return idx
@@ -242,7 +245,7 @@ class MngrController():
     return
 
   def ready(self) -> bool:
-    if self.image_loaded and self._runner.initialized and self.flow_model.loaded:
+    if self.image_loaded and self._runner.initialized and self._model.flow.active.loaded:
       self._view.flow.activate_buttons(True)
       return True
     else:

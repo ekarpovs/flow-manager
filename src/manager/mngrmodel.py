@@ -1,6 +1,8 @@
-from typing import List
+from typing import Dict, List
 
 from flow_model import FlowModel
+
+from src.manager.models.activeflow.activeflowmodel import ActiveFlowModel
 
 from ..configuration import Configuration
 from .models import *
@@ -14,8 +16,10 @@ class MngrModel():
     self._cfg = cfg
     # Create models
     self._image = ImagesModel()   
-    self._flow = FlowModelList(self.worksheets_paths)
+    self._flow = None
     self._module = ModuleModelList(self.modules_paths)
+    self._worksheet = WorksheetModel(self.worksheets_paths)
+
 
   @property
   def modules_paths(self) -> List[str]:
@@ -46,15 +50,15 @@ class MngrModel():
   def modulemodellist(self) -> List[ModuleModel]:
     return self.module.modulemodellist
 
+# Worksheet
+  def worksheetnames(self):
+    return self._worksheet.workseetnames
 # Flow 
+  def create_active_flow_model(self, ws_path: str, ws_name: str, ws: List[Dict]) -> None:
+    self._flow = ActiveFlowModel(ws_path, ws_name, ws)
+    return
+
   @property
-  def flow(self) -> FlowModelList:
+  def flow(self) -> ActiveFlowModel:
     return self._flow
-
-  @property
-  def flowmodellist(self) -> List[FlowModel]:
-    return self.flow.flowmodellist
-
-  def flowmodel(self, path: str, name: str) -> FlowModel:
-    return self.flow.flowmodel(path, name)
 

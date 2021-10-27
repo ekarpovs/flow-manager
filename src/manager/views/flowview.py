@@ -114,12 +114,12 @@ class FlowView(View):
     return idx
 
   @property
-  def flow_names(self) -> List[str]:
+  def ws_names(self) -> List[str]:
     return self.names_combo_box.get('values')
 
-  @flow_names.setter
-  def flow_names(self, flows_names: List[str]) ->None:
-    self.names_combo_box['values'] = flows_names
+  @ws_names.setter
+  def ws_names(self, ws_names: List[str]) ->None:
+    self.names_combo_box['values'] = ws_names
     self.names_combo_box.current(0)
     return
 

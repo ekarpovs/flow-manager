@@ -1,8 +1,7 @@
 from typing import List, Dict, Tuple
 
-from flow_model import FlowModel, FlowItemModel, FlowItemType
+from src.manager.models.activeflow.activeflowmodel import ActiveFlowModel
 
-from ..models import FlowModelList
 
 
 class FlowConverter():
@@ -12,27 +11,28 @@ class FlowConverter():
   def __init__(self):
     pass
 
-  @staticmethod
-  def flowlist_to_flow_names(flowlist: FlowModelList) ->List[str]:
-    names = []
-    names.append(f'new <>')
-    for flow in flowlist.flowmodellist:
-      name = flow.name
-      path = flow.path
-      name = f'{name} <{path}>'
-      names.append(name)
-    return names
+  # @staticmethod
+  # def flowlist_to_flow_names(flowlist: FlowModelList) ->List[str]:
+  #   names = []
+  #   names.append(f'new <>')
+  #   for flow in flowlist.flowmodellist:
+  #     name = flow.name
+  #     path = flow.path
+  #     name = f'{name} <{path}>'
+  #     names.append(name)
+  #   return names
 
   @staticmethod
-  def flow_name_to_path_name(flow_name) -> Tuple[str, str]:
-    name, path = flow_name.split('<')
+  def split_ws_name(ws_name) -> Tuple[str, str]:
+    name, path = ws_name.split('<')
     name = name[:-1]
     path =  path[:-1]
     return (path, name)
     
   @staticmethod
-  def flow_model_to_module_names(flow_model: FlowModel):
+  def flow_model_to_module_names(flow_model: ActiveFlowModel):
     names = []
-    for item in flow_model.items:
-      names.append(item.name)
+    for item in flow_model.item.items:
+      name = item.name 
+    names.append(name)
     return names

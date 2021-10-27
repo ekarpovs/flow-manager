@@ -44,12 +44,12 @@ class MngrView(LabelFrame):
 
 
   @property
-  def flow_names(self):
-    return self._flow.flow_names
+  def ws_names(self):
+    return self._flow.ws_names
 
-  @flow_names.setter
-  def flow_names(self, flows_names):
-    self._flow.flow_names = flows_names
+  @ws_names.setter
+  def ws_names(self, ws_names):
+    self._flow.ws_names = ws_names
     return
 
   def set(self, flow_module_name):
