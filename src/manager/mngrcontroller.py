@@ -1,5 +1,9 @@
+from flow_model.flowmodel import FlowModel
 import numpy as np
 import copy
+
+from src.manager.models.module.modulemodel import ModuleModel
+from src.manager.models.module.modulemodellist import ModuleModelList
 
 from ..configuration import Configuration
 from flow_runner import Runner
@@ -45,9 +49,26 @@ class MngrController():
     self.cv2image = self.init_mage
     self._view.image.set_result_image(self.cv2image)
     self.file_idx = None
-    self.flow_model = None
     self.start()
-    
+
+  @property
+  def mmodule(self) -> ModuleModelList:
+    return self._model.module
+
+  @mmodule.setter
+  def mmodule(self, model) -> None:
+    self._model.module = model
+    return
+
+  @property
+  def mflow(self) -> FlowModel:
+    return self._model.flow
+
+  @mflow.setter
+  def mflow(self, model) -> None:
+    self._model.flow = model
+    return
+
 # Initialization
   def start(self) -> None:
     self.update_module_view()
@@ -55,8 +76,8 @@ class MngrController():
     self.update_image_view()
     return
 
-  def update_module_view(self) -> None:
-    module_defs = self._converter.modulelist_to_module_defs(self._model.module)
+  def update_module_view(self) -> None:   
+    module_defs = self._converter.modulelist_to_module_defs(self.mmodule)
     self._view.module_defs = module_defs
     return
 
@@ -66,25 +87,29 @@ class MngrController():
     self._view.ws_names = names
     return
 
-
   def update_flow_model(self, ws_name) -> None:
     self._view.flow.activate_buttons()
     (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
     # read worksheet
     ws = self._model._worksheet.read(ws_path, ws_name)
     # Create active flow model
-    self._model.create_active_flow_model(ws_path, ws_name, ws)
-    self._model.flow
-    names = self._model.flow.names()
+    self._model.create_flow_model(ws_path, ws_name, ws)
+    names = self.mflow.names()
     self._view.flow.set_flow_names(names)
-    # Merge active flow model's operations with operations definitions from module models
-    
+    # Set operations definitions from module models into the flow item
+    for name in names:
+      if name == 'glbstm.begin' or name == 'glbstm.end':
+        continue
+      operation = self.mmodule.get_operation_by_name(name)
+      # print(f'{operation.name}: {operation.params}')
+      item = self.mflow.get_item(name)
+      item.params_def = operation.params
     self.rerun_fsm()
     return
 
   def rerun_fsm(self) -> None:
-    if self._model.flow:
-      fc = FlowConverter(self._model.flow.active)
+    if self.mflow:
+      fc = FlowConverter(self.mflow)
       fsm_def = fc.convert()
       self._runner.create_frfsm(self.cfg.cfg_fsm, fsm_def)
       self._runner.start()
@@ -129,26 +154,27 @@ class MngrController():
 
     module_name, oper_name = step_def.split('.')
     orig_image_size = self._model.image.get_original_image_size()
-    oper_params_defenition = self._model.module.read_operation_params_defenition(module_name, oper_name)
+    oper_params_defenition = self.mmodule.read_operation_params_defenition(module_name, oper_name)
     oper_params = self._converter.module.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
     return step_def, oper_params
 
-  def set_operation_params(self, model, idx):
-    if len(model) > 0:
-      print('model.name', model.name)
-      # step = meta[idx]
-      # step_def, oper_params = self.get_operation_params(step)
-      # self._view.flows_view.set_operation_params(idx, step_def, oper_params)
+  def set_operation_params(self, idx, operation_name):
+    if self.mflow is not None:
+      item = self.mflow.get_item(operation_name)
+      params = item.params_def
+      if params is not None:
+        self._view.flow.set_operation_params(idx, operation_name, params)
     return
 
   def tree_selection_changed(self, event) -> None:
-    idx = self._view.flow.get_current_selection_tree()
-    # self.set_operation_params(self.flow_model, idx)
+    idx, item = self._view.flow.get_current_selection_tree()
+    name = item.get('text')
+    self.set_operation_params(idx, name)
     return
 
   def add_operation_to_flow_model(self, event):
     # Get destination item position after that will be added new one
-    cur_idx = self._view.flow.get_current_selection_tree()
+    cur_idx,_ = self._view.flow.get_current_selection_tree()
     # Get source item position from modules view
     operation_name = self._view.module.get_selected_operation_meta()   
     # Perform if operation only selected
@@ -162,9 +188,9 @@ class MngrController():
     return
 
   def remove_operation_from_flow_model(self, event):
-    cur_idx = self._view.flow.get_current_selection_tree()
-    new_flow_model = self._model.flow.remove_operation_from_current_flow(cur_idx)
-    self.flow_model = new_flow_model
+    cur_idx, _ = self._view.flow.get_current_selection_tree()
+    new_flow_model = self.mflow.remove_operation_from_current_flow(cur_idx)
+    self.mflow = new_flow_model
     new_flow_model = self.convert_flow_model(new_flow_model)
     self._view.flow.set_flow_model(new_flow_model, cur_idx)
     self.rerun_fsm()
@@ -178,8 +204,8 @@ class MngrController():
   def store_flow_model(self, event):
     flow_name = self._view.flow.names_combo_box.get()
     path, name = self._converter.flow.convert_ws_item(flow_name)
-    self._model.flow.store_flow_model(path, name, self.flow_model)
-    self.update_flow_model(flow_name)
+    self.mflow.store_flow_model(path, name, self.mflow)
+    # self.update_flow_model(flow_name)
     self.set_top_state()
     return
 
@@ -193,14 +219,15 @@ class MngrController():
   def run(self, event) -> int:
     idx = 0
     if self.ready():
-      idx, cv2image = self._runner.run_all(self._model.flow.active.items)
+      idx, cv2image = self._runner.run_all(self.mflow.items)
       self.set_result(idx, cv2image)
     return idx
 
   def step(self, event_name) -> int:
-    idx = self._view.flow.get_current_selection_tree()
+    idx, item = self._view.flow.get_current_selection_tree()
     if self.ready():
-      flow_item = self._model.flow.active.items[idx]
+      name = item.get('text')
+      flow_item = self.mflow.get_item(name)
       idx, cv2image = self._runner.run_step(event_name, flow_item)
       self.set_result(idx, cv2image)
     return idx
@@ -238,14 +265,14 @@ class MngrController():
 # Operation parameters sub panel's commands
   def update_current_flow_params(self):
     operation_params_item = self._view.flow.oper_params_view.get_operation_params_item()
-    self._model.flow.update_current_flow_params(operation_params_item)
+    self.mflow.update_current_flow_params(operation_params_item)
     # self._view.flows_view.flow_tree_view.focus_set()
     if self.image_loaded():
       self.current()
     return
 
   def ready(self) -> bool:
-    if self.image_loaded and self._runner.initialized and self._model.flow.active.loaded:
+    if self.image_loaded and self._runner.initialized and self.mflow.loaded:
       self._view.flow.activate_buttons(True)
       return True
     else:

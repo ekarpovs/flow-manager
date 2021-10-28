@@ -60,6 +60,25 @@ class ModuleItemModel():
     return 
 
 
+    # 'name':'thrs1'
+    # 'type':'Range'
+    # 'default':'50'
+    # 'p_values':'10,150,1'
+    # 'comment':'threshold1'
+
+    
+    # 'name':'type'
+    # 'comment':'new color space, one from cv2.COLOR_(...)'
+    # 'p_values':'BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82'
+    # 'default':'BGR2GRAY'
+    # 'type':'Dict'
+
+    # 'name':'kernel'
+    # 'comment':'kernel size'
+    # 'p_values':'3,5,7,9'
+    # 'default':'3'
+    # 'type':'List'
+
   def _parse_descrtiptors(self, descriptors: List[str]) -> List[Dict]:
     definitions = []
     for descr in descriptors:
@@ -77,9 +96,15 @@ class ModuleItemModel():
           idx_e = type.index(')')
           p_values = type[idx_s+1:idx_e]
           (type, _) = self._split_descriptor(type, '(')
+          if '[' in type:
+            idx_s = type.index('[')
+            idx_e = type.index(']')
+            p_types = type[idx_s+1:idx_e]
+            (type, _) = self._split_descriptor(type, '[')
         else:
           p_values = None
-      definition = {'name': name, 'type': type, 'default': default, 'p_values': p_values, 'comment': comment}
+          p_types = None
+      definition = {'name': name, 'type': type, 'default': default, 'p_types': p_types, 'p_values': p_values, 'comment': comment}
       definitions.append(definition)
     return definitions
 

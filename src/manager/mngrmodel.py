@@ -2,7 +2,7 @@ from typing import Dict, List
 
 from flow_model import FlowModel
 
-from src.manager.models.activeflow.activeflowmodel import ActiveFlowModel
+from src.manager.models.flow.currentflowmodel import CurrentFlowModel
 
 from ..configuration import Configuration
 from .models import *
@@ -54,11 +54,11 @@ class MngrModel():
   def worksheetnames(self):
     return self._worksheet.workseetnames
 # Flow 
-  def create_active_flow_model(self, ws_path: str, ws_name: str, ws: List[Dict]) -> None:
-    self._flow = ActiveFlowModel(ws_path, ws_name, ws)
+  def create_flow_model(self, ws_path: str, ws_name: str, ws: List[Dict]) -> None:
+    self._flow = CurrentFlowModel(ws_path, ws_name, ws)
     return
 
   @property
-  def flow(self) -> ActiveFlowModel:
+  def flow(self) -> CurrentFlowModel:
     return self._flow
 

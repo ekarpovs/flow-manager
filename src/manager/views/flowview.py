@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from tkinter import *
 from tkinter import ttk
 from tkscrolledframe import ScrolledFrame
@@ -105,13 +105,19 @@ class FlowView(View):
     self.flow_tree_view.focus(idx)   
     return
 
-  def get_current_selection_tree(self):
+  def get_current_selection_tree(self) -> Tuple[int, Dict]:
     idx = self.flow_tree_view.selection()
     if len(idx) > 0:
       idx = int(idx[0])
     else:
       idx = 0
-    return idx
+    cur_item = self.flow_tree_view.focus()
+    item = self.flow_tree_view.item(cur_item)  
+    return (idx, item)
+  
+  # def get_current_tree_item(self) -> str:
+  #   cur_item = self.flow_tree_view.focus()
+  #   return self.flow_tree_view.item(cur_item)  
 
   @property
   def ws_names(self) -> List[str]:

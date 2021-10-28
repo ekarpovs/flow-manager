@@ -54,7 +54,13 @@ class ModuleModel():
 
 
   def get_item(self, name: str) -> ModuleItemModel:
-    return self._items.get(name, None)
+    oper = None
+    for item in self._items:
+      iname = item.name
+      if iname is not '' and iname == name:
+        oper = item
+        break;
+    return oper
 
 
   def load(self, name: str) -> None:

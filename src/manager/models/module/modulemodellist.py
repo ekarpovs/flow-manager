@@ -4,6 +4,8 @@
 import os
 from typing import List
 
+from src.manager.models.module.moduleitemmodel import ModuleItemModel
+
 from .modulemodel import ModuleModel
 
 
@@ -34,13 +36,22 @@ class ModuleModelList():
         models.append(model)
     return models
 
-  def get_model(self, path: str, name: str) -> ModuleModel:
-    models = self.get_models_by_path(path)
-    for model in models:
+  def get_model_by_name(self, name: str) -> ModuleModel:
+    # models = self.get_models_by_path(path)
+    for model in self.modulemodellist:
       if model.name == name:
         return model
-    return ModuleModel()
+    return None
   
+  def get_operation_by_name(self, name: str) -> ModuleItemModel:
+    p = name.split('.')
+    mname = p[0]
+    oname = p[1]
+    oper = None
+    module = self.get_model_by_name(mname)
+    oper = module.get_item(oname)
+    return oper
+
   # Initialization 
   def _load(self) -> None:
     for path in self.paths:

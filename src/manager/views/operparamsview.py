@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import * 
 from tkinter.ttk import Combobox, Spinbox, Button
+from typing import Dict, Tuple
 from ...uiconst import *
 
 class OperParamsView(Frame):
@@ -77,78 +78,111 @@ class OperParamsView(Frame):
   def controls_factory(self, param):
     # {"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l}    
     param_command, param_control = self.create_param_control(param)
-
-    label_text = param['label']
+    name = param.get('name')
+    comment = param.get('comment')
+    label_text = f"{name} - {comment})"
     param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
 
     return param_command, param_control, param_label
 
   
-  def create_param_control(self, param):
-    param_domain = param.get('domain')
+  def create_param_control(self, param: Dict):
+    
+    
+    # 'name':'y0'
+    # 'type':'int'
+    # 'default':'0'
+    # 'p_values':None
+    # 'comment':'left top coordinate'
 
-    def domain_single(param):
+    # 'name':'thrs1'
+    # 'type':'Range[int]'
+    # 'default':'50'
+    # 'p_values':'10,150,1'
+    # 'comment':'threshold1'
+    
+    # 'name':'type'
+    # 'comment':'new color space, one from cv2.COLOR_(...)'
+    # 'p_values':'BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82'
+    # 'default':'BGR2GRAY'
+    # 'type':'Dict[str,int]'
+
+    # 'name':'kernel'
+    # 'comment':'kernel size'
+    # 'p_values':'3,5,7,9'
+    # 'default':'3'
+    # 'type':'List[int]'
+
+    param_type = param.get('type')
+
+    def pint(param: Dict) -> Tuple[object, Entry]:
       def get():
-        value = param_control.get()
-        if param_type == 'f':
-          value = float(value)
-        elif param_type == 'n':
-          value = int(value)
-        else:
-          pass
-        return value
+        return int(param_control.get())
 
-      param_value = param.get('value')
-      param_type = param.get('type')
-      var = self.get_var_by_type(param_type)  
+      param_value = param.get('default')
+      var = tk.IntVar()
       var.set(param_value)
       param_control = Entry(self, textvariable=var)
       param_command = get
       return param_command, param_control
 
-    def domain_list(param):
-      param_control = Combobox(self)
+    def pfloat(param: Dict) -> Tuple[object, Entry]:
+      def get():
+        return float(param_control.get())
 
+      param_value = param.get('default')
+      var = tk.DoubleVar()
+      var.set(param_value)
+      param_control = Entry(self, textvariable=var)
+      param_command = get
+      return param_command, param_control
+
+    def pstr(param: Dict) -> Tuple[object, Entry]:
+      def get():
+        return param_control.get()
+
+      param_value = param.get('default')
+      var = tk.StringVar()
+      var.set(param_value)
+      param_control = Entry(self, textvariable=var)
+      param_command = get
+      return param_command, param_control
+
+    def pbool(param: Dict) -> Tuple[object, Entry]:
+      item = tk.BooleanVar()
+      def get():
+        return item.get()
+      param_value = param['value']
+      item.set(param_value)
+      param_control = Checkbutton(self, variable=item, onvalue=True, offvalue=False, command=get)
+      param_command = get
+      return param_command, param_control
+
+    def plist(param: Dict) -> Tuple[object, Entry]:
+      p_types = param.get('p_types')
+      param_control = Combobox(self)
       def get():
         value = param_control.get()
-        if param_type == 'f':
+        if p_types == 'float':
           value = float(value)
-        elif param_type == 'n':
+        elif p_types == 'int':
           value = int(value)
         else:
           pass
         return value
 
-      param_possible_values = param['p_values']
+      param_possible_values = param.get('p_values')
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       param_control['values'] = param_values_tuple
-
-      param_type = param.get('type')
-      var = self.get_var_by_type(param_type)  
-
-      param_default_value = param['value']     
+      var = self.get_var_by_type(p_types)  
+      param_default_value = param.get('default')    
       param_control.set(param_default_value)
-
       param_control.textvariable = var
       param_command = get
-
       return param_command, param_control
 
-    def domain_flag(param):
-      item = tk.BooleanVar()
 
-      def get():
-        return item.get()
-
-      param_value = param['value']
-      item.set(param_value)
-
-      param_control = Checkbutton(self, variable=item, onvalue=True, offvalue=False, command=get)
-      param_command = get
-
-      return param_command, param_control
-
-    def domain_dictionary(param):
+    def pdict(param: Dict) -> Tuple[object, Entry]:
       param_control = Combobox(self)
 
       def get():
@@ -163,64 +197,104 @@ class OperParamsView(Frame):
             return key
         return "key doesn't exist"
 
-      param_type = param['type']
-      param_possible_values = param['p_values']     
+      p_types = param.get('p_types')
+      param_possible_values = param.get('p_values')     
       param_keys_tuple = self.possible_values_pairs_to_tuple(param_possible_values)
       param_control['values'] = param_keys_tuple
       param_dict = self.possible_values_pairs_to_dict(param_possible_values)
-      param_value = param['value']
-      if (type(param_value) is int) or (type(param_value) is float):
-        param_value = get_key(param_value)
-
-      param_control.set(param_value)
+      param_default_value = param.get('default')
+      # if (type(param_value) is int) or (type(param_value) is float):
+      #   param_value = get_key(param_value)
+      param_control.set(param_default_value)
       item = tk.StringVar()
       param_control.textvariable = item
       param_command = get
-
       return param_command, param_control
 
-    def domain_range(param):
-      param_possible_values = param['p_values']
+    def prange(param: Dict) -> Tuple[object, Entry]:
+      param_possible_values = param.get('p_values')
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       from_ = param_values_tuple[0]
       to = param_values_tuple[1]
-
-      param_type = param.get('type')
-      var = self.get_var_by_type(param_type)  
+      p_types = param.get('p_types')
+      var = self.get_var_by_type(p_types)  
 
       def get():
         value = var.get()
-        if param_type == 'f':
+        if p_types == 'float':
           value = float(value)
-        elif param_type == 'n':
+        elif p_types == 'int':
           value = int(value)
         else:
           pass
         return value
 
-      param_value = param['value']     
-      var.set(param_value)
+      param_default_value = param.get('default')     
+      var.set(param_default_value)
       param_control = Spinbox(self, from_=from_, to=to, textvariable=var, wrap=True, command=get)
       param_command = get
       return param_command, param_control
 
-    domain_switcher = {
-      's': domain_single,
-      'l': domain_list,
-      'd': domain_dictionary,
-      'r': domain_range,
-      'f': domain_flag
+
+    type_switcher = {
+      'int': pint,
+      'float': pfloat,
+      'str': pstr,
+      'bool': pbool,
+      'Dict': pdict,
+      'List': plist,
+      'Range': prange
     }
 
-    control_builder = domain_switcher.get(param_domain, 'Invalid domain')
+    control_builder = type_switcher.get(param_type, 'Invalid type')
 
     return control_builder(param)
 
+
+
+    # def domain_range(param):
+    #   param_possible_values = param['p_values']
+    #   param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
+    #   from_ = param_values_tuple[0]
+    #   to = param_values_tuple[1]
+
+    #   param_type = param.get('type')
+    #   var = self.get_var_by_type(param_type)  
+
+    #   def get():
+    #     value = var.get()
+    #     if param_type == 'f':
+    #       value = float(value)
+    #     elif param_type == 'n':
+    #       value = int(value)
+    #     else:
+    #       pass
+    #     return value
+
+    #   param_value = param['value']     
+    #   var.set(param_value)
+    #   param_control = Spinbox(self, from_=from_, to=to, textvariable=var, wrap=True, command=get)
+    #   param_command = get
+    #   return param_command, param_control
+
+    # type_switcher = {
+    #   'int': pint,
+    #   'float': pfloat,
+    #   'str': pstr,
+    #   'Dict': pdict,
+    #   'List': plist,
+    #   'Range': prange
+    # }
+
+    # control_builder = type_switcher.get(param_type, 'Invalid domain')
+
+    # return control_builder(param)
+
   @staticmethod
   def get_var_by_type(type):
-    if type == 'f':
+    if type == 'float':
       var = tk.DoubleVar()
-    elif type == 'n':
+    elif type == 'int':
       var = tk.IntVar()
     else:
       var = tk.StringVar()
@@ -233,8 +307,8 @@ class OperParamsView(Frame):
 
   @staticmethod
   def split_possible_values_string(param_possible_values):
-    end_idx = len(param_possible_values) - 1
-    param_possible_values = param_possible_values[1:end_idx]
+    end_idx = len(param_possible_values)
+    param_possible_values = param_possible_values[0:end_idx]
     return param_possible_values.split(',')
 
   @staticmethod
