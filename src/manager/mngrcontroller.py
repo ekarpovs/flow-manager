@@ -98,10 +98,7 @@ class MngrController():
     self._view.flow.set_flow_names(names)
     # Set operations definitions from module models into the flow item
     for name in names:
-      if name == 'glbstm.begin' or name == 'glbstm.end':
-        continue
       operation = self.mmodule.get_operation_by_name(name)
-      # print(f'{operation.name}: {operation.params}')
       item = self.mflow.get_item(name)
       item.params_def = operation.params
     self.rerun_fsm()
