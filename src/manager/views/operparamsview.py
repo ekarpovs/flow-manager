@@ -71,7 +71,7 @@ class OperParamsView(Frame):
       params.append({"name": name, "value": value})
       
       # operation_params_item = {"idx": self.operation_param_controls['idx'], "exec": self.operation_param_controls['exec'], "params": params}
-    operation_params_item = {"params": params}
+    operation_params_item = params
       
     return operation_params_item
 

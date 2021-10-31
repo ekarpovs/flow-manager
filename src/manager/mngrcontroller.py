@@ -1,3 +1,4 @@
+from typing import Dict, List
 from flow_model.flowmodel import FlowModel
 import numpy as np
 import copy
@@ -96,66 +97,47 @@ class MngrController():
     self._model.create_flow_model(ws)
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
-
+    # Init the flow items models with default operations parameters
+    self._init_operation_params(names)
     self._rerun_fsm()
     return
 
 
   def _tree_selection_changed(self, event) -> None:
     idx, item = self._view.flow.get_current_selection_tree()
-    name = item.get('text')
     self._view.flow.clear_operation_params()
-    # Update the flow items models with default operations parameters
-    operation = self._model.module.get_operation_by_name(name)
+    name = item.get('text')
     item = self._model.flow.get_item(idx)
-    item.params_def = operation.params
-    self._view.flow.set_operation_params(idx, name, operation.params)
-
-
-
-    # self._set_operation_params(idx, name)
+    self._set_operation_params(idx, name)
     return
 
 
-
 # !!! Parameters 
+  def _init_operation_params(self, names):
+    for idx, name in enumerate(names):
+      operation = self._model.module.get_operation_by_name(name)
+      item = self._model.flow.get_item(idx)
+      item.params_def = operation.params
+    return 
+
+
   def _set_operation_params(self, idx, operation_name):
     if self._model.flow is not None:
       item = self._model.flow.get_item(idx)
       # Merge default and current params
       params_def = item.params_def
-      new_params = params_def
+      if len(params_def) == 0:
+        return
+      params_new = copy.deepcopy(params_def)
       params = item.params
-      if params is not None and len(params) > 0:
-        # params = params.get('params')
-        for param_def in params_def:
-          pname_def = param_def.get('name')
-          for param in params:
-          # param = params.get('params').get(pname_def)
-            if param.get('name') == pname_def:
-              new_param = new_params.get(pname_def)
-              new_param = param
-      if new_params is not None:
-        self._view.flow.set_operation_params(idx, operation_name, new_params)
+      if params is not None:
+        for param_new in params_new:
+          pname_new = param_new.get('name')
+          if pname_new in params:
+            new_value = params.get(pname_new)
+            param_new['default'] = new_value
+        self._view.flow.set_operation_params(idx, operation_name, params_new)
     return
-
-
-
-  # def get_operation_params(self, step):
-  #   if type(step) is dict:
-  #     if 'exec' in step:
-  #       step_def = step['exec'] 
-  #     elif 'stm' in step:
-  #       step_def = step['stm']
-  #   else:
-  #     step_def = step   
-
-  #   module_name, oper_name = step_def.split('.')
-  #   orig_image_size = self._model.image.get_original_image_size()
-  #   oper_params_defenition = self._model.module.read_operation_params_defenition(module_name, oper_name)
-  #   oper_params = self._converter.module.convert_params_defenition_to_params(step, oper_params_defenition, orig_image_size)
-  #   return step_def, oper_params
-
 
   def _add_operation_to_flow_model(self, event):
     # Get destination item position after that will be added new one
@@ -205,7 +187,7 @@ class MngrController():
     idx = 0
     if self._ready():
       idx, cv2image = self._runner.run_all(self._model.flow.items)
-      self.set_result(idx, cv2image)
+      self._set_result(idx, cv2image)
     return idx
 
   def _step(self, event_name) -> int:
@@ -246,15 +228,76 @@ class MngrController():
       self._runner.init_storage(self.cv2image) 
     return
 
+
+  def _convert_to_dict(self, params_def: List[Dict]) -> Dict:
+    type_switcher = {
+      'int': int,
+      'float': float
+    }
+    params = {}
+    for param_def in params_def:
+      name = param_def.get('name')
+      value = param_def.get('default')
+      vtype = param_def.get('type')
+      converter = type_switcher.get(vtype)
+      value = converter()   
+      params[name] = value
+    return params
+
+  def _convert_to_list_of_dict(self, params: Dict, params_def: List[Dict]) -> List[Dict]:
+    for param_def in params_def:
+      name = param_def.get('name')
+      default = param_def.get('default')
+      pvalue = params.get(name, None)
+      if pvalue is not None:
+        default = pvalue
+    return params_def
+
+  @staticmethod
+  def _merge_params(params_new: Dict, params_def: List[Dict], params: Dict) -> Dict:
+    # Mergre the new param set with current one:
+    # for param in new param set:
+    #  if a param is in current params set:
+    #   if the current param value == new param value:
+    #     continue
+    #   else:
+    #     upate current param value with new one
+    #  else:
+    #   if the new param value == default param value:
+    #     continue
+    #   else:
+    #     add the pair {param: value} into current param set
+    for param_new in params_new:
+      name_new = param_new.get('name')
+      value_new = param_new.get('value')
+      if name_new in params:
+        value = params.get(name_new)
+        if value_new == value:
+          continue
+        else:
+          params[name_new] = value_new
+      else:
+        value_def = params_def.get(name_new)
+        if value_new == value_def:
+          continue
+        else:
+          params[name_new] = value_new
+    return params
+
 # Operation parameters sub panel's commands
   def _update_current_flow_params(self):
-    operation_params_item = self._view.flow.oper_params_view.get_operation_params_item()
+    # get new params values from params view 
+    params_new = self._view.flow.oper_params_view.get_operation_params_item()
     idx, item = self._view.flow.get_current_selection_tree()
-    name = item.get('text')
-    flow_item = self._model.flow.get_item(name)
-    flow_item.params = operation_params_item
-    if self.image_loaded:
-      self.current()
+    # get params defenitions and current flow params from the flow item 
+    flow_item = self._model.flow.get_item(idx)
+    params_def = flow_item.params_def
+    params_dict = self._convert_to_dict(params_def)
+    params = flow_item.params
+
+    params = self._merge_params(params_new, params_dict, params)
+    params_list = self._convert_to_list_of_dict(params, copy.deepcopy(params_def))
+    self._view.flow.oper_params_view.set_operation_params(idx, item.get('text'), params_list)
     return
 
   def _ready(self) -> bool:
@@ -266,15 +309,20 @@ class MngrController():
       return False
 
   def _apply(self, event):
-    self.update_current_flow_params()
+    self._update_current_flow_params()
+    if self.image_loaded:
+      self.current()
     return
 
   def _reset(self, event):
     idx, item = self._view.flow.get_current_selection_tree()
-    item = self._view.flow.names_combo_box.get()        
-    # orig_flow_model = self._model.flow.get_worksheet(*self._converter.flow.convert_ws_item(item))
-    # self.set_operation_params(orig_flow_model, idx)
-    # self.update_current_flow_params()   
+    name = item.get('text')
+    operation = self._model.module.get_operation_by_name(name)
+    self._view.flow.oper_params_view.set_operation_params(idx, name, operation.params)
+    fitem = self._model.flow.get_item(idx)
+    fitem.params = {}
+    if self.image_loaded:
+      self.current()
     return
 
 # Images panel's commands
