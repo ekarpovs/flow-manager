@@ -5,36 +5,30 @@ from flow_model import FlowModel, FlowItemModel
 
 
 class CurrentFlowModel(FlowModel):
-  def __init__(self, path: str, name: str, worksheet: List[Dict]) -> None:
-    super().__init__(path, name, worksheet)
-    # self._active: FlowModel = FlowModel(path, name, worksheet)
+  def __init__(self, worksheet: List[Dict]) -> None:
+    super().__init__(worksheet)
     return
 
-  def params_ws(self, name: str) -> Dict:
-    params = self.get_item(name).params_ws
+  def get_params_ws(self, idx: int) -> Dict:
+    params = self.get_item(idx).params_ws
     return params
   
-  def params_def(self, name: str) -> Dict:
-    params = self.get_item(name).params_def
+  def get_params_def(self, idx: int) -> Dict:
+    params = self.get_item(idx).params_def
     return params
 
-  def set_params_def(self, name: str, params: Dict) -> None:
-    self.get_item(name).params_def = params
+  def set_params_def(self, idx: int, params: Dict) -> None:
+    self.get_item(idx).params_def = params
     return
 
-  def params(self, name: str) -> Dict:
-    params = self.get_item(name).params
+  def get_params(self, idx: int) -> Dict:
+    params = self.get_item(idx).params
     return params
 
-  def set_params(self, name: str, params: Dict) -> None:
-    self.get_item(name).params = params
+  def set_params(self, idx: int, params: Dict) -> None:
+    self.get_item(idx).params = params
     return
 
-
-  def names(self) -> List[str]:
-    names = []
-    for item in self.items:
-      name = item.name
-      names.append(name)
+  def get_names(self) -> List[str]:
+    names = [item.name for item in self.items]
     return names
-  # Merge params

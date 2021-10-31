@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import * 
 from tkinter.ttk import Combobox, Spinbox, Button
-from typing import Dict, Tuple
+from typing import Callable, Dict, Tuple
 from ...uiconst import *
 
 class OperParamsView(Frame):
@@ -61,7 +61,7 @@ class OperParamsView(Frame):
   def get_operation_params_item(self):
     params = []
     for control in self.operation_param_controls['param_controls']:
-      name = control['label']['text'].split(':')[0]
+      name = control['label']['text'].split('-')[0].strip()
       t = type(control['control'])
       if t in [Entry, Combobox, Spinbox, Checkbutton]:
         value = control['command']()
@@ -70,7 +70,8 @@ class OperParamsView(Frame):
       
       params.append({"name": name, "value": value})
       
-      operation_params_item = {"idx": self.operation_param_controls['idx'], "exec": self.operation_param_controls['exec'], "params": params}
+      # operation_params_item = {"idx": self.operation_param_controls['idx'], "exec": self.operation_param_controls['exec'], "params": params}
+    operation_params_item = {"params": params}
       
     return operation_params_item
 
@@ -86,9 +87,7 @@ class OperParamsView(Frame):
     return param_command, param_control, param_label
 
   
-  def create_param_control(self, param: Dict):
-    
-    
+  def create_param_control(self, param: Dict) -> Tuple[Callable, Entry]:   
     # 'name':'y0'
     # 'type':'int'
     # 'default':'0'
@@ -115,7 +114,7 @@ class OperParamsView(Frame):
 
     param_type = param.get('type')
 
-    def pint(param: Dict) -> Tuple[object, Entry]:
+    def pint(param: Dict) -> Tuple[Callable, Entry]:
       def get():
         return int(param_control.get())
 
@@ -126,7 +125,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def pfloat(param: Dict) -> Tuple[object, Entry]:
+    def pfloat(param: Dict) -> Tuple[Callable, Entry]:
       def get():
         return float(param_control.get())
 
@@ -137,7 +136,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def pstr(param: Dict) -> Tuple[object, Entry]:
+    def pstr(param: Dict) -> Tuple[Callable, Entry]:
       def get():
         return param_control.get()
 
@@ -148,7 +147,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def pbool(param: Dict) -> Tuple[object, Entry]:
+    def pbool(param: Dict) -> Tuple[Callable, Checkbutton]:
       item = tk.BooleanVar()
       def get():
         return item.get()
@@ -158,7 +157,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def plist(param: Dict) -> Tuple[object, Entry]:
+    def plist(param: Dict) -> Tuple[Callable, Combobox]:
       p_types = param.get('p_types')
       param_control = Combobox(self)
       def get():
@@ -182,7 +181,7 @@ class OperParamsView(Frame):
       return param_command, param_control
 
 
-    def pdict(param: Dict) -> Tuple[object, Entry]:
+    def pdict(param: Dict) -> Tuple[Callable, Combobox]:
       param_control = Combobox(self)
 
       def get():
@@ -211,7 +210,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def prange(param: Dict) -> Tuple[object, Entry]:
+    def prange(param: Dict) -> Tuple[Callable, Spinbox]:
       param_possible_values = param.get('p_values')
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       from_ = param_values_tuple[0]
@@ -291,7 +290,7 @@ class OperParamsView(Frame):
     # return control_builder(param)
 
   @staticmethod
-  def get_var_by_type(type):
+  def get_var_by_type(type) -> Variable:
     if type == 'float':
       var = tk.DoubleVar()
     elif type == 'int':

@@ -87,7 +87,7 @@ class FlowView(View):
       self.flow_tree_view.delete(item)
     return
     
-  def set_flow_names(self, flow_names, idx=0):
+  def set_flow_item_names(self, flow_names, idx=0):
     self.clear_flow_tree_view()
     for i, name in enumerate(flow_names):
       self.flow_tree_view.insert(parent='', index='end', iid=i, text=name)

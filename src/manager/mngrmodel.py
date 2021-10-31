@@ -54,8 +54,8 @@ class MngrModel():
   def worksheetnames(self):
     return self._worksheet.workseetnames
 # Flow 
-  def create_flow_model(self, ws_path: str, ws_name: str, ws: List[Dict]) -> None:
-    self._flow = CurrentFlowModel(ws_path, ws_name, ws)
+  def create_flow_model(self, ws: List[Dict]) -> None:
+    self._flow = CurrentFlowModel(ws)
     return
 
   @property
