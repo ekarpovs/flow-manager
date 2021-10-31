@@ -230,10 +230,18 @@ class MngrController():
 
 
   def _convert_to_dict(self, params_def: List[Dict]) -> Dict:
+    def compl():
+      return param_def.get('p_types')      
+
     type_switcher = {
       'int': int,
-      'float': float
+      'float': float,
+      'Range': compl,
+      'List': compl,
+      'Dict': compl
     }
+
+
     params = {}
     for param_def in params_def:
       name = param_def.get('name')
