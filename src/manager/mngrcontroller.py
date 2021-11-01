@@ -46,9 +46,10 @@ class MngrController():
     self._view.image.file_names_list_box.bind('<<ListboxSelect>>', 
       lambda e: self._image_file_selected(self._view.image.file_names_list_box.curselection()))
 
-    self.init_mage = np.ones((10, 10, 3), dtype="uint8")*255 
-    self.cv2image = self.init_mage
-    self._view.image.set_result_image(self.cv2image)
+    # self.init_mage = np.ones((10, 10, 3), dtype="uint8")*255 
+    # self.cv2image = self.init_mage
+    # self._view.image.set_result_image(self.cv2image)
+    self.cv2image = None
     self.file_idx = None
     self._start()
 
@@ -87,8 +88,8 @@ class MngrController():
     self._init_flow_model(ws_name)
     return
 
-  # When worksheet item is selected
-  def _init_flow_model(self, ws_name) -> None:
+  # When a worksheet item is selected
+  def _init_flow_model(self, ws_name: str) -> None:
     self._view.flow.activate_buttons()
     (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
     # read worksheet
@@ -113,7 +114,7 @@ class MngrController():
 
 
 # !!! Parameters 
-  def _init_operation_params(self, names):
+  def _init_operation_params(self, names: List[str]) -> None:
     for idx, name in enumerate(names):
       operation = self._model.module.get_operation_by_name(name)
       item = self._model.flow.get_item(idx)
@@ -121,7 +122,7 @@ class MngrController():
     return 
 
 
-  def _set_operation_params(self, idx, operation_name):
+  def _set_operation_params(self, idx: int, operation_name: str) -> None:
     if self._model.flow is not None:
       item = self._model.flow.get_item(idx)
       # Merge default and current params
@@ -177,7 +178,7 @@ class MngrController():
     return
 
 # Execution commands
-  def _set_result(self, idx, cv2image) -> None:
+  def _set_result(self, idx: int, cv2image: np.dtype) -> None:
     if cv2image is not None:
       self._view.image.set_result_image(cv2image)
     self._view.flow.set_selection_tree(idx)
@@ -190,7 +191,7 @@ class MngrController():
       self._set_result(idx, cv2image)
     return idx
 
-  def _step(self, event_name) -> int:
+  def _step(self, event_name: str) -> int:
     idx, item = self._view.flow.get_current_selection_tree()
     if self._ready():
       flow_item = self._model.flow.get_item(idx)
@@ -229,7 +230,8 @@ class MngrController():
     return
 
 
-  def _convert_to_dict(self, params_def: List[Dict]) -> Dict:
+  @staticmethod
+  def _convert_to_dict(params_def: List[Dict]) -> Dict:
     def compl():
       return param_def.get('p_types')      
 
@@ -241,7 +243,6 @@ class MngrController():
       'Dict': compl
     }
 
-
     params = {}
     for param_def in params_def:
       name = param_def.get('name')
@@ -252,13 +253,14 @@ class MngrController():
       params[name] = value
     return params
 
-  def _convert_to_list_of_dict(self, params: Dict, params_def: List[Dict]) -> List[Dict]:
+  @staticmethod
+  def _convert_to_list_of_dict(params: Dict, params_def: List[Dict]) -> List[Dict]:
     for param_def in params_def:
       name = param_def.get('name')
-      default = param_def.get('default')
+      # default = param_def.get('default')
       pvalue = params.get(name, None)
       if pvalue is not None:
-        default = pvalue
+        param_def['default'] = pvalue
     return params_def
 
   @staticmethod
@@ -293,7 +295,7 @@ class MngrController():
     return params
 
 # Operation parameters sub panel's commands
-  def _update_current_flow_params(self):
+  def _update_current_flow_params(self) -> None:
     # get new params values from params view 
     params_new = self._view.flow.oper_params_view.get_operation_params_item()
     idx, item = self._view.flow.get_current_selection_tree()
@@ -308,29 +310,19 @@ class MngrController():
     self._view.flow.oper_params_view.set_operation_params(idx, item.get('text'), params_list)
     return
 
-  def _ready(self) -> bool:
-    if self.image_loaded and self._runner.initialized and self._model.flow.loaded:
-      self._view.flow.activate_buttons(True)
-      return True
-    else:
-      self._view.flow.activate_buttons()
-      return False
-
-  def _apply(self, event):
+  def _apply(self, event) -> None:
     self._update_current_flow_params()
-    if self.image_loaded:
-      self.current()
+    self.current()
     return
 
-  def _reset(self, event):
+  def _reset(self, event) -> None:
     idx, item = self._view.flow.get_current_selection_tree()
     name = item.get('text')
     operation = self._model.module.get_operation_by_name(name)
     self._view.flow.oper_params_view.set_operation_params(idx, name, operation.params)
     fitem = self._model.flow.get_item(idx)
     fitem.params = {}
-    if self.image_loaded:
-      self.current()
+    self.current()
     return
 
 # Images panel's commands
@@ -372,6 +364,15 @@ class MngrController():
       image_full_file_name = self._model.image.get_selected_file_full_name(idx)
       cv2image = self._model.image.get_image(image_full_file_name)
     return cv2image
+
+
+  def _ready(self) -> bool:
+    if self.image_loaded and self._runner.initialized and self._model.flow.loaded:
+      self._view.flow.activate_buttons(True)
+      return True
+    else:
+      self._view.flow.activate_buttons()
+      return False
 
   def _rerun_fsm(self) -> None:
     if self._model.flow:
