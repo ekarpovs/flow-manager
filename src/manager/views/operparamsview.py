@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import * 
 from tkinter.ttk import Combobox, Spinbox, Button
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, List, Tuple
 from ...uiconst import *
 
 class OperParamsView(Frame):
@@ -31,15 +31,29 @@ class OperParamsView(Frame):
       self.operation_param_controls['param_controls'] = []
     return
 
-  def init_operation_params(self, idx, exec):
+  def init_operation_params(self, idx, item_name):
     self.operation_param_controls["idx"] = idx
-    self.operation_param_controls["exec"] = exec
+    self.operation_param_controls["exec"] = item_name
     
     return
 
-  def set_operation_params(self, idx, exec, oper_params):
+  @staticmethod
+  def _convert_to_list_of_dict(params: Dict, params_def: List[Dict]) -> List[Dict]:
+    for param_def in params_def:
+      name = param_def.get('name')
+      pvalue = params.get(name, None)
+      if pvalue is not None:
+        param_def['default'] = pvalue
+    return params_def
+
+  def set_operation_params_from_dict(self, idx: int, item_name: str, params: Dict, params_def: List[Dict]) -> None:
+    params_list = self._convert_to_list_of_dict(params, params_def)
+    self.set_operation_params(idx, item_name, params_list)
+    return
+
+  def set_operation_params(self, idx, item_name: str, oper_params: List[Dict]) -> None:
     self.clear_operation_params()
-    self.init_operation_params(idx, exec)
+    self.init_operation_params(idx, item_name)
     self.btn_apply['state']=DISABLED
     self.btn_reset['state']=DISABLED 
     self.btn_apply.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
@@ -58,7 +72,7 @@ class OperParamsView(Frame):
       self.btn_reset['state']=NORMAL    
     return
 
-  def get_operation_params_item(self):
+  def get_operation_params_item(self) -> List[Dict]:
     params = []
     for control in self.operation_param_controls['param_controls']:
       name = control['label']['text'].split('-')[0].strip()
@@ -66,14 +80,9 @@ class OperParamsView(Frame):
       if t in [Entry, Combobox, Spinbox, Checkbutton]:
         value = control['command']()
       else:
-        print("wrong control type", type(control['control']))
-      
-      params.append({"name": name, "value": value})
-      
-      # operation_params_item = {"idx": self.operation_param_controls['idx'], "exec": self.operation_param_controls['exec'], "params": params}
-    operation_params_item = params
-      
-    return operation_params_item
+        print("wrong control type", type(control['control']))    
+      params.append({"name": name, "value": value})     
+    return params
 
 
   def controls_factory(self, param):
@@ -202,8 +211,8 @@ class OperParamsView(Frame):
       param_control['values'] = param_keys_tuple
       param_dict = self.possible_values_pairs_to_dict(param_possible_values)
       param_default_value = param.get('default')
-      # if (type(param_value) is int) or (type(param_value) is float):
-      #   param_value = get_key(param_value)
+      if (type(param_default_value) is int) or (type(param_default_value) is float):
+        param_default_value = get_key(param_default_value)
       param_control.set(param_default_value)
       item = tk.StringVar()
       param_control.textvariable = item

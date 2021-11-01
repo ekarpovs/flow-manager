@@ -30,7 +30,7 @@ class MngrController():
     self._view.flow.btn_add.bind("<Button>", self._add_operation_to_flow_model)
     self._view.flow.btn_remove.bind("<Button>", self._remove_operation_from_flow_model)
     self._view.flow.btn_reset.bind("<Button>", self._reset_flow_model)
-    self._view.flow.btn_save.bind("<Button>", self._store_flow_model)
+    self._view.flow.btn_save.bind("<Button>", self._store_flow_model_as_ws)
     self._view.flow.btn_run.bind("<Button>", self._run)
     self._view.flow.btn_next.bind("<Button>", self._next)
     self._view.flow.btn_prev.bind("<Button>", self._prev)
@@ -172,12 +172,9 @@ class MngrController():
     self._rerun_fsm()
     return
 
-  def _store_flow_model(self, event):
+  def _store_flow_model_as_ws(self, event):
     flow_name = self._view.flow.names_combo_box.get()
     path, name = self._converter.flow.split_ws_name(flow_name)
-    # self._model.flow.store_flow_model(path, name, self._model.flow)
-    # # self.update_flow_model(flow_name)
-    # self._set_top_state()
     return
 
 # Execution commands
@@ -257,16 +254,6 @@ class MngrController():
     return params
 
   @staticmethod
-  def _convert_to_list_of_dict(params: Dict, params_def: List[Dict]) -> List[Dict]:
-    for param_def in params_def:
-      name = param_def.get('name')
-      # default = param_def.get('default')
-      pvalue = params.get(name, None)
-      if pvalue is not None:
-        param_def['default'] = pvalue
-    return params_def
-
-  @staticmethod
   def _merge_params(params_new: Dict, params_def: List[Dict], params: Dict) -> Dict:
     # Mergre the new param set with current one:
     # for param in new param set:
@@ -309,8 +296,7 @@ class MngrController():
     params = flow_item.params
 
     params = self._merge_params(params_new, params_dict, params)
-    params_list = self._convert_to_list_of_dict(params, copy.deepcopy(params_def))
-    self._view.flow.oper_params_view.set_operation_params(idx, item.get('text'), params_list)
+    self._view.flow.oper_params_view.set_operation_params_from_dict(idx, item.get('text'), params, copy.deepcopy(params_def))
     return
 
   def _apply(self, event) -> None:
