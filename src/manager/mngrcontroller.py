@@ -1,4 +1,6 @@
 from typing import Dict, List
+from flow_model.flowitemmodel import FlowItemModel
+from flow_model.flowitemtype import FlowItemType
 from flow_model.flowmodel import FlowModel
 import numpy as np
 import copy
@@ -140,41 +142,42 @@ class MngrController():
         self._view.flow.set_operation_params(idx, operation_name, params_new)
     return
 
-  def _add_operation_to_flow_model(self, event):
-    # Get destination item position after that will be added new one
-    cur_idx,_ = self._view.flow.get_current_selection_tree()
+  def _add_operation_to_flow_model(self, event) -> None:
+    # Get destination item position before that will be added new one
+    cur_idx, item = self._view.flow.get_current_selection_tree()
     # Get source item position from modules view
-    operation_name = self._view.module.get_selected_operation_meta()   
+    name = self._view.module.get_selected_item_name()   
     # Perform if operation only selected
-    # if operation_name is not None:     
-    #   step_def, oper_params = self.get_operation_params(operation_name)
-    #   new_flow_model = self._model.flows_model.add_opearation_to_current_flow(step_def, oper_params, cur_idx)
-    #   self.flow_model = new_flow_model
-    #   new_flow_model = self.convert_flow_model(new_flow_model)
-    #   self._view.flows_view.set_flow_model(new_flow_model, cur_idx+1)
-    self.rerun_fsm()
+    if name is not None:     
+      new_flow_tem = FlowItemModel(FlowItemType.EXEC, name)
+      operation = self._model.module.get_operation_by_name(name)
+      new_flow_tem.params_def = operation.params
+      self._model.flow.set_item(cur_idx, new_flow_tem)
+      names = self._model.flow.get_names()
+      self._view.flow.set_flow_item_names(names)   
+      self._rerun_fsm()
     return
 
-  def _remove_operation_from_flow_model(self, event):
+  def _remove_operation_from_flow_model(self, event) -> None:
     cur_idx, _ = self._view.flow.get_current_selection_tree()
-    new_flow_model = self._model.flow.remove_operation_from_current_flow(cur_idx)
-    self._model.flow = new_flow_model
-    new_flow_model = self.convert_flow_model(new_flow_model)
-    self._view.flow.set_flow_model(new_flow_model, cur_idx)
-    self.rerun_fsm()
+    self._model.flow.remove_item(cur_idx)
+    names = self._model.flow.get_names()
+    self._view.flow.set_flow_item_names(names)   
+    self._rerun_fsm()
     return
 
-  def _reset_flow_model(self, event):
-    self.set_selected_flow_model()
-    self.rerun_fsm()
+  def _reset_flow_model(self, event) -> None:
+    ws_name = self._view.flow.names_combo_box.get()
+    self._init_flow_model(ws_name)
+    self._rerun_fsm()
     return
 
   def _store_flow_model(self, event):
     flow_name = self._view.flow.names_combo_box.get()
-    path, name = self._converter.flow.convert_ws_item(flow_name)
-    self._model.flow.store_flow_model(path, name, self._model.flow)
-    # self.update_flow_model(flow_name)
-    self._set_top_state()
+    path, name = self._converter.flow.split_ws_name(flow_name)
+    # self._model.flow.store_flow_model(path, name, self._model.flow)
+    # # self.update_flow_model(flow_name)
+    # self._set_top_state()
     return
 
 # Execution commands
