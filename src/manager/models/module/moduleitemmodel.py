@@ -49,8 +49,8 @@ class ModuleItemModel():
     idx_e = self._doc.index('Returns:')
     parameters = self._doc[idx_s+1:idx_e]
     returns_descr = self._doc[idx_e+2:]
-    idx_s = parameters.index('- params keys:')
-    idx_e = parameters.index('- data keys:')
+    idx_s = parameters.index('- params:')
+    idx_e = parameters.index('- data:')
     params_descr = parameters[idx_s+1:idx_e]
     data_descr = parameters[idx_e+1:]
 

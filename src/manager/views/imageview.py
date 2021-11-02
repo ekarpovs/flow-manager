@@ -82,7 +82,9 @@ class ImageView(View):
     tb_frame = Frame(self)
     tb_frame.grid(row=1, column=0, padx=PADX, pady=PADY, columnspan=3, sticky=W + E + N + S)
     NavigationToolbar2Tk(canvas, tb_frame)
-
-    plt.imshow(cv2image, cmap='gray')
+    if cv2image is None:
+      plt.clf()
+    else:    
+      plt.imshow(cv2image, cmap='gray')
     return
 

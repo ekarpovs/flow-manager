@@ -187,7 +187,7 @@ class MngrController():
   def _run(self, event) -> int:
     idx = 0
     if self._ready():
-      idx, cv2image = self._runner.run_all(self._model.flow.items)
+      idx, cv2image = self._runner.run_all(self._model.flow)
       self._set_result(idx, cv2image)
     return idx
 
@@ -341,7 +341,7 @@ class MngrController():
     return
 
   def _clear(self, event) -> None:
-    self.cv2image = self.init_mage
+    self.cv2image = None
     self._view.image.set_result_image(self.cv2image)
     self._set_top_state()
     return
