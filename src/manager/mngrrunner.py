@@ -31,6 +31,14 @@ class MngrRunner():
   def initialized(self) -> bool:
     return self.runner.initialized
 
+  @property
+  def state_idx(self):
+    return self.runner.state_idx
+
+  def get_current_input(self) -> Dict:
+    state_id = self.runner.state_id
+    data = self.storage.get_state_input_data(state_id)
+    return data
 
   def build(self, model: FlowModel) -> None:
     self._model = model
@@ -55,6 +63,3 @@ class MngrRunner():
     self.runner.run_step(event, flow_item)
     return
   
-  @property
-  def state_idx(self):
-    return self.runner.state_idx

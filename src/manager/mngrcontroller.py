@@ -173,18 +173,20 @@ class MngrController():
     return
 
 # Execution commands
-  def _set_result(self, idx: int) -> None:
+  def _set_result(self, idx: int, data: Dict) -> None:
+    cv2image = data.get('image')
     # if cv2image is not None:
-    #   self._view.image.set_result_image(cv2image)
+    self._view.image.set_result_image(cv2image)
     self._view.flow.set_selection_tree(idx)
     return
 
   def _run(self, event) -> int:
-    idx = 0
+    idx = self._runner.state_idx
     if self._ready():
       self._runner.run_all()
       idx = self._runner.state_idx
-      self._set_result(idx)
+      data = self._runner.get_current_input()
+      self._set_result(idx, data)
     return idx
 
   def _step(self, event_name: str) -> None:
@@ -192,7 +194,8 @@ class MngrController():
     if self._ready():
       self._runner.run_one(event_name, idx)
       idx = self._runner.state_idx
-      self._set_result(idx)
+      data = self._runner.get_current_input()
+      self._set_result(idx, data)
     return
 
   def _next(self, event)  -> int:
@@ -216,8 +219,7 @@ class MngrController():
     return
   
   def _set_top_state(self) -> None:
-    if self.image_loaded:
-      self._view.image.set_result_image(self.cv2image)
+    self._view.image.set_result_image(self.cv2image)
     if self._ready():
       self._view.flow.set_selection_tree()
       self._runner.reset()
