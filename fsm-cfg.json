@@ -1,6 +1,7 @@
   {
-    "info": "Configuration of flow runner fsm",
+    "info": "Configuration of flow runner",
     "user-actions-paths": [
+      "./frfsm",
       "../modules-and-worksheets/modules",
       "../modules-and-worksheets/modules-common"
     ],
@@ -10,5 +11,6 @@
       "next",
       "prev",
       "current"
-    ]
+    ],
+    "storage-path": "../data/storage"
   }

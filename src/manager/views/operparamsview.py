@@ -90,7 +90,7 @@ class OperParamsView(Frame):
     param_command, param_control = self.create_param_control(param)
     name = param.get('name')
     comment = param.get('comment')
-    label_text = f"{name} - {comment})"
+    label_text = f"{name} - {comment}"
     param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
 
     return param_command, param_control, param_label
@@ -160,7 +160,7 @@ class OperParamsView(Frame):
       item = tk.BooleanVar()
       def get():
         return item.get()
-      param_value = param['value']
+      param_value = param.get('default')
       item.set(param_value)
       param_control = Checkbutton(self, variable=item, onvalue=True, offvalue=False, command=get)
       param_command = get

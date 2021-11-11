@@ -2,9 +2,12 @@ import sys
 import json
 from typing import List, Dict, Tuple
 
+from flow_storage import FlowStorageConfig
+
 class Configuration():
   def __init__(self):
     (self._cfg, self._cfg_fsm) = self._load()
+    self._cfg_storage = FlowStorageConfig(self._cfg_fsm.get('storage-path', '.'))
     
 
   # Loaders
@@ -43,3 +46,7 @@ class Configuration():
   @property
   def cfg_fsm(self) ->Dict:
     return self._cfg_fsm
+
+  @property
+  def cfg_storage(self):
+    return self._cfg_storage

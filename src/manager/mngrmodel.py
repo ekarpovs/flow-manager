@@ -1,22 +1,20 @@
 from typing import Dict, List
 
-from flow_model import FlowModel
-
-from src.manager.models.flow.currentflowmodel import CurrentFlowModel
-
-from ..configuration import Configuration
 from .models import *
+from ..configuration import Configuration
+
 
 class MngrModel():
   '''
   Fasade for models 
   '''
+
   def __init__(self, cfg: Configuration):
 
     self._cfg = cfg
     # Create models
     self._image = ImagesModel()   
-    self._flow = None
+    self._flow: CurrentFlowModel = None
     self._module = ModuleModelList(self.modules_paths)
     self._worksheet = WorksheetModel(self.worksheets_paths)
 
@@ -54,7 +52,8 @@ class MngrModel():
   def worksheetnames(self):
     return self._worksheet.workseetnames
 # Flow 
-  def create_flow_model(self, ws: List[Dict]) -> None:
+  def create_flow_model(self, path: str, name: str) -> None:
+    ws = self._worksheet.read(path, name)
     self._flow = CurrentFlowModel(ws)
     return
 

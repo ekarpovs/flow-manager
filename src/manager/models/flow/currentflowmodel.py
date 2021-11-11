@@ -1,7 +1,7 @@
 from copy import copy
 from typing import Dict, List
 
-from flow_model import FlowModel, FlowItemModel
+from flow_model import FlowModel
 
 
 class CurrentFlowModel(FlowModel):

@@ -1,25 +1,20 @@
 from typing import Dict, List
-from flow_model.flowitemmodel import FlowItemModel
-from flow_model.flowitemtype import FlowItemType
-from flow_model.flowmodel import FlowModel
 import numpy as np
 import copy
 
-from src.manager.models.module.modulemodel import ModuleModel
-from src.manager.models.module.modulemodellist import ModuleModelList
+from flow_model import FlowItemModel, FlowItemType
 
-from ..configuration import Configuration
-from flow_runner import Runner
-from flow_converter import FlowConverter 
 from .mngrmodel import MngrModel  
+from .mngrrunner import MngrRunner 
 from .mngrconverter import MngrConverter  
 from .mngrview import MngrView  
+from ..configuration import Configuration
 
 class MngrController():
   def __init__(self, parent):
     self.cfg = Configuration()
-    self._runner = Runner()
     self._model = MngrModel(self.cfg)
+    self._runner = MngrRunner(self.cfg)
     self._converter = MngrConverter()
     self._view = MngrView(parent)
 # Bind to modules panel
@@ -94,15 +89,13 @@ class MngrController():
   def _init_flow_model(self, ws_name: str) -> None:
     self._view.flow.activate_buttons()
     (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
-    # read worksheet
-    ws = self._model._worksheet.read(ws_path, ws_name)
-    # Create current flow model
-    self._model.create_flow_model(ws)
+    # Create current flow model regarding ws defintion
+    self._model.create_flow_model(ws_path, ws_name)
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
-    # Init the flow items models with default operations parameters
-    self._init_operation_params(names)
-    self._rerun_fsm()
+    # Init the flow items models with default operations definitions
+    self._set_operation_definitions(names)
+    self._rebuild_runner()
     return
 
 
@@ -116,11 +109,13 @@ class MngrController():
 
 
 # !!! Parameters 
-  def _init_operation_params(self, names: List[str]) -> None:
+  def _set_operation_definitions(self, names: List[str]) -> None:
     for idx, name in enumerate(names):
       operation = self._model.module.get_operation_by_name(name)
       item = self._model.flow.get_item(idx)
       item.params_def = operation.params
+      item.inrefs_def = operation.inrefs
+      item.outrefs_def = operation.outrefs
     return 
 
 
@@ -178,29 +173,30 @@ class MngrController():
     return
 
 # Execution commands
-  def _set_result(self, idx: int, cv2image: np.dtype) -> None:
-    if cv2image is not None:
-      self._view.image.set_result_image(cv2image)
+  def _set_result(self, idx: int) -> None:
+    # if cv2image is not None:
+    #   self._view.image.set_result_image(cv2image)
     self._view.flow.set_selection_tree(idx)
     return
 
   def _run(self, event) -> int:
     idx = 0
     if self._ready():
-      idx, cv2image = self._runner.run_all(self._model.flow)
-      self._set_result(idx, cv2image)
+      self._runner.run_all()
+      idx = self._runner.state_idx
+      self._set_result(idx)
     return idx
 
-  def _step(self, event_name: str) -> int:
-    idx, item = self._view.flow.get_current_selection_tree()
+  def _step(self, event_name: str) -> None:
+    idx, _ = self._view.flow.get_current_selection_tree()
     if self._ready():
-      flow_item = self._model.flow.get_item(idx)
-      idx, cv2image = self._runner.run_step(event_name, flow_item)
-      self._set_result(idx, cv2image)
-    return idx
+      self._runner.run_one(event_name, idx)
+      idx = self._runner.state_idx
+      self._set_result(idx)
+    return
 
   def _next(self, event)  -> int:
-    return self._step('next')
+    self._step('next')
 
   def current(self) -> int:
     return self._step('current')
@@ -216,9 +212,7 @@ class MngrController():
     return image
 
   def _top(self, event) -> None:
-    if self._ready():
-      self._runner.start()
-      self._set_top_state()
+    self._set_top_state()
     return
   
   def _set_top_state(self) -> None:
@@ -226,7 +220,7 @@ class MngrController():
       self._view.image.set_result_image(self.cv2image)
     if self._ready():
       self._view.flow.set_selection_tree()
-      self._runner.init_storage(self.cv2image) 
+      self._runner.reset()
     return
 
 
@@ -238,6 +232,8 @@ class MngrController():
     type_switcher = {
       'int': int,
       'float': float,
+      'str': str,
+      'bool': bool,
       'Range': compl,
       'List': compl,
       'Dict': compl
@@ -356,18 +352,17 @@ class MngrController():
 
 
   def _ready(self) -> bool:
-    if self.image_loaded and self._runner.initialized and self._model.flow.loaded:
+    # if self.image_loaded and self._runner.initialized and self._model.flow.loaded:
+    if self._runner.initialized and self._model.flow.loaded:
       self._view.flow.activate_buttons(True)
       return True
     else:
       self._view.flow.activate_buttons()
       return False
 
-  def _rerun_fsm(self) -> None:
+  def _rebuild_runner(self) -> None:
     if self._model.flow:
-      fc = FlowConverter(self._model.flow)
-      fsm_def = fc.convert()
-      self._runner.create_frfsm(self.cfg.cfg_fsm, fsm_def)
-      self._runner.start()
+      self._runner.build(self._model.flow)
+      # self._runner.reset()
     self._set_top_state()
     return
