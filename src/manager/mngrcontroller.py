@@ -1,4 +1,5 @@
 from typing import Dict, List
+import cv2
 import numpy as np
 import copy
 
@@ -43,10 +44,6 @@ class MngrController():
     self._view.image.file_names_list_box.bind('<<ListboxSelect>>', 
       lambda e: self._image_file_selected(self._view.image.file_names_list_box.curselection()))
 
-    # self.init_mage = np.ones((10, 10, 3), dtype="uint8")*255 
-    # self.cv2image = self.init_mage
-    # self._view.image.set_result_image(self.cv2image)
-    self.cv2image = None
     self.file_idx = None
     self._start()
 
@@ -175,6 +172,8 @@ class MngrController():
 # Execution commands
   def _set_result(self, idx: int, data: Dict) -> None:
     cv2image = data.get('image')
+    if cv2image is not None:
+      cv2image = cv2.cvtColor(cv2image, cv2.COLOR_BGR2RGB)
     # if cv2image is not None:
     self._view.image.set_result_image(cv2image)
     self._view.flow.set_selection_tree(idx)
@@ -219,7 +218,7 @@ class MngrController():
     return
   
   def _set_top_state(self) -> None:
-    self._view.image.set_result_image(self.cv2image)
+    self._view.image.set_result_image(None)
     if self._ready():
       self._view.flow.set_selection_tree()
       self._runner.reset()
@@ -312,11 +311,6 @@ class MngrController():
     self.current()
     return
 
-# Images panel's commands
-  @property
-  def image_loaded(self) ->bool:
-    return self.cv2image is not None
-
   def _selected_path(self, event) -> None:
     item = self._view.image.names_combo_box.get()
     self._update_images_file_names_list(item)   
@@ -334,23 +328,18 @@ class MngrController():
     return
 
   def _load(self, event) -> None:
-    self.cv2image = self._get_cv2image()
-    self._set_top_state()
     return
 
   def _clear(self, event) -> None:
-    self.cv2image = None
-    self._view.image.set_result_image(self.cv2image)
-    self._set_top_state()
     return
 
-  def _get_cv2image(self) -> np.dtype:
-    cv2image = None
-    if self.file_idx is not None:
-      idx = self.file_idx
-      image_full_file_name = self._model.image.get_selected_file_full_name(idx)
-      cv2image = self._model.image.get_image(image_full_file_name)
-    return cv2image
+  # def _get_cv2image(self) -> np.dtype:
+  #   cv2image = None
+  #   if self.file_idx is not None:
+  #     idx = self.file_idx
+  #     image_full_file_name = self._model.image.get_selected_file_full_name(idx)
+  #     cv2image = self._model.image.get_image(image_full_file_name)
+  #   return cv2image
 
 
   def _ready(self) -> bool:
