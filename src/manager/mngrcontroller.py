@@ -174,6 +174,9 @@ class MngrController():
 # Execution commands
   def _set_result(self, idx: int, data: Dict) -> None:
     cv2image = data.get('image')
+    # Temporary - will be generic solution
+    if cv2image is None:
+      cv2image = data.get('mask')
     if cv2image is not None:
       cv2image = cv2.cvtColor(cv2image, cv2.COLOR_BGR2RGB)
     # if cv2image is not None:
