@@ -147,7 +147,7 @@ class MngrController():
       self._model.flow.set_item(cur_idx, new_flow_tem)
       names = self._model.flow.get_names()
       self._view.flow.set_flow_item_names(names)   
-      self._rerun_fsm()
+      self._rebuild_runner()
     return
 
   def _remove_operation_from_flow_model(self, event) -> None:
@@ -155,13 +155,13 @@ class MngrController():
     self._model.flow.remove_item(cur_idx)
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
-    self._rerun_fsm()
+    self._rebuild_runner()
     return
 
   def _reset_flow_model(self, event) -> None:
     ws_name = self._view.flow.names_combo_box.get()
     self._init_flow_model(ws_name)
-    self._rerun_fsm()
+    self.__rebuild_runner()
     return
 
   def _store_flow_model_as_ws(self, event):
@@ -184,7 +184,7 @@ class MngrController():
     if self._ready():
       self._runner.run_all()
       idx = self._runner.state_idx
-      data = self._runner.get_current_input()
+      data = self._runner.get_current_output()
       self._set_result(idx, data)
     return idx
 
@@ -193,7 +193,7 @@ class MngrController():
     if self._ready():
       self._runner.run_one(event_name, idx)
       idx = self._runner.state_idx
-      data = self._runner.get_current_input()
+      data = self._runner.get_current_output()
       self._set_result(idx, data)
     return
 

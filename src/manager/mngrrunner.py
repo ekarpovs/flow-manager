@@ -35,9 +35,9 @@ class MngrRunner():
   def state_idx(self):
     return self.runner.state_idx
 
-  def get_current_input(self) -> Dict:
-    state_id = self.runner.state_id
-    data = self.storage.get_state_input_data(state_id)
+  def get_current_output(self) -> Dict:
+    state_id = self.runner.output_from_state
+    data = self.storage.get_state_output_data(state_id)
     return data
 
   def build(self, model: FlowModel) -> None:
