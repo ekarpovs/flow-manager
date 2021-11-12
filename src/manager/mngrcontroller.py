@@ -35,15 +35,6 @@ class MngrController():
     self._view.flow.oper_params_view.btn_reset.bind("<Button>", self._reset)
     self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
 
-# Bind to images panel
-    # self._view.images_view.auto_input_check_button.bind('<<CheckbuttonChecked>>', lambda e: self.auto_input_changed(True))
-    # self._view.images_view.auto_input_check_button.bind('<<CheckbuttonUnChecked>>', lambda e: self.auto_input_changed())
-    self._view.image.btn_load.bind("<Button>", self._load)
-    self._view.image.btn_clear.bind("<Button>", self._clear)
-    self._view.image.names_combo_box.bind('<<ComboboxSelected>>', self._selected_path)  
-    self._view.image.file_names_list_box.bind('<<ListboxSelect>>', 
-      lambda e: self._image_file_selected(self._view.image.file_names_list_box.curselection()))
-
     self.file_idx = None
     self._start()
 
@@ -52,7 +43,6 @@ class MngrController():
   def _start(self) -> None:
     self._update_module_view()
     self._update_worksheet_list()
-    self._update_image_view()
     return
 
   def _update_module_view(self) -> None:   
@@ -61,13 +51,9 @@ class MngrController():
     return
 
   def _update_worksheet_list(self) -> None:
-    names = self._model._worksheet.workseetnames
+    names = self._model.worksheet.workseetnames
     names.insert(0, 'new <>')
     self._view.ws_names = names
-    return
-
-  def _update_image_view(self) -> None:
-    self._view.image.set_input_paths(self.cfg.input_paths)
     return
 
 # Actions
@@ -166,9 +152,11 @@ class MngrController():
     self._rebuild_runner()
     return
 
-  def _store_flow_model_as_ws(self, event):
+  def _store_flow_model_as_ws(self, event) -> None:
     flow_name = self._view.flow.names_combo_box.get()
     path, name = self._converter.flow.split_ws_name(flow_name)
+    ws = self._model.flow.worksheet
+    self._model.worksheet.store(path, name, ws)
     return
 
 # Execution commands
@@ -210,13 +198,6 @@ class MngrController():
 
   def _prev(self, event) -> int:
     return self._step('prev')
-
-  @staticmethod
-  def _get_image_from_output(output) ->np.dtype:
-    image = None
-    if output is not None:
-      image = output['image']
-    return image
 
   def _top(self, event) -> None:
     self._set_top_state()
@@ -321,34 +302,7 @@ class MngrController():
     self._update_images_file_names_list(item)   
     return
 
-  def _update_images_file_names_list(self, path) -> None:
-    file_names_list = self._model.image.get_images_file_names_list(path)
-    self._view.image.set_file_names_list(file_names_list)
-    return
-
-  def _image_file_selected(self, idx) -> None:
-    if not idx:
-      return
-    self.file_idx = idx[0] 
-    return
-
-  def _load(self, event) -> None:
-    return
-
-  def _clear(self, event) -> None:
-    return
-
-  # def _get_cv2image(self) -> np.dtype:
-  #   cv2image = None
-  #   if self.file_idx is not None:
-  #     idx = self.file_idx
-  #     image_full_file_name = self._model.image.get_selected_file_full_name(idx)
-  #     cv2image = self._model.image.get_image(image_full_file_name)
-  #   return cv2image
-
-
   def _ready(self) -> bool:
-    # if self.image_loaded and self._runner.initialized and self._model.flow.loaded:
     if self._runner.initialized and self._model.flow.loaded:
       self._view.flow.activate_buttons(True)
       return True
