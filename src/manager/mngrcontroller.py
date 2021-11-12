@@ -161,7 +161,7 @@ class MngrController():
   def _reset_flow_model(self, event) -> None:
     ws_name = self._view.flow.names_combo_box.get()
     self._init_flow_model(ws_name)
-    self.__rebuild_runner()
+    self._rebuild_runner()
     return
 
   def _store_flow_model_as_ws(self, event):
