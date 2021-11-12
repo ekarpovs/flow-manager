@@ -152,6 +152,8 @@ class MngrController():
 
   def _remove_operation_from_flow_model(self, event) -> None:
     cur_idx, _ = self._view.flow.get_current_selection_tree()
+    if cur_idx == 0 or cur_idx == len(self._model.flow.items) -1:
+      return
     self._model.flow.remove_item(cur_idx)
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
