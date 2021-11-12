@@ -49,6 +49,11 @@ class MngrModel():
     return self.module.modulemodellist
 
 # Worksheet
+  @property
+  def worksheet(self):
+    return self._worksheet
+
+
   def worksheetnames(self):
     return self._worksheet.workseetnames
 # Flow 
