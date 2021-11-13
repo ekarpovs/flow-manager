@@ -171,7 +171,7 @@ class MngrController():
     if cv2image is not None:
       cv2image = cv2.cvtColor(cv2image, cv2.COLOR_BGR2RGB)
     # if cv2image is not None:
-    self._view.image.set_result_image(cv2image)
+    self._view.data.set_result_image(cv2image)
     self._view.flow.set_selection_tree(idx)
     return
 
@@ -207,7 +207,7 @@ class MngrController():
     return
   
   def _set_top_state(self) -> None:
-    self._view.image.set_result_image(None)
+    self._view.data.set_result_image(None)
     if self._ready():
       self._view.flow.set_selection_tree()
       self._runner.reset()
