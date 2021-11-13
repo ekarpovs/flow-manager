@@ -11,6 +11,7 @@ from .mngrconverter import MngrConverter
 from .mngrview import MngrView  
 from ..configuration import Configuration
 
+
 class MngrController():
   def __init__(self, parent):
     self.cfg = Configuration()
@@ -58,13 +59,13 @@ class MngrController():
     return
 
 
-# Modules panel' events and commands
+# Modules panel' events
   def _open_all(self, event) -> None:
     self._view.module.open_all()
     return
 
 
-# Flows panel's events and commands
+# Flows panel's events
   def _worksheet_selected(self, event) -> None:
     ws_name = self._view.flow.names_combo_box.get()
     self._init_flow_model(ws_name)
@@ -120,6 +121,8 @@ class MngrController():
         self._view.flow.set_operation_params(idx, operation_name, params_new)
     return
 
+
+# Flows panel's commands 
   def _add_operation_to_flow_model(self, event) -> None:
     # Get destination item position before that will be added new one
     cur_idx, item = self._view.flow.get_current_selection_tree()
@@ -213,71 +216,15 @@ class MngrController():
 
 
 # Operation parameters sub panel's commands
-  @staticmethod
-  def _convert_to_dict(params_def: List[Dict]) -> Dict:
-    def compl():
-      return param_def.get('p_types')      
-
-    type_switcher = {
-      'int': int,
-      'float': float,
-      'str': str,
-      'bool': bool,
-      'Range': compl,
-      'List': compl,
-      'Dict': compl
-    }
-
-    params = {}
-    for param_def in params_def:
-      name = param_def.get('name')
-      value = param_def.get('default')
-      vtype = param_def.get('type')
-      converter = type_switcher.get(vtype)
-      value = converter()   
-      params[name] = value
-    return params
-
-  @staticmethod
-  def _merge_params(params_new: Dict, params_def: List[Dict], params: Dict) -> Dict:
-    # Mergre the new param set with current one:
-    # for param in new param set:
-    #  if a param is in current params set:
-    #   if the current param value == new param value:
-    #     continue
-    #   else:
-    #     upate current param value with new one
-    #  else:
-    #   if the new param value == default param value:
-    #     continue
-    #   else:
-    #     add the pair {param: value} into current param set
-    for param_new in params_new:
-      name_new = param_new.get('name')
-      value_new = param_new.get('value')
-      if name_new in params:
-        value = params.get(name_new)
-        if value_new == value:
-          continue
-        else:
-          params[name_new] = value_new
-      else:
-        value_def = params_def.get(name_new)
-        if value_new == value_def:
-          continue
-        else:
-          params[name_new] = value_new
-    return params
-
-  def _update_current_flow_params(self, idx, name) -> None:
+  def _update_current_operation_params(self, idx, name) -> None:
     # get new params values from params view 
     params_new = self._view.flow.oper_params_view.get_operation_params_item()
     # get params defenitions and current flow params from the flow item 
     flow_item = self._model.flow.get_item(idx)
-    params_def = flow_item.params_def
-    params_dict = self._convert_to_dict(params_def)
     params = flow_item.params
-    params = self._merge_params(params_new, params_dict, params)
+    params_def = flow_item.params_def
+    params_dict = self._converter.flow._convert_params_def_to_dict(params_def)
+    params = self._converter.flow._merge_operation_params(params_new, params_dict, params)
     self._view.flow.oper_params_view.set_operation_params_from_dict(idx, name, params, copy.deepcopy(params_def))
     return
 
@@ -288,7 +235,7 @@ class MngrController():
 
   def _apply(self, event) -> None:
     idx, item = self._view.flow.get_current_selection_tree()
-    self._update_current_flow_params(idx, item.get('text'))
+    self._update_current_operation_params(idx, item.get('text'))
     self._run_current(idx)
     return
 
