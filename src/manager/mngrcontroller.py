@@ -37,6 +37,7 @@ class MngrController():
 
     self.file_idx = None
     self._start()
+    return
 
 
 # Initialization
@@ -56,11 +57,12 @@ class MngrController():
     self._view.ws_names = names
     return
 
-# Actions
+
 # Modules panel' events and commands
   def _open_all(self, event) -> None:
     self._view.module.open_all()
     return
+
 
 # Flows panel's events and commands
   def _worksheet_selected(self, event) -> None:
@@ -81,7 +83,6 @@ class MngrController():
     self._rebuild_runner()
     return
 
-
   def _tree_selection_changed(self, event) -> None:
     idx, item = self._view.flow.get_current_selection_tree()
     self._view.flow.clear_operation_params()
@@ -91,7 +92,7 @@ class MngrController():
     return
 
 
-# !!! Parameters 
+# Parameters 
   def _set_operation_definitions(self, names: List[str]) -> None:
     for idx, name in enumerate(names):
       operation = self._model.module.get_operation_by_name(name)
@@ -100,7 +101,6 @@ class MngrController():
       item.inrefs_def = operation.inrefs
       item.outrefs_def = operation.outrefs
     return 
-
 
   def _set_operation_params(self, idx: int, operation_name: str) -> None:
     if self._model.flow is not None:
@@ -159,6 +159,7 @@ class MngrController():
     self._model.worksheet.store(path, name, ws)
     return
 
+
 # Execution commands
   def _set_result(self, idx: int, data: Dict) -> None:
     cv2image = data.get('image')
@@ -193,7 +194,7 @@ class MngrController():
   def _next(self, event)  -> int:
     self._step('next')
 
-  def current(self) -> int:
+  def _current(self) -> int:
     return self._step('current')
 
   def _prev(self, event) -> int:
@@ -211,6 +212,7 @@ class MngrController():
     return
 
 
+# Operation parameters sub panel's commands
   @staticmethod
   def _convert_to_dict(params_def: List[Dict]) -> Dict:
     def compl():
@@ -267,24 +269,27 @@ class MngrController():
           params[name_new] = value_new
     return params
 
-# Operation parameters sub panel's commands
-  def _update_current_flow_params(self) -> None:
+  def _update_current_flow_params(self, idx, name) -> None:
     # get new params values from params view 
     params_new = self._view.flow.oper_params_view.get_operation_params_item()
-    idx, item = self._view.flow.get_current_selection_tree()
     # get params defenitions and current flow params from the flow item 
     flow_item = self._model.flow.get_item(idx)
     params_def = flow_item.params_def
     params_dict = self._convert_to_dict(params_def)
     params = flow_item.params
-
     params = self._merge_params(params_new, params_dict, params)
-    self._view.flow.oper_params_view.set_operation_params_from_dict(idx, item.get('text'), params, copy.deepcopy(params_def))
+    self._view.flow.oper_params_view.set_operation_params_from_dict(idx, name, params, copy.deepcopy(params_def))
+    return
+
+  def _run_current(self, idx: int) -> None:
+    if self._ready() and self._runner.state_idx == idx:
+      self._current()
     return
 
   def _apply(self, event) -> None:
-    self._update_current_flow_params()
-    self.current()
+    idx, item = self._view.flow.get_current_selection_tree()
+    self._update_current_flow_params(idx, item.get('text'))
+    self._run_current(idx)
     return
 
   def _reset(self, event) -> None:
@@ -294,14 +299,11 @@ class MngrController():
     self._view.flow.oper_params_view.set_operation_params(idx, name, operation.params)
     fitem = self._model.flow.get_item(idx)
     fitem.params = {}
-    self.current()
+    self._run_current(idx)
     return
 
-  def _selected_path(self, event) -> None:
-    item = self._view.image.names_combo_box.get()
-    self._update_images_file_names_list(item)   
-    return
 
+# Runner
   def _ready(self) -> bool:
     if self._runner.initialized and self._model.flow.loaded:
       self._view.flow.activate_buttons(True)
