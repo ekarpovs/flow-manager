@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import List
 
 from .models import *
 from ..configuration import Configuration
@@ -12,7 +12,7 @@ class MngrModel():
   def __init__(self, cfg: Configuration):
     self._cfg = cfg
     # Create models
-    self._image = ImagesModel()   
+    self._data = DataModel()   
     self._flow: CurrentFlowModel = None
     self._module = ModuleModelList(self.modules_paths)
     self._worksheet = WorksheetModel(self.worksheets_paths)
@@ -35,8 +35,8 @@ class MngrModel():
     return self._cfg.get_factory()
 
   @property
-  def image(self) -> ImagesModel:
-    return self._image
+  def data(self) -> DataModel:
+    return self._data
 
 # Module
   @property
