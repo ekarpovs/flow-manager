@@ -27,11 +27,8 @@ class DataView(View):
     self.figure = plt.figure(1); 
 
   def set_result_image(self, cv2image):
-    if cv2image is None:
-      return
-    # !!! Memory leak
     plt.clf()
-    plt.imshow(cv2image, cmap='gray')
+    # !!! Memory leak
     # plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
     canvas = FigureCanvasTkAgg(self.figure, self)
     canvas.draw()
@@ -40,5 +37,8 @@ class DataView(View):
     tb_frame = Frame(self)
     tb_frame.grid(row=1, column=0, padx=PADX, pady=PADY, columnspan=3, sticky=W + E + N + S)
     NavigationToolbar2Tk(canvas, tb_frame)
+    if cv2image is None:
+      return
+    plt.imshow(cv2image, cmap='gray')
     return
 
