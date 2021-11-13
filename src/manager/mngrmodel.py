@@ -10,14 +10,13 @@ class MngrModel():
   '''
 
   def __init__(self, cfg: Configuration):
-
     self._cfg = cfg
     # Create models
     self._image = ImagesModel()   
     self._flow: CurrentFlowModel = None
     self._module = ModuleModelList(self.modules_paths)
     self._worksheet = WorksheetModel(self.worksheets_paths)
-
+    return
 
   @property
   def modules_paths(self) -> List[str]:
