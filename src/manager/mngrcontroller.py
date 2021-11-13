@@ -79,8 +79,7 @@ class MngrController():
     self._model.create_flow_model(ws_path, ws_name)
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
-    # Init the flow items models with default operations definitions
-    self._set_operation_definitions(names)
+    self._init_flow_by_operations_params_def(names)
     self._rebuild_runner()
     return
 
@@ -89,12 +88,12 @@ class MngrController():
     self._view.flow.clear_operation_params()
     name = item.get('text')
     item = self._model.flow.get_item(idx)
-    self._set_operation_params(idx, name)
+    self._update_current_operation_params(idx, name)
     return
 
 
 # Parameters 
-  def _set_operation_definitions(self, names: List[str]) -> None:
+  def _init_flow_by_operations_params_def(self, names: List[str]) -> None:
     for idx, name in enumerate(names):
       operation = self._model.module.get_operation_by_name(name)
       item = self._model.flow.get_item(idx)
@@ -103,23 +102,23 @@ class MngrController():
       item.outrefs_def = operation.outrefs
     return 
 
-  def _set_operation_params(self, idx: int, operation_name: str) -> None:
-    if self._model.flow is not None:
-      item = self._model.flow.get_item(idx)
-      # Merge default and current params
-      params_def = item.params_def
-      if len(params_def) == 0:
-        return
-      params_new = copy.deepcopy(params_def)
-      params = item.params
-      if params is not None:
-        for param_new in params_new:
-          pname_new = param_new.get('name')
-          if pname_new in params:
-            new_value = params.get(pname_new)
-            param_new['default'] = new_value
-        self._view.flow.set_operation_params(idx, operation_name, params_new)
-    return
+  # def _update_operation_params(self, idx: int, operation_name: str) -> None:
+  #   if self._model.flow is not None:
+  #     item = self._model.flow.get_item(idx)
+  #     # Merge default and current params
+  #     params_def = item.params_def
+  #     if len(params_def) == 0:
+  #       return
+  #     params_new = copy.deepcopy(params_def)
+  #     params = item.params
+  #     if params is not None:
+  #       for param_new in params_new:
+  #         pname_new = param_new.get('name')
+  #         if pname_new in params:
+  #           new_value = params.get(pname_new)
+  #           param_new['default'] = new_value
+  #       self._view.flow.set_operation_params(idx, operation_name, params_new)
+  #   return
 
 
 # Flows panel's commands 
@@ -218,14 +217,14 @@ class MngrController():
 # Operation parameters sub panel's commands
   def _update_current_operation_params(self, idx, name) -> None:
     # get new params values from params view 
-    params_new = self._view.flow.oper_params_view.get_operation_params_item()
+    params_new = self._view.flow.get_operation_params_item()
     # get params defenitions and current flow params from the flow item 
     flow_item = self._model.flow.get_item(idx)
     params = flow_item.params
     params_def = flow_item.params_def
     params_dict = self._converter.flow._convert_params_def_to_dict(params_def)
     params = self._converter.flow._merge_operation_params(params_new, params_dict, params)
-    self._view.flow.oper_params_view.set_operation_params_from_dict(idx, name, params, copy.deepcopy(params_def))
+    self._view.flow.set_operation_params(idx, name, params, copy.deepcopy(params_def))
     return
 
   def _run_current(self, idx: int) -> None:
@@ -243,7 +242,7 @@ class MngrController():
     idx, item = self._view.flow.get_current_selection_tree()
     name = item.get('text')
     operation = self._model.module.get_operation_by_name(name)
-    self._view.flow.oper_params_view.set_operation_params(idx, name, operation.params)
+    self._view.flow.reset_operation_params(idx, name, operation.params)
     fitem = self._model.flow.get_item(idx)
     fitem.params = {}
     self._run_current(idx)

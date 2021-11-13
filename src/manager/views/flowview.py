@@ -129,7 +129,15 @@ class FlowView(View):
     self.names_combo_box.current(0)
     return
 
-  def set_operation_params(self, idx, exec, oper_params):
+  # Parameter subpanel Wrappers
+  def get_operation_params_item(self) -> List[Dict]: 
+    return self.oper_params_view.get_operation_params_item()
+
+  def set_operation_params(self, idx, name, params, params_def):
+    self.oper_params_view.set_operation_params_from_dict(idx, name, params, params_def)
+    return
+
+  def reset_operation_params(self, idx, exec, oper_params):
     self.oper_params_view.set_operation_params(idx, exec, oper_params)
     return
 
