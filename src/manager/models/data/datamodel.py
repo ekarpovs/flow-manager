@@ -1,12 +1,9 @@
 import cv2
 import os
 
-class ImagesModel():
+class DataModel():
   def __init__(self):
-    self.path = ''
-    self.images_files_list = []
-    self.cv2image = None
-
+    pass
 
   def get_images_file_names_list(self, path):
     
