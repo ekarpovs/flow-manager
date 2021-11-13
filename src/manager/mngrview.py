@@ -21,13 +21,13 @@ class MngrView(LabelFrame):
 
     self._module = ModuleView(self)
     self._flow = FlowView(self)
-    self._image = ImageView(self)
+    self._data = DataView(self)
 
     self._divide_view()
 
     self._module.grid(row=0, column=0)
     self._flow.grid(row=0, column=1)
-    self._image.grid(row=0, column=2)
+    self._data.grid(row=0, column=2)
 
 
   @property
@@ -39,8 +39,8 @@ class MngrView(LabelFrame):
     return self._flow
 
   @property
-  def image(self) -> ImageView:
-    return self._image
+  def data(self) -> DataView:
+    return self._data
 
 
   @property
