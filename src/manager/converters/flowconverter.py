@@ -20,17 +20,31 @@ class FlowConverter():
     
   @staticmethod
   def _convert_params_def_to_dict(params_def: List[Dict]) -> Dict:
-    def compl():
+    def cnv_int(value: str) -> int:
+      return int(value)      
+
+    def cnv_float(value: str) -> float:
+      return float(value)      
+
+    def cnv_str(value: str) -> str:
+      return value      
+
+    def cnv_bool(value: str) -> bool:
+      return value == 'True'      
+
+    def cnv_compl():
       return param_def.get('p_types')      
 
+
+
     type_switcher = {
-      'int': int,
-      'float': float,
-      'str': str,
-      'bool': bool,
-      'Range': compl,
-      'List': compl,
-      'Dict': compl
+      'int': cnv_int,
+      'float': cnv_float,
+      'str': cnv_str,
+      'bool': cnv_bool,
+      'Range': cnv_compl,
+      'List': cnv_compl,
+      'Dict': cnv_compl
     }
 
     params = {}
@@ -39,8 +53,8 @@ class FlowConverter():
       value = param_def.get('default')
       vtype = param_def.get('type')
       converter = type_switcher.get(vtype)
-      value = converter()   
-      params[name] = value
+      v = converter(value)   
+      params[name] = v
     return params
 
   @staticmethod

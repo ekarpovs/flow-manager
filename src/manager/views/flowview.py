@@ -105,7 +105,7 @@ class FlowView(View):
     self.flow_tree_view.focus(idx)   
     return
 
-  def get_current_selection_tree(self) -> Tuple[int, Dict]:
+  def get_current_selection_tree(self) -> Tuple[int, str]:
     idx = self.flow_tree_view.selection()
     if len(idx) > 0:
       idx = int(idx[0])
@@ -113,7 +113,7 @@ class FlowView(View):
       idx = 0
     cur_item = self.flow_tree_view.focus()
     item = self.flow_tree_view.item(cur_item)  
-    return (idx, item)
+    return (idx, item.get('text'))
   
   # def get_current_tree_item(self) -> str:
   #   cur_item = self.flow_tree_view.focus()

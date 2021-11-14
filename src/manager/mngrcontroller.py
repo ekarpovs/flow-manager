@@ -84,10 +84,8 @@ class MngrController():
     return
 
   def _tree_selection_changed(self, event) -> None:
-    idx, item = self._view.flow.get_current_selection_tree()
+    idx, name = self._view.flow.get_current_selection_tree()
     self._view.flow.clear_operation_params()
-    name = item.get('text')
-    item = self._model.flow.get_item(idx)
     self._update_current_operation_params(idx, name)
     return
 
@@ -102,29 +100,29 @@ class MngrController():
       item.outrefs_def = operation.outrefs
     return 
 
-  # def _update_operation_params(self, idx: int, operation_name: str) -> None:
-  #   if self._model.flow is not None:
-  #     item = self._model.flow.get_item(idx)
-  #     # Merge default and current params
-  #     params_def = item.params_def
-  #     if len(params_def) == 0:
-  #       return
-  #     params_new = copy.deepcopy(params_def)
-  #     params = item.params
-  #     if params is not None:
-  #       for param_new in params_new:
-  #         pname_new = param_new.get('name')
-  #         if pname_new in params:
-  #           new_value = params.get(pname_new)
-  #           param_new['default'] = new_value
-  #       self._view.flow.set_operation_params(idx, operation_name, params_new)
-  #   return
+  def _merge_operation_params_def_with_flow_params(self, idx: int, name: str) -> None:
+    if self._model.flow is not None:
+      item = self._model.flow.get_item(idx)
+      # Merge default and current params
+      params_def = item.params_def
+      if len(params_def) == 0:
+        return
+      params_new = copy.deepcopy(params_def)
+      params = item.params
+      if params is not None:
+        for param_new in params_new:
+          pname_new = param_new.get('name')
+          if pname_new in params:
+            new_value = params.get(pname_new)
+            param_new['default'] = new_value
+        self._view.flow.set_operation_params(idx, name, params_new)
+    return
 
 
 # Flows panel's commands 
   def _add_operation_to_flow_model(self, event) -> None:
     # Get destination item position before that will be added new one
-    cur_idx, item = self._view.flow.get_current_selection_tree()
+    cur_idx, _ = self._view.flow.get_current_selection_tree()
     # Get source item position from modules view
     name = self._view.module.get_selected_item_name()   
     # Perform if operation only selected
@@ -233,14 +231,13 @@ class MngrController():
     return
 
   def _apply(self, event) -> None:
-    idx, item = self._view.flow.get_current_selection_tree()
-    self._update_current_operation_params(idx, item.get('text'))
+    idx, name = self._view.flow.get_current_selection_tree()
+    self._update_current_operation_params(idx, name)
     self._run_current(idx)
     return
 
   def _reset(self, event) -> None:
-    idx, item = self._view.flow.get_current_selection_tree()
-    name = item.get('text')
+    idx, name = self._view.flow.get_current_selection_tree()
     operation = self._model.module.get_operation_by_name(name)
     self._view.flow.reset_operation_params(idx, name, operation.params)
     fitem = self._model.flow.get_item(idx)
