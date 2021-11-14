@@ -3,9 +3,8 @@ from typing import Dict, List
 
 from flow_model import FlowModel
 from flow_model.flowitemmodel import FlowItemModel
-from src.configuration.configuration import Configuration
 
-from src.manager.models import worksheet
+from src.configuration.configuration import Configuration
 from src.manager.models.worksheet.worksheetmodel import WorksheetModel
 
 
