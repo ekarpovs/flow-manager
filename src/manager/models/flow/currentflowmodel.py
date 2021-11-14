@@ -85,5 +85,6 @@ class CurrentFlowModel():
       if len(ialiases)> 0:
         ws_item["aliases"] = ialiases
       ws.append(ws_item)
+    # 2.Store
     self._ws_model.store(path, name, ws)
     return
