@@ -1,3 +1,4 @@
+import json
 from typing import List, Dict, Tuple
 
 from src.manager.models.flow.currentflowmodel import CurrentFlowModel
@@ -32,19 +33,31 @@ class FlowConverter():
     def cnv_bool(value: str) -> bool:
       return value == 'True'      
 
-    def cnv_compl():
+    def cnv_range(value: str):
       return param_def.get('p_types')      
 
-
+    def cnv_list(value: str):
+      return param_def.get('p_types')      
+# 'BLACK:0,WHITE:1,RED:2,GREEN:3, BLUE:4,MAGENTA:5,CYAN:6,YELLOW:7,LIME:8'
+    def cnv_dict(value_key: str) -> str:
+      p_values_str = param_def.get('p_values')
+      p_values_str_pairs = p_values_str.split(',')
+      value = {}
+      for str_pair in p_values_str_pairs:
+        str_pair_k_v = str_pair.split(':')
+        if value_key in str_pair_k_v:
+          value[str_pair_k_v[0].strip()] = str_pair_k_v[1].strip()
+          break
+      return value 
 
     type_switcher = {
       'int': cnv_int,
       'float': cnv_float,
       'str': cnv_str,
       'bool': cnv_bool,
-      'Range': cnv_compl,
-      'List': cnv_compl,
-      'Dict': cnv_compl
+      'Range': cnv_range,
+      'List': cnv_list,
+      'Dict': cnv_dict
     }
 
     params = {}
