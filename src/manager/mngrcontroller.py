@@ -33,7 +33,7 @@ class MngrController():
     self._view.flow.btn_prev.bind("<Button>", self._prev)
     self._view.flow.btn_top.bind("<Button>", self._top)
     self._view.flow.oper_params_view.btn_apply.bind("<Button>", self._apply)
-    self._view.flow.oper_params_view.btn_reset.bind("<Button>", self._reset)
+    self._view.flow.oper_params_view.btn_default.bind("<Button>", self._default)
     self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
 
     self.file_idx = None
@@ -236,7 +236,7 @@ class MngrController():
     self._run_current(idx)
     return
 
-  def _reset(self, event) -> None:
+  def _default(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     operation = self._model.module.get_operation_by_name(name)
     self._view.flow.reset_operation_params(idx, name, operation.params)

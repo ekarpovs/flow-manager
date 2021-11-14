@@ -19,7 +19,7 @@ class OperParamsView(Frame):
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
 
     self.btn_apply = Button(self, text='Apply', width=BTNW)
-    self.btn_reset = Button(self, text='Restet', width=BTNW)
+    self.btn_default = Button(self, text='Default', width=BTNW)
 
 
   def clear_operation_params(self):
@@ -55,9 +55,9 @@ class OperParamsView(Frame):
     self.clear_operation_params()
     self.init_operation_params(idx, item_name)
     self.btn_apply['state']=DISABLED
-    self.btn_reset['state']=DISABLED 
+    self.btn_default['state']=DISABLED 
     self.btn_apply.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
-    self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
+    self.btn_default.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
 
     for i, param in enumerate(oper_params):
       param_command, param_control, param_label = self.controls_factory(param)
@@ -69,7 +69,7 @@ class OperParamsView(Frame):
 
     if len(oper_params) > 0:
       self.btn_apply['state']=NORMAL
-      self.btn_reset['state']=NORMAL    
+      self.btn_default['state']=NORMAL    
     return
 
   def get_operation_params_item(self) -> List[Dict]:
