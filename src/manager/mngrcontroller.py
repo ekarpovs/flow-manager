@@ -53,7 +53,7 @@ class MngrController():
     return
 
   def _update_worksheet_list(self) -> None:
-    names = self._model.worksheet.workseetnames
+    names = self._model.flow.worksheetnames
     names.insert(0, 'new <>')
     self._view.ws_names = names
     return
@@ -76,7 +76,7 @@ class MngrController():
     self._view.flow.activate_buttons()
     (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
     # Create current flow model regarding ws defintion
-    self._model.create_flow_model(ws_path, ws_name)
+    self._model.init_flow_model(ws_path, ws_name)
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
     self._init_flow_by_operations_params_def(names)
@@ -138,7 +138,7 @@ class MngrController():
 
   def _remove_operation_from_flow_model(self, event) -> None:
     cur_idx, _ = self._view.flow.get_current_selection_tree()
-    if cur_idx == 0 or cur_idx == len(self._model.flow.items) -1:
+    if cur_idx == 0 or cur_idx == len(self._model.flow.flow.items) -1:
       return
     self._model.flow.remove_item(cur_idx)
     names = self._model.flow.get_names()
@@ -155,8 +155,7 @@ class MngrController():
   def _store_flow_model_as_ws(self, event) -> None:
     flow_name = self._view.flow.names_combo_box.get()
     path, name = self._converter.flow.split_ws_name(flow_name)
-    ws = self._model.flow.worksheet
-    self._model.worksheet.store(path, name, ws)
+    self._model.flow.store_flow_model_as_ws(path, name)
     return
 
 
@@ -248,7 +247,7 @@ class MngrController():
 
 # Runner
   def _ready(self) -> bool:
-    if self._runner.initialized and self._model.flow.loaded:
+    if self._runner.initialized and self._model.flow.flow.loaded:
       self._view.flow.activate_buttons(True)
       return True
     else:
@@ -257,7 +256,7 @@ class MngrController():
 
   def _rebuild_runner(self) -> None:
     if self._model.flow:
-      self._runner.build(self._model.flow)
+      self._runner.build(self._model.flow.flow)
       # self._runner.reset()
     self._set_top_state()
     return
