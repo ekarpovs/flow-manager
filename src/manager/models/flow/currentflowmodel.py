@@ -76,7 +76,14 @@ class CurrentFlowModel():
     # 1. Buld new ws from flow model
     ws = [self._ws_info]
     for item in self._flow.items:
-      name = item.name
-      params = item.params
-      aliases = item.aliases
+      iname = item.name
+      ws_item = {"exec": iname}
+      iparams = item.params
+      if len(iparams)> 0:
+        ws_item["params"] = iparams
+      ialiases = item.aliases
+      if len(ialiases)> 0:
+        ws_item["aliases"] = ialiases
+      ws.append(ws_item)
+    self._ws_model.store(path, name, ws)
     return
