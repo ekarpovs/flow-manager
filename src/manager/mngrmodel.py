@@ -57,7 +57,22 @@ class MngrModel():
     return self._worksheet.workseetnames
 # Flow 
   def create_flow_model(self, path: str, name: str) -> None:
-    ws = self._worksheet.read(path, name)
+    if path == '' and name == 'new':
+      ws = [
+              {
+                "info": "new worksheet"
+              },
+              {
+                "exec": "glbstm.begin",
+                "params": {
+                }
+              },
+              {
+                "exec": "glbstm.end"
+              }
+            ]
+    else:
+      ws = self._worksheet.read(path, name)
     self._flow = CurrentFlowModel(ws)
     return
 
