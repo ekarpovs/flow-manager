@@ -21,6 +21,7 @@ class MngrController():
     self._view = MngrView(parent)
 # Bind to modules panel
     self._view.module.tree_view.bind('<<TreeviewOpen>>', self._open_all)
+    self._view.module.tree_view.bind('<<TreeviewSelect>>', self._module_tree_selection_changed)
 # Bind to flows panel
     self.flows_view_idx = 0  
     self._view.flow.names_combo_box.bind('<<ComboboxSelected>>', self._worksheet_selected)
@@ -64,6 +65,14 @@ class MngrController():
     self._view.module.open_all()
     return
 
+  def _module_tree_selection_changed(self, event) -> None:
+    name = self._view.module.get_current_selection_tree()
+    doc = ''
+    if name is not '':
+      operation = self._model.module.get_operation_by_name(name)
+      doc = operation._doc
+    self._view.module.set_operation_doc(doc)
+    return
 
 # Flows panel's events
   def _worksheet_selected(self, event) -> None:

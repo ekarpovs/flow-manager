@@ -27,29 +27,32 @@ class ModuleView(View):
     # print("modules panel size", height, width)
 
     self.grid()
-    self.rowconfigure(0, weight=3)
+    self.rowconfigure(0, weight=10)
     self.columnconfigure(0, weight=1)
+    self.rowconfigure(1, weight=8)
     
     # Setup Treeview
     self.tree_view = ttk.Treeview(self, columns=("index", "description"), selectmode="browse")
     # Setup the treview heading
     self.tree_view.heading('#0', text='Operation', anchor=W)
     self.tree_view.heading('#1', text='Index', anchor=W)  
-    self.tree_view.heading('#2', text='Description', anchor=W)    
-    
+    self.tree_view.heading('#2', text='Description', anchor=W)     
     self.tree_view.column('#0', minwidth=100, width=160, anchor=W)
     self.tree_view.column('#1', minwidth=30, width=50, anchor=W)
     self.tree_view.column('#2', minwidth=200, width=400, anchor=W)
-
     self.tree_view_scrollbar_y = ttk.Scrollbar(self, orient=VERTICAL, command=self.tree_view.yview)
-    self.tree_view_scrollbar_y.grid(row=0, column=2, sticky=N+S)
+    self.tree_view_scrollbar_y.grid(row=0, column=0, sticky=N+S+E)
     self.tree_view.configure(yscrollcommand=self.tree_view_scrollbar_y.set)
-
     self.tree_view_scrollbar_x = ttk.Scrollbar(self, orient=HORIZONTAL, command=self.tree_view.xview)
-    self.tree_view_scrollbar_x.grid(row=1, column=0, columnspan=2, sticky=W+E)
+    self.tree_view_scrollbar_x.grid(row=0, column=0, columnspan=2, sticky=W+E+S)
     self.tree_view.configure(xscrollcommand=self.tree_view_scrollbar_x.set)
-
     self.tree_view.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=S + W + E + N)
+
+    # Doc label
+    self._doc_label_var = StringVar()
+    self._doc_label = Label(self, textvariable=self._doc_label_var, justify=LEFT, anchor='nw')
+    self._doc_label.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=S + W + E + N)
+    return
 
   def open_children(self, parent):
     self.tree_view.item(parent, open=True)
@@ -86,3 +89,16 @@ class ModuleView(View):
       return name
     else:
       return None
+
+  def get_current_selection_tree(self) -> str:
+    cur_item = self.tree_view.focus()
+    if '.' not in cur_item:
+      cur_item = ''
+    return cur_item
+
+  def set_operation_doc(self, doc):
+    doc_str = ''
+    for line in doc:
+      doc_str += line + '\n'
+    self._doc_label_var.set(doc_str)
+    return
