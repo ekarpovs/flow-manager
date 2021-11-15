@@ -11,7 +11,6 @@ class FlowView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
-    # self['bg'] = "mint cream"
     self['text'] = 'Flows'
 
     self.grid()
