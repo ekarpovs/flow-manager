@@ -79,7 +79,7 @@ class MngrController():
     self._model.init_flow_model(ws_path, ws_name)
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
-    self._init_flow_by_operations_params_def(names)
+    self._update_flow_by_operations_params_def(names)
     self._rebuild_runner()
     return
 
@@ -91,7 +91,7 @@ class MngrController():
 
 
 # Parameters 
-  def _init_flow_by_operations_params_def(self, names: List[str]) -> None:
+  def _update_flow_by_operations_params_def(self, names: List[str]) -> None:
     for idx, name in enumerate(names):
       operation = self._model.module.get_operation_by_name(name)
       item = self._model.flow.get_item(idx)
@@ -99,25 +99,6 @@ class MngrController():
       item.inrefs_def = operation.inrefs
       item.outrefs_def = operation.outrefs
     return 
-
-  def _merge_operation_params_def_with_flow_params(self, idx: int, name: str) -> None:
-    if self._model.flow is not None:
-      item = self._model.flow.get_item(idx)
-      # Merge default and current params
-      params_def = item.params_def
-      if len(params_def) == 0:
-        return
-      params_new = copy.deepcopy(params_def)
-      params = item.params
-      if params is not None:
-        for param_new in params_new:
-          pname_new = param_new.get('name')
-          if pname_new in params:
-            new_value = params.get(pname_new)
-            param_new['default'] = new_value
-        self._view.flow.set_operation_params(idx, name, params_new)
-    return
-
 
 # Flows panel's commands 
   def _add_operation_to_flow_model(self, event) -> None:
@@ -130,7 +111,7 @@ class MngrController():
       new_flow_tem = FlowItemModel(FlowItemType.EXEC, name)
       operation = self._model.module.get_operation_by_name(name)
       new_flow_tem.params_def = operation.params
-      self._model.flow.set_item(cur_idx, new_flow_tem)
+      self._model.flow._flow.set_item(cur_idx, new_flow_tem)
       names = self._model.flow.get_names()
       self._view.flow.set_flow_item_names(names)   
       self._rebuild_runner()
@@ -140,7 +121,7 @@ class MngrController():
     cur_idx, _ = self._view.flow.get_current_selection_tree()
     if cur_idx == 0 or cur_idx == len(self._model.flow.flow.items) -1:
       return
-    self._model.flow.remove_item(cur_idx)
+    self._model.flow._flow.remove_item(cur_idx)
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
     self._rebuild_runner()
