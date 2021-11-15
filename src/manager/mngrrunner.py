@@ -42,7 +42,7 @@ class MngrRunner():
 
   def build(self, model: FlowModel) -> None:
     self._model = model
-    self._stotage = FlowStorage(self._cfg.cfg_storage, model.worksheet)
+    self._stotage = FlowStorage(self._cfg.cfg_storage, model.get_as_ws())
     self.runner.storage = self._stotage
     flow_converter = FlowConverter(model)
     fsm_def = flow_converter.convert()

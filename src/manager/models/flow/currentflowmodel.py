@@ -12,7 +12,6 @@ class CurrentFlowModel():
   def __init__(self, cfg: Configuration) -> None:
     self._ws_model = WorksheetModel(cfg.worksheets_paths)
     self._flow: FlowModel = None
-    self._ws_info = None
     return
 
   @property
@@ -68,22 +67,9 @@ class CurrentFlowModel():
     else:
       ws = self._ws_model.read(path, name)
     self._flow = FlowModel(ws)
-    self._ws_info = ws[0]
     return
 
   def store_flow_model_as_ws(self, path, name) -> None:
-    # 1. Buld new ws from flow model
-    ws = [self._ws_info]
-    for item in self._flow.items:
-      iname = item.name
-      ws_item = {"exec": iname}
-      iparams = item.params
-      if len(iparams)> 0:
-        ws_item["params"] = iparams
-      ialiases = item.aliases
-      if len(ialiases)> 0:
-        ws_item["aliases"] = ialiases
-      ws.append(ws_item)
-    # 2.Store
+    ws = self.flow.get_as_ws()
     self._ws_model.store(path, name, ws)
     return
