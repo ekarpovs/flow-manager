@@ -18,9 +18,26 @@ class CurrentFlowModel():
   def flow(self) -> FlowModel:
     return self._flow
 
+  @property
+  def loaded(self) -> bool:
+    return self._flow.loaded
+
+  @property
+  def items(self) -> List[FlowItemModel]:
+    return self._flow.items
+
   def get_item(self, idx: int) -> FlowItemModel:
     return self._flow.get_item(idx)
-    
+
+  def set_item(self, idx: int, item: FlowItemModel) -> None:
+    self._flow.set_item(idx, item)
+    return
+
+  def remove_item(self, idx) -> None:
+    self.flow.remove_item(idx)
+    return
+
+
   def get_params_ws(self, idx: int) -> Dict:
     params = self._flow.get_item(idx).params_ws
     return params

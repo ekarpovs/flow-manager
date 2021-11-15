@@ -111,7 +111,7 @@ class MngrController():
       new_flow_tem = FlowItemModel(FlowItemType.EXEC, name)
       operation = self._model.module.get_operation_by_name(name)
       new_flow_tem.params_def = operation.params
-      self._model.flow._flow.set_item(cur_idx, new_flow_tem)
+      self._model.flow.set_item(cur_idx, new_flow_tem)
       names = self._model.flow.get_names()
       self._view.flow.set_flow_item_names(names)   
       self._rebuild_runner()
@@ -119,9 +119,9 @@ class MngrController():
 
   def _remove_operation_from_flow_model(self, event) -> None:
     cur_idx, _ = self._view.flow.get_current_selection_tree()
-    if cur_idx == 0 or cur_idx == len(self._model.flow.flow.items) -1:
+    if cur_idx == 0 or cur_idx == len(self._model.flow.items) -1:
       return
-    self._model.flow._flow.remove_item(cur_idx)
+    self._model.flow.remove_item(cur_idx)
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
     self._rebuild_runner()
@@ -228,7 +228,7 @@ class MngrController():
 
 # Runner
   def _ready(self) -> bool:
-    if self._runner.initialized and self._model.flow.flow.loaded:
+    if self._runner.initialized and self._model.flow.loaded:
       self._view.flow.activate_buttons(True)
       return True
     else:
