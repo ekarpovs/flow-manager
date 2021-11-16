@@ -46,6 +46,7 @@ class MngrController():
   def _start(self) -> None:
     self._update_module_view()
     self._update_worksheet_list()
+    self._set_top_state()
     return
 
   def _update_module_view(self) -> None:   
@@ -113,6 +114,7 @@ class MngrController():
   def _add_operation_to_flow_model(self, event) -> None:
     # Get destination item position before that will be added new one
     cur_idx, _ = self._view.flow.get_current_selection_tree()
+    cur_idx = max(1, cur_idx)
     # Get source item position from modules view
     name = self._view.module.get_selected_item_name()   
     # Perform if operation only selected
@@ -150,13 +152,19 @@ class MngrController():
 
 
 # Execution commands
-  def _set_result(self, idx: int, data: Dict) -> None:
-    cv2image = data.get('image')
-    # Temporary - will be generic solution
-    if cv2image is None:
-      cv2image = data.get('mask')
-    if cv2image is not None:
-      cv2image = cv2.cvtColor(cv2image, cv2.COLOR_BGR2RGB)
+  def _set_result(self, idx: int, data: Dict = None) -> None:
+    cv2image = None
+    if data is not None:
+      cv2image = data.get('image')
+      # Temporary - will be generic solution
+      if cv2image is None:
+        cv2image = data.get('mask')
+      if cv2image is None:
+        cv2image = data.get('rect')
+      if cv2image is None:
+        cv2image = data.get('circle')
+      if cv2image is not None:
+        cv2image = cv2.cvtColor(cv2image, cv2.COLOR_BGR2RGB)
     # if cv2image is not None:
     self._view.data.set_result_image(cv2image)
     self._view.flow.set_selection_tree(idx)
@@ -194,7 +202,7 @@ class MngrController():
     return
   
   def _set_top_state(self) -> None:
-    self._view.data.set_result_image(None)
+    self._set_result(0)
     if self._ready():
       self._view.flow.set_selection_tree()
       self._runner.reset()
