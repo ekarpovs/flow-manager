@@ -83,6 +83,8 @@ class ModuleItemModel():
     definitions = []
     for descr in descriptors:
       #p - 'x1: int=10 ; right top coordinate'
+      p_values = None
+      p_types = None
       (descr, comment) = self._split_descriptor(descr)
       if ':' in descr:
         (name, descr) = self._split_descriptor(descr, ':')
@@ -101,9 +103,6 @@ class ModuleItemModel():
             idx_e = type.index(']')
             p_types = type[idx_s+1:idx_e]
             (type, _) = self._split_descriptor(type, '[')
-        else:
-          p_values = None
-          p_types = None
       definition = {'name': name, 'type': type, 'default': default, 'p_types': p_types, 'p_values': p_values, 'comment': comment}
       definitions.append(definition)
     return definitions
