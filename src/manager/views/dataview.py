@@ -12,6 +12,7 @@ class DataView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
+    self['text'] = 'Data'
 
     self.panel_height, self.panel_width = get_panel_size(parent)
     
