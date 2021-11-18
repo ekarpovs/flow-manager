@@ -20,11 +20,11 @@ class MngrRunner():
     return
 
   @property
-  def runner(self):
+  def runner(self) -> Runner:
     return self._runner
 
   @property
-  def storage(self):
+  def storage(self) -> FlowStorage:
     return self._stotage
 
   @property
@@ -32,7 +32,7 @@ class MngrRunner():
     return self.runner.initialized
 
   @property
-  def state_idx(self):
+  def state_idx(self) -> int:
     return self.runner.state_idx
 
   def get_current_output(self) -> Dict:
