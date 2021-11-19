@@ -1,9 +1,9 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from flow_model import FlowModel
 from flow_runner import Runner
 from flow_converter import FlowConverter
-from flow_storage import FlowStorage
+from flow_storage import FlowStorage, FlowDataType
 
 from ..configuration import Configuration
 
@@ -35,10 +35,13 @@ class MngrRunner():
   def state_idx(self) -> int:
     return self.runner.state_idx
 
-  def get_current_output(self) -> Dict:
+  def get_current_output(self) -> Tuple[List[Tuple[str, FlowDataType]], Dict]:
     state_id = self.runner.output_from_state
     data = self.storage.get_state_output_data(state_id)
-    return data
+    refs = self.storage.get_state_output_refs(state_id)
+    int_refs = [(ref.int_ref,ref.data_type) for ref in refs]  
+    return (int_refs, data)
+  
 
   def build(self, model: FlowModel) -> None:
     self._model = model

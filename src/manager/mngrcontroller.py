@@ -1,8 +1,8 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import cv2
-import numpy as np
 import copy
 
+from flow_storage import FlowDataType
 from flow_model import FlowItemModel, FlowItemType
 
 from .mngrmodel import MngrModel  
@@ -152,21 +152,20 @@ class MngrController():
 
 
 # Execution commands
-  def _set_result(self, idx: int, data: Dict = None) -> None:
-    cv2image = None
-    if data is not None:
-      cv2image = data.get('image')
-      # Temporary - will be generic solution
-      if cv2image is None:
-        cv2image = data.get('mask')
-      if cv2image is None:
-        cv2image = data.get('rect')
-      if cv2image is None:
-        cv2image = data.get('circle')
-      if cv2image is not None:
-        cv2image = cv2.cvtColor(cv2image, cv2.COLOR_BGR2RGB)
-    # if cv2image is not None:
-    self._view.data.set_result_image(cv2image)
+  def _set_result(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
+    if out is not None:
+      out_refs, out_data = out
+      for ref in out_refs:
+        (ref_name, ref_type) = ref
+        data = out_data[ref_name]
+        if ref_type == FlowDataType.IMAGE:
+          if data is not None:
+            image = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
+            self._view.data.set_result_image(image)
+        else:
+          print(f'{ref_name}: ', data)
+    else:
+      self._view.data.set_result_image(None)
     self._view.flow.set_selection_tree(idx)
     return
 
@@ -175,8 +174,8 @@ class MngrController():
     if self._ready():
       self._runner.run_all()
       idx = self._runner.state_idx
-      data = self._runner.get_current_output()
-      self._set_result(idx, data)
+      out = self._runner.get_current_output()
+      self._set_result(idx, out)
     return idx
 
   def _step(self, event_name: str) -> None:
@@ -184,8 +183,8 @@ class MngrController():
     if self._ready():
       self._runner.run_one(event_name, idx)
       idx = self._runner.state_idx
-      data = self._runner.get_current_output()
-      self._set_result(idx, data)
+      out = self._runner.get_current_output()
+      self._set_result(idx, out)
     return
 
   def _next(self, event)  -> int:
