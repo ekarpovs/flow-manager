@@ -162,6 +162,8 @@ class MngrController():
           if data is not None:
             image = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
             self._view.data.set_result_image(image)
+          else:  
+            self._view.data.set_result_image(None)
         else:
           print(f'{ref_name}: ', data)
     else:
