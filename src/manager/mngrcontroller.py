@@ -147,7 +147,8 @@ class MngrController():
   def _store_flow_model_as_ws(self, event) -> None:
     flow_name = self._view.flow.names_combo_box.get()
     path, name = self._converter.flow.split_ws_name(flow_name)
-    self._model.flow.store_flow_model_as_ws(path, name)
+    stored_as = self._model.flow.store_flow_model_as_ws(path, name)
+    # TODO: implement change flow name and reload? 
     return
 
 

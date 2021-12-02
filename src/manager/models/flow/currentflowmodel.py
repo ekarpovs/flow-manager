@@ -86,7 +86,6 @@ class CurrentFlowModel():
     self._flow = FlowModel(ws)
     return
 
-  def store_flow_model_as_ws(self, path, name) -> None:
+  def store_flow_model_as_ws(self, path, name) -> str:
     ws = self.flow.get_as_ws()
-    self._ws_model.store(path, name, ws)
-    return
+    return self._ws_model.store(path, name, ws)
