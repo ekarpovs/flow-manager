@@ -127,8 +127,8 @@ class FlowView(View):
     return
 
   # Parameter subpanel Wrappers
-  def get_operation_params_item(self) -> List[Dict]: 
-    return self.oper_params_view.get_operation_params_item()
+  def get_current_operation_params_def(self) -> List[Dict]: 
+    return self.oper_params_view.get_current_operation_params_def()
 
   def set_operation_params(self, idx, name, params, params_def):
     self.oper_params_view.set_operation_params_from_dict(idx, name, params, params_def)

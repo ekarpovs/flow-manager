@@ -21,25 +21,24 @@ class FlowConverter():
     
   @staticmethod
   def _convert_params_def_to_dict(params_def: List[Dict]) -> Dict:
-    def cnv_int(value: str) -> int:
+    def _cnv_int(value: str) -> int:
       return int(value)      
 
-    def cnv_float(value: str) -> float:
+    def _cnv_float(value: str) -> float:
       return float(value)      
 
-    def cnv_str(value: str) -> str:
+    def _cnv_str(value: str) -> str:
       return value      
 
-    def cnv_bool(value: str) -> bool:
+    def _cnv_bool(value: str) -> bool:
       return value == 'True'      
 
-    def cnv_range(value: str):
+    def _cnv_range(value: str):
       return param_def.get('p_types')      
 
-    def cnv_list(value: str):
+    def _cnv_list(value: str):
       return param_def.get('p_types')      
-# 'BLACK:0,WHITE:1,RED:2,GREEN:3, BLUE:4,MAGENTA:5,CYAN:6,YELLOW:7,LIME:8'
-    def cnv_dict(value_key: str) -> str:
+    def _cnv_dict(value_key: str) -> str:
       p_values_str = param_def.get('p_values')
       p_values_str_pairs = p_values_str.split(',')
       value = {}
@@ -50,14 +49,18 @@ class FlowConverter():
           break
       return value 
 
+    def _cnv_button(value: str) -> str:
+      return value      
+
     type_switcher = {
-      'int': cnv_int,
-      'float': cnv_float,
-      'str': cnv_str,
-      'bool': cnv_bool,
-      'Range': cnv_range,
-      'List': cnv_list,
-      'Dict': cnv_dict
+      'int': _cnv_int,
+      'float': _cnv_float,
+      'str': _cnv_str,
+      'bool': _cnv_bool,
+      'Range': _cnv_range,
+      'List': _cnv_list,
+      'Dict': _cnv_dict,
+      'button': _cnv_button
     }
 
     params = {}
@@ -65,6 +68,8 @@ class FlowConverter():
       name = param_def.get('name')
       value = param_def.get('default')
       vtype = param_def.get('type')
+      # if vtype == 'button':
+      #   continue
       converter = type_switcher.get(vtype)
       v = converter(value)   
       params[name] = v

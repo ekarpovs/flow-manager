@@ -1,6 +1,8 @@
 from typing import Dict, List, Tuple
 import cv2
 import copy
+import os
+from tkinter.filedialog import askopenfilename
 
 from flow_storage import FlowDataType
 from flow_model import FlowItemModel, FlowItemType
@@ -33,11 +35,11 @@ class MngrController():
     self._view.flow.btn_next.bind("<Button>", self._next)
     self._view.flow.btn_prev.bind("<Button>", self._prev)
     self._view.flow.btn_top.bind("<Button>", self._top)
+    self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
     self._view.flow.oper_params_view.btn_apply.bind("<Button>", self._apply)
     self._view.flow.oper_params_view.btn_default.bind("<Button>", self._default)
-    self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
 
-    self.file_idx = None
+    self._image_path = ''
     self._start()
     return
 
@@ -151,7 +153,6 @@ class MngrController():
     # TODO: implement change flow name and reload? 
     return
 
-
 # Execution commands
   def _set_result(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
     if out is not None:
@@ -212,16 +213,37 @@ class MngrController():
 
 
 # Operation parameters sub panel's commands
+  def _params_def_contains_button_define(self, params_def) -> bool:
+    ret = False
+    for param_def in params_def:
+      name = param_def.get('name')
+      type = param_def.get('type')
+      if type == 'button' and name == 'define':
+        ret = True
+        break
+    return ret
+
+  def _set_image_path_to_params(self, params) -> None:
+    path, name = os.path.split(self._image_path)
+    params['path'] = path
+    params['name'] = name
+    self._image_path = ''
+    return
+
   def _update_current_operation_params(self, idx, name) -> None:
     # get new params values from params view 
-    params_new = self._view.flow.get_operation_params_item()
+    params_new = self._view.flow.get_current_operation_params_def()
     # get params defenitions and current flow params from the flow item 
     flow_item = self._model.flow.get_item(idx)
     params = flow_item.params
     params_def = flow_item.params_def
     params_dict = self._converter.flow._convert_params_def_to_dict(params_def)
     params = self._converter.flow._merge_operation_params(params_new, params_dict, params)
+    if self._image_path is not '':
+      self._set_image_path_to_params(params)
     self._view.flow.set_operation_params(idx, name, params, copy.deepcopy(params_def))
+    if self._params_def_contains_button_define(params_def):
+      self._view.flow.oper_params_view.btn_define.bind("<Button>", self._get_path)
     return
 
   def _run_current(self, idx: int) -> None:
@@ -257,6 +279,14 @@ class MngrController():
   def _rebuild_runner(self) -> None:
     if self._model.flow:
       self._runner.build(self._model.flow.flow)
-      # self._runner.reset()
     self._set_top_state()
+    return
+
+# Data commands
+  def _get_path(self, event) -> None:
+    self._image_path = askopenfilename(title="Select a file", 
+      filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
+    if self._image_path is not '':
+      idx, name = self._view.flow.get_current_selection_tree()
+      self._update_current_operation_params(idx, name)
     return

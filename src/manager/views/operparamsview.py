@@ -20,7 +20,8 @@ class OperParamsView(Frame):
 
     self.btn_apply = Button(self, text='Apply', width=BTNW)
     self.btn_default = Button(self, text='Default', width=BTNW)
-
+    self.btn_define = None
+    return
 
   def clear_operation_params(self):
     for control in self.operation_param_controls['param_controls']:
@@ -72,12 +73,12 @@ class OperParamsView(Frame):
       self.btn_default['state']=NORMAL    
     return
 
-  def get_operation_params_item(self) -> List[Dict]:
+  def get_current_operation_params_def(self) -> List[Dict]:
     params = []
     for control in self.operation_param_controls['param_controls']:
       name = control['label']['text'].split('-')[0].strip()
       t = type(control['control'])
-      if t in [Entry, Combobox, Spinbox, Checkbutton]:
+      if t in [Entry, Combobox, Spinbox, Checkbutton, Button]:
         value = control['command']()
       else:
         print("wrong control type", type(control['control']))    
@@ -97,33 +98,9 @@ class OperParamsView(Frame):
 
   
   def create_param_control(self, param: Dict) -> Tuple[Callable, Entry]:   
-    # 'name':'y0'
-    # 'type':'int'
-    # 'default':'0'
-    # 'p_values':None
-    # 'comment':'left top coordinate'
-
-    # 'name':'thrs1'
-    # 'type':'Range[int]'
-    # 'default':'50'
-    # 'p_values':'10,150,1'
-    # 'comment':'threshold1'
-    
-    # 'name':'type'
-    # 'comment':'new color space, one from cv2.COLOR_(...)'
-    # 'p_values':'BGR2BGRA:0,BGR2RGB:4,BGR2GRAY:6,BGR2XYZ:32,BGR2YCrCb:36,BGR2HSV:40,BGR2LAB:44,BGR2Luv:50,BGR2HLS:52,BGR2YUV:82'
-    # 'default':'BGR2GRAY'
-    # 'type':'Dict[str,int]'
-
-    # 'name':'kernel'
-    # 'comment':'kernel size'
-    # 'p_values':'3,5,7,9'
-    # 'default':'3'
-    # 'type':'List[int]'
-
     param_type = param.get('type')
 
-    def pint(param: Dict) -> Tuple[Callable, Entry]:
+    def _pint(param: Dict) -> Tuple[Callable, Entry]:
       def get():
         return int(param_control.get())
 
@@ -134,7 +111,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def pfloat(param: Dict) -> Tuple[Callable, Entry]:
+    def _pfloat(param: Dict) -> Tuple[Callable, Entry]:
       def get():
         return float(param_control.get())
 
@@ -145,7 +122,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def pstr(param: Dict) -> Tuple[Callable, Entry]:
+    def _pstr(param: Dict) -> Tuple[Callable, Entry]:
       def get():
         return param_control.get()
 
@@ -156,7 +133,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def pbool(param: Dict) -> Tuple[Callable, Checkbutton]:
+    def _pbool(param: Dict) -> Tuple[Callable, Checkbutton]:
       item = tk.BooleanVar()
       def get():
         return item.get()
@@ -166,7 +143,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def plist(param: Dict) -> Tuple[Callable, Combobox]:
+    def _plist(param: Dict) -> Tuple[Callable, Combobox]:
       p_types = param.get('p_types')
       param_control = Combobox(self)
       def get():
@@ -189,8 +166,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-
-    def pdict(param: Dict) -> Tuple[Callable, Combobox]:
+    def _pdict(param: Dict) -> Tuple[Callable, Combobox]:
       param_control = Combobox(self)
 
       def get():
@@ -219,7 +195,7 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
-    def prange(param: Dict) -> Tuple[Callable, Spinbox]:
+    def _prange(param: Dict) -> Tuple[Callable, Spinbox]:
       param_possible_values = param.get('p_values')
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       from_ = param_values_tuple[0]
@@ -243,61 +219,31 @@ class OperParamsView(Frame):
       param_command = get
       return param_command, param_control
 
+    def _pbutton(param: Dict) -> Tuple[Callable, Button]:
+      def get():
+        return param_value
+        # return item.get()
+
+      param_value = param.get('default')
+      param_control = Button(self, text=param_value, width=BTNW)
+      self.btn_define = param_control
+      param_command = get
+      return param_command, param_control
 
     type_switcher = {
-      'int': pint,
-      'float': pfloat,
-      'str': pstr,
-      'bool': pbool,
-      'Dict': pdict,
-      'List': plist,
-      'Range': prange
+      'int': _pint,
+      'float': _pfloat,
+      'str': _pstr,
+      'bool': _pbool,
+      'Dict': _pdict,
+      'List': _plist,
+      'Range': _prange,
+      'button': _pbutton
     }
 
     control_builder = type_switcher.get(param_type, 'Invalid type')
 
     return control_builder(param)
-
-
-
-    # def domain_range(param):
-    #   param_possible_values = param['p_values']
-    #   param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
-    #   from_ = param_values_tuple[0]
-    #   to = param_values_tuple[1]
-
-    #   param_type = param.get('type')
-    #   var = self.get_var_by_type(param_type)  
-
-    #   def get():
-    #     value = var.get()
-    #     if param_type == 'f':
-    #       value = float(value)
-    #     elif param_type == 'n':
-    #       value = int(value)
-    #     else:
-    #       pass
-    #     return value
-
-    #   param_value = param['value']     
-    #   var.set(param_value)
-    #   param_control = Spinbox(self, from_=from_, to=to, textvariable=var, wrap=True, command=get)
-    #   param_command = get
-    #   return param_command, param_control
-
-    # type_switcher = {
-    #   'int': pint,
-    #   'float': pfloat,
-    #   'str': pstr,
-    #   'Dict': pdict,
-    #   'List': plist,
-    #   'Range': prange
-    # }
-
-    # control_builder = type_switcher.get(param_type, 'Invalid domain')
-
-    # return control_builder(param)
-
   @staticmethod
   def get_var_by_type(type) -> Variable:
     if type == 'float':
@@ -307,11 +253,6 @@ class OperParamsView(Frame):
     else:
       var = tk.StringVar()
     return var
-  
-# Possible parameters values parsing
-  # d = [key1:0,key2:1,key3:2]
-  # l = [0,1,2]
-  # r = [0,10,1]
 
   @staticmethod
   def split_possible_values_string(param_possible_values):
