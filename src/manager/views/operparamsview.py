@@ -16,10 +16,17 @@ class OperParamsView(Frame):
     self.columnconfigure(1, weight=1)
     self.columnconfigure(2, weight=1)
 
+    self.buttons_frame = Frame(self)
+    self.buttons_frame.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY, sticky=W+N+E)
+    self.btn_apply = Button(self.buttons_frame, text='Apply', width=BTNW)
+    self.btn_reset = Button(self.buttons_frame, text='Reset', width=BTNW)
+    self.btn_default = Button(self.buttons_frame, text='Default', width=BTNW)
+    self.btn_apply.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
+    self.btn_reset.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W+N)
+    self.btn_default.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
+
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
 
-    self.btn_apply = Button(self, text='Apply', width=BTNW)
-    self.btn_default = Button(self, text='Default', width=BTNW)
     self.btn_define = None
     return
 
@@ -35,7 +42,6 @@ class OperParamsView(Frame):
   def init_operation_params(self, idx, item_name):
     self.operation_param_controls["idx"] = idx
     self.operation_param_controls["exec"] = item_name
-    
     return
 
   @staticmethod
@@ -55,10 +61,6 @@ class OperParamsView(Frame):
   def set_operation_params(self, idx, item_name: str, oper_params: List[Dict]) -> None:
     self.clear_operation_params()
     self.init_operation_params(idx, item_name)
-    self.btn_apply['state']=DISABLED
-    self.btn_default['state']=DISABLED 
-    self.btn_apply.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
-    self.btn_default.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
 
     for i, param in enumerate(oper_params):
       param_command, param_control, param_label = self.controls_factory(param)
@@ -67,10 +69,6 @@ class OperParamsView(Frame):
 
       param_control.grid(row=i+1, column=0, padx=PADX, pady=PADY, sticky=W+N)
       param_label.grid(row=i+1, column=1, columnspan=2, padx=PADX, pady=PADY, sticky=W+S)
-
-    if len(oper_params) > 0:
-      self.btn_apply['state']=NORMAL
-      self.btn_default['state']=NORMAL    
     return
 
   def get_current_operation_params_def(self) -> List[Dict]:
@@ -93,7 +91,6 @@ class OperParamsView(Frame):
     comment = param.get('comment')
     label_text = f"{name} - {comment}"
     param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
-
     return param_command, param_control, param_label
 
   
@@ -137,6 +134,7 @@ class OperParamsView(Frame):
       item = tk.BooleanVar()
       def get():
         return item.get()
+
       param_value = param.get('default')
       item.set(param_value)
       param_control = Checkbutton(self, variable=item, onvalue=True, offvalue=False, command=get)
@@ -248,7 +246,6 @@ class OperParamsView(Frame):
     def _pbutton(param: Dict) -> Tuple[Callable, Button]:
       def get():
         return param_value
-        # return item.get()
 
       param_value = param.get('default')
       param_control = Button(self, text=param_value, width=BTNW)
@@ -269,8 +266,8 @@ class OperParamsView(Frame):
     }
 
     control_builder = type_switcher.get(param_type, 'Invalid type')
-
     return control_builder(param)
+
   @staticmethod
   def get_var_by_type(type) -> Variable:
     var = tk.StringVar()
