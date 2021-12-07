@@ -37,6 +37,7 @@ class MngrController():
     self._view.flow.btn_top.bind("<Button>", self._top)
     self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
     self._view.flow.oper_params_view.btn_apply.bind("<Button>", self._apply)
+    self._view.flow.oper_params_view.btn_reset.bind("<Button>", self._reset)
     self._view.flow.oper_params_view.btn_default.bind("<Button>", self._default)
 
     self._image_path = ''
@@ -230,15 +231,20 @@ class MngrController():
     self._image_path = ''
     return
 
-  def _update_current_operation_params(self, idx, name) -> None:
+  def _update_current_operation_params(self, idx, name, reset=False) -> None:
     # get new params values from params view 
     params_new = self._view.flow.get_current_operation_params_def()
     # get params defenitions and current flow params from the flow item 
     flow_item = self._model.flow.get_item(idx)
+
     params = flow_item.params
     params_def = flow_item.params_def
-    params_dict = self._converter.flow._convert_params_def_to_dict(params_def)
-    params = self._converter.flow._merge_operation_params(params_new, params_dict, params)
+    if reset:
+      params_ws = self._model.flow.get_params_ws(idx)
+      flow_item.params = copy.deepcopy(params_ws)
+    else:
+      params_dict = self._converter.flow._convert_params_def_to_dict(params_def)
+      params = self._converter.flow._merge_operation_params(params_new, params_dict, params)
     if self._image_path is not '':
       self._set_image_path_to_params(params)
     self._view.flow.set_operation_params(idx, name, params, copy.deepcopy(params_def))
@@ -257,6 +263,12 @@ class MngrController():
     self._run_current(idx)
     return
 
+  def _reset(self, event) -> None:
+    idx, name = self._view.flow.get_current_selection_tree()
+    self._update_current_operation_params(idx, name, reset=True)
+    self._run_current(idx)
+    return
+
   def _default(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     operation = self._model.module.get_operation_by_name(name)
@@ -265,7 +277,6 @@ class MngrController():
     fitem.params = {}
     self._run_current(idx)
     return
-
 
 # Runner
   def _ready(self) -> bool:
