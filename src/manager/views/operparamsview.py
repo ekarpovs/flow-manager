@@ -78,7 +78,7 @@ class OperParamsView(Frame):
     for control in self.operation_param_controls['param_controls']:
       name = control['label']['text'].split('-')[0].strip()
       t = type(control['control'])
-      if t in [Entry, Combobox, Spinbox, Checkbutton, Button]:
+      if t in [Entry, Combobox, Spinbox, Checkbutton, Button, Scale]:
         value = control['command']()
       else:
         print("wrong control type", type(control['control']))    
@@ -200,6 +200,7 @@ class OperParamsView(Frame):
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       from_ = param_values_tuple[0]
       to = param_values_tuple[1]
+      resolution = param_values_tuple[2]
       p_types = param.get('p_types')
       var = self.get_var_by_type(p_types)  
 
@@ -216,6 +217,31 @@ class OperParamsView(Frame):
       param_default_value = param.get('default')     
       var.set(param_default_value)
       param_control = Spinbox(self, from_=from_, to=to, textvariable=var, wrap=True, command=get)
+      param_command = get
+      return param_command, param_control
+
+    def _pscale(param: Dict) -> Tuple[Callable, Spinbox]:
+      param_possible_values = param.get('p_values')
+      param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
+      from_ = param_values_tuple[0]
+      to = param_values_tuple[1]
+      resolution = param_values_tuple[2]
+      p_types = param.get('p_types')
+      var = self.get_var_by_type(p_types)  
+
+      def get():
+        value = param_control.get()
+        if p_types == 'float':
+          value = float(value)
+        elif p_types == 'int':
+          value = int(value)
+        else:
+          pass
+        return value
+
+      param_default_value = param.get('default')     
+      var.set(param_default_value)
+      param_control = Scale(self, from_=from_, to=to, resolution=resolution, variable=var, length=170, orient=HORIZONTAL)
       param_command = get
       return param_command, param_control
 
@@ -238,6 +264,7 @@ class OperParamsView(Frame):
       'Dict': _pdict,
       'List': _plist,
       'Range': _prange,
+      'Scale': _pscale,
       'button': _pbutton
     }
 
@@ -246,12 +273,11 @@ class OperParamsView(Frame):
     return control_builder(param)
   @staticmethod
   def get_var_by_type(type) -> Variable:
+    var = tk.StringVar()
     if type == 'float':
       var = tk.DoubleVar()
     elif type == 'int':
       var = tk.IntVar()
-    else:
-      var = tk.StringVar()
     return var
 
   @staticmethod

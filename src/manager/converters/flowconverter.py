@@ -36,6 +36,9 @@ class FlowConverter():
     def _cnv_range(value: str):
       return param_def.get('p_types')      
 
+    def _cnv_scale(value: str):
+      return param_def.get('p_types')      
+
     def _cnv_list(value: str):
       return param_def.get('p_types')      
     def _cnv_dict(value_key: str) -> str:
@@ -58,6 +61,7 @@ class FlowConverter():
       'str': _cnv_str,
       'bool': _cnv_bool,
       'Range': _cnv_range,
+      'Scale': _cnv_scale,
       'List': _cnv_list,
       'Dict': _cnv_dict,
       'button': _cnv_button
