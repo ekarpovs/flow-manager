@@ -1,5 +1,5 @@
 from copy import copy
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from flow_model import FlowModel
 from flow_model.flowitemmodel import FlowItemModel
@@ -10,6 +10,7 @@ from src.manager.models.worksheet.worksheetmodel import WorksheetModel
 
 class CurrentFlowModel():
   def __init__(self, cfg: Configuration) -> None:
+    self._cfg = cfg
     self._ws_model = WorksheetModel(cfg.worksheets_paths)
     self._flow: FlowModel = None
     return
@@ -25,6 +26,10 @@ class CurrentFlowModel():
   @property
   def items(self) -> List[FlowItemModel]:
     return self._flow.items
+
+  def reload(self) -> None:
+    self._ws_model = WorksheetModel(self._cfg.worksheets_paths)
+    return
 
   def get_item(self, idx: int) -> FlowItemModel:
     return self._flow.get_item(idx)
@@ -86,6 +91,6 @@ class CurrentFlowModel():
     self._flow = FlowModel(ws)
     return
 
-  def store_flow_model_as_ws(self, path, name) -> str:
+  def store_flow_model_as_ws(self, path, name) -> Tuple[str, str]:
     ws = self.flow.get_as_ws()
     return self._ws_model.store(path, name, ws)

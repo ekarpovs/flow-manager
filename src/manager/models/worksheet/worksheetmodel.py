@@ -3,7 +3,7 @@
 import json
 import os
 from tkinter.filedialog import asksaveasfilename
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 class WorksheetModel():
   def __init__(self, paths: List[str]) -> None:
@@ -35,17 +35,18 @@ class WorksheetModel():
   # If indent is a non-negative integer, then JSON array elements and object members 
   # will be pretty-printed with that indent level. An indent level of 0, or negative, 
   # will only insert newlines. None (the default) selects the most compact representation.
-  def store(self, path: str, name: str, ws: List[Dict]) -> str:
+  def store(self, path: str, name: str, ws: List[Dict]) -> Tuple[str, str]:
     new_name = name
+    new_path = path
     ffn = asksaveasfilename(initialfile = '{}.json'.format(name),
       initialdir = path,
       defaultextension=".json",filetypes=[("All Files","*.*"),("Json Documents","*.json")])
     if ffn is not '':
       with open(ffn, 'w') as fp:
         json.dump(ws, fp, indent=2)
-        path, fn = os.path.split(ffn)
+        new_path, fn = os.path.split(ffn)
         new_name, ext = fn.split('.')
     # Reread 
-    return new_name
+    return (new_path, new_name)
 
   

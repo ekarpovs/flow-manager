@@ -27,6 +27,7 @@ class MngrController():
 # Bind to flows panel
     self.flows_view_idx = 0  
     self._view.flow.names_combo_box.bind('<<ComboboxSelected>>', self._worksheet_selected)
+    self._view.flow.btn_reload.bind("<Button>", self._reload_ws_list)
     self._view.flow.btn_add.bind("<Button>", self._add_operation_to_flow_model)
     self._view.flow.btn_remove.bind("<Button>", self._remove_operation_from_flow_model)
     self._view.flow.btn_reset.bind("<Button>", self._reset_flow_model)
@@ -114,6 +115,13 @@ class MngrController():
     return 
 
 # Flows panel's commands 
+  def _reload_ws_list(self, event) -> None:
+    self._model.flow.reload()
+    names = self._model.flow.worksheetnames
+    names.insert(0, 'new <>')
+    self._view.ws_names = names
+    return
+
   def _add_operation_to_flow_model(self, event) -> None:
     # Get destination item position before that will be added new one
     cur_idx, _ = self._view.flow.get_current_selection_tree()
@@ -150,8 +158,11 @@ class MngrController():
   def _store_flow_model_as_ws(self, event) -> None:
     flow_name = self._view.flow.names_combo_box.get()
     path, name = self._converter.flow.split_ws_name(flow_name)
-    stored_as = self._model.flow.store_flow_model_as_ws(path, name)
+    (new_path, stored_as) = self._model.flow.store_flow_model_as_ws(path, name)
     # TODO: implement change flow name and reload? 
+    ws_name = f'{stored_as} <{new_path}>'
+    self._reload_ws_list(None)
+    self._view.flow.names_combo_box.set(ws_name)
     return
 
 # Execution commands

@@ -16,21 +16,25 @@ class FlowView(View):
     self.grid()
     self.rowconfigure(1, weight=1)
     self.rowconfigure(3, weight=4)
-    self.columnconfigure(0, weight=1)
+    self.columnconfigure(0, weight=10)
+    self.columnconfigure(1, weight=1)
 
     # Setup combobox
     self.namesvar = StringVar()
     self.names_combo_box = ttk.Combobox(self, textvariable=self.namesvar, font=("TkDefaultFont"))
     self.names_combo_box['state'] = 'readonly'
+    self.btn_reload = ttk.Button(self, text='Reload', width=BTNW)
+
+    
 
     # Setup Treeview
     self.flow_tree_view = ttk.Treeview(self, columns=("description"), selectmode="browse")
     # Setup the treview heading
     self.flow_tree_view.heading('#0', text='Exec/Statement', anchor=W)
     # self.flow_tree_view.heading('#1', text='Parameters', anchor=W)  
-    self.flow_tree_view.column('#0', minwidth=70, width=80)
+    self.flow_tree_view.column('#0', minwidth=90, width=100)
     self.tree_view_scrollbar = ttk.Scrollbar(self, orient=VERTICAL, command=self.flow_tree_view.yview)
-    self.tree_view_scrollbar.grid(row=1, column=0, sticky=N+S+E)
+    self.tree_view_scrollbar.grid(row=1, column=1, sticky=N+S+E)
     self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar.set)
 
     # Setup operation parameters view
@@ -69,10 +73,11 @@ class FlowView(View):
     self.btn_top.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
     # Setup widgets layout
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
-    self.flow_tree_view.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
-    oper_actions.grid(row=2, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
-    sf.grid(row=3, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
-    flow_actions.grid(row=4, column=0, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=N+S+W+E)
+    self.flow_tree_view.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    oper_actions.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    sf.grid(row=3, column=0, columnspan=2,padx=PADX, pady=PADY, sticky=N+S+W+E)
+    flow_actions.grid(row=4, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
     # Set the buttons initial state
     self.activate_buttons()
     return
