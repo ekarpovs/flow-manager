@@ -18,9 +18,9 @@ class OperParamsView(Frame):
 
     self.buttons_frame = Frame(self)
     self.buttons_frame.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY, sticky=W+N+E)
-    self.btn_apply = Button(self.buttons_frame, text='Apply', width=BTNW)
-    self.btn_reset = Button(self.buttons_frame, text='Reset', width=BTNW)
-    self.btn_default = Button(self.buttons_frame, text='Default', width=BTNW)
+    self.btn_apply = Button(self.buttons_frame, text='Apply', width=BTNW_S)
+    self.btn_reset = Button(self.buttons_frame, text='Reset', width=BTNW_S)
+    self.btn_default = Button(self.buttons_frame, text='Default', width=BTNW_S)
     self.btn_apply.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
     self.btn_reset.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W+N)
     self.btn_default.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
@@ -256,7 +256,7 @@ class OperParamsView(Frame):
         return param_value
 
       param_value = param.get('default')
-      param_control = Button(self, text=param_value, width=BTNW)
+      param_control = Button(self, text=param_value, width=BTNW_S)
       self.btn_define = param_control
       param_command = get
       return param_command, param_control

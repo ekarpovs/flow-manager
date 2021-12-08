@@ -1,6 +1,7 @@
 PADX = 10
 PADY = 10
 BTNW = 10
+BTNW_S = 7
 
 
 def calculate_reminder_height(parent, frames):
