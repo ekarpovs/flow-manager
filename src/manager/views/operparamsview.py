@@ -26,6 +26,9 @@ class OperParamsView(Frame):
     self.btn_default.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
 
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
+    self.btn_apply['state']=DISABLED
+    self.btn_default['state']=DISABLED
+    self.btn_reset['state']=DISABLED
 
     self.btn_define = None
     return
@@ -39,7 +42,7 @@ class OperParamsView(Frame):
       self.operation_param_controls['param_controls'] = []
     return
 
-  def init_operation_params(self, idx, item_name):
+  def init_operation_params(self, idx: int, item_name: str) -> None:
     self.operation_param_controls["idx"] = idx
     self.operation_param_controls["exec"] = item_name
     return
@@ -59,6 +62,10 @@ class OperParamsView(Frame):
     return
 
   def set_operation_params(self, idx, item_name: str, oper_params: List[Dict]) -> None:
+    self.btn_apply['state']=NORMAL
+    self.btn_default['state']=NORMAL
+    self.btn_reset['state']=NORMAL
+
     self.clear_operation_params()
     self.init_operation_params(idx, item_name)
 
@@ -69,6 +76,9 @@ class OperParamsView(Frame):
 
       param_control.grid(row=i+1, column=0, padx=PADX, pady=PADY, sticky=W+N)
       param_label.grid(row=i+1, column=1, columnspan=2, padx=PADX, pady=PADY, sticky=W+S)
+    if len(oper_params) == 0:
+      self.btn_default['state']=DISABLED
+      self.btn_reset['state']=DISABLED
     return
 
   def get_current_operation_params_def(self) -> List[Dict]:
@@ -83,8 +93,7 @@ class OperParamsView(Frame):
       params.append({"name": name, "value": value})     
     return params
 
-
-  def controls_factory(self, param):
+  def controls_factory(self, param: Dict) -> Tuple[Callable, Entry, Label]:
     # {"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l}    
     param_command, param_control = self.create_param_control(param)
     name = param.get('name')
@@ -93,7 +102,6 @@ class OperParamsView(Frame):
     param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
     return param_command, param_control, param_label
 
-  
   def create_param_control(self, param: Dict) -> Tuple[Callable, Entry]:   
     param_type = param.get('type')
 
@@ -269,7 +277,7 @@ class OperParamsView(Frame):
     return control_builder(param)
 
   @staticmethod
-  def get_var_by_type(type) -> Variable:
+  def get_var_by_type(type: str) -> Variable:
     var = tk.StringVar()
     if type == 'float':
       var = tk.DoubleVar()
@@ -278,26 +286,25 @@ class OperParamsView(Frame):
     return var
 
   @staticmethod
-  def split_possible_values_string(param_possible_values):
+  def split_possible_values_string(param_possible_values: str) -> List[str]:
     end_idx = len(param_possible_values)
     param_possible_values = param_possible_values[0:end_idx]
     return param_possible_values.split(',')
 
   @staticmethod
-  def parse_possible_values_dict_def(param_possible_values):   
+  def parse_possible_values_dict_def(param_possible_values: str) -> List[str]:   
     param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
     return [item for  item in param_possible_values_list]
 
-
   @staticmethod
-  def possible_values_pairs_to_tuple(param_possible_values):   
+  def possible_values_pairs_to_tuple(param_possible_values: List[str]) -> Tuple:   
     pairs_list = OperParamsView.parse_possible_values_dict_def(param_possible_values)
     param_key_list = [item.split(':')[0] for  item in pairs_list]
     param_keys_tuple = tuple(param_key_list)
     return param_keys_tuple
 
   @staticmethod
-  def possible_values_pairs_to_dict(param_possible_values):   
+  def possible_values_pairs_to_dict(param_possible_values: str) -> Dict:   
     pairs_list = OperParamsView.parse_possible_values_dict_def(param_possible_values)
     param_dict = {}
     for pair_str in pairs_list:
@@ -309,7 +316,7 @@ class OperParamsView(Frame):
     return param_dict
 
   @staticmethod
-  def parse_possible_values_list_or_range(param_possible_values):
+  def parse_possible_values_list_or_range(param_possible_values: str) -> Tuple:
     param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
     param_key_list = [item for  item in param_possible_values_list]   
     param_values_tuple = tuple(param_key_list)
