@@ -48,12 +48,13 @@ Following features are available:
 
 - Load images
 - Load a worksheet from defined folders
-- Create/Edit worksheets
-- Run a whole worksheet
-- Run a worksheet by step
-- Playback a worksheet
-- Edit/restore an operation's parameters
-- Edit/restore an operation's parameters during running by step or playback
+- Convert a worksheet to corresponding workflow
+- Create/Edit workflow definition
+- Run a whole workflow
+- Run a workflow step by step
+- Playback a workflow
+- Edit/Restore/Set Default an operation's parameters
+- Edit/Restore/Set Default an operation's parameters during running by step or playback
 
 Constarains:
 
@@ -62,9 +63,8 @@ Constarains:
 
 ## Road map
 
-- [ ] Fix existing bugs
-- [x] Implement Statements (IF, FOR, WHILE...) for possibility to create more complicated workflows
+- [ ] Implement data link (aliases) editor
+- [ ] Implement Statements (IF, FOR, WHILE...)
 - [x] Improve operation parameters editor builder (add combo boxes, sliders, etc)
-- [ ] Change flow listview to tree view
-- [ ] Implement more modules
-- [ ] Implement more worksheets for perform standard tasks
+- [x] Change flow listview to tree view
+- [ ] Improve data view with matplotlib
