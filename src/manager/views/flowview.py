@@ -3,6 +3,9 @@ from tkinter import *
 from tkinter.ttk import Combobox, Treeview, Button 
 from tkscrolledframe import ScrolledFrame
 
+from src.manager.linksdialog.linksdialog import LinksDialog
+from src.manager.models.flow.currentflowmodel import CurrentFlowModel
+
 from ...uiconst import *
 from .view import View
 from .operparamsview import OperParamsView
@@ -159,4 +162,9 @@ class FlowView(View):
     self.btn_next['state']=state
     self.btn_prev['state']=state
     self.btn_top['state']=state
+    return
+
+
+  def edit_flow_links(self, flow: CurrentFlowModel) -> None:
+    lnk_dlg = LinksDialog(self.parent, flow)
     return

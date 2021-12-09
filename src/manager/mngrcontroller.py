@@ -13,7 +13,6 @@ from .mngrconverter import MngrConverter
 from .mngrview import MngrView  
 from ..configuration import Configuration
 
-
 class MngrController():
   def __init__(self, parent):
     self.cfg = Configuration()
@@ -32,6 +31,7 @@ class MngrController():
     self._view.flow.btn_remove.bind("<Button>", self._remove_operation_from_flow_model)
     self._view.flow.btn_reset.bind("<Button>", self._reset_flow_model)
     self._view.flow.btn_save.bind("<Button>", self._store_flow_model_as_ws)
+    self._view.flow.btn_links.bind("<Button>", self._edit_flow_links)
     self._view.flow.btn_run.bind("<Button>", self._run)
     self._view.flow.btn_next.bind("<Button>", self._next)
     self._view.flow.btn_prev.bind("<Button>", self._prev)
@@ -163,6 +163,10 @@ class MngrController():
     ws_name = f'{stored_as} <{new_path}>'
     self._reload_ws_list(None)
     self._view.flow.names_combo_box.set(ws_name)
+    return
+
+  def _edit_flow_links(self, event) -> None:
+    self._view.flow.edit_flow_links(self._model.flow)
     return
 
 # Execution commands
