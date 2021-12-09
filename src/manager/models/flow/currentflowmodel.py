@@ -18,6 +18,11 @@ class CurrentFlowModel():
   @property
   def flow(self) -> FlowModel:
     return self._flow
+  
+  @flow.setter
+  def flow(self, flow: FlowModel) -> None:
+    self._flow = flow
+    return
 
   @property
   def loaded(self) -> bool:

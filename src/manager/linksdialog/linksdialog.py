@@ -1,15 +1,15 @@
 from tkinter import *
 from tkscrolledframe import ScrolledFrame
 
-from src.configdialog.contentview import ContentView
-
-from src.manager.models.flow.currentflowmodel import CurrentFlowModel 
 from ...uiconst import *
+from ..linksdialog.contentview import ContentView
+from ..models.flow.currentflowmodel import CurrentFlowModel 
 from .ldactionsframe import CdActionsFrame
 
 class LinksDialog(Toplevel):
   def __init__(self, parent, flow: CurrentFlowModel):
     super().__init__(parent)
+    self._flow = flow
     # Do the dialog modal
     self.transient(parent)
     self.grab_set()
@@ -39,7 +39,8 @@ class LinksDialog(Toplevel):
     return
 
   def apply(self) -> None:
-    print("Saved!") 
+    self.content_view.update_flow()
+    self._flow.flow = self.content_view.tmp_flow
     self.destroy()
     return
 
