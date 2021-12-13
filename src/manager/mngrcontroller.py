@@ -314,5 +314,18 @@ class MngrController():
       filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
     if ffn is not '':
       idx, name = self._view.flow.get_current_selection_tree()
-      # self._update_current_operation_params(idx, name)
+      flow_item = self._model.flow.get_item(idx)
+      params_def = flow_item.params_def   
+      params = flow_item.params
+
+      path, fn = os.path.split(ffn)
+      p = [p for p in params_def if p.get('name') == 'path']
+      n = [n for n in params_def if n.get('name') == 'name']
+      if p is not None and n is not None:
+        params['path'] = path
+        params['name'] = fn
+
+      self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
+      self._bind_param_controls(params_def)
     return
+
