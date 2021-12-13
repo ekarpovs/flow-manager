@@ -20,7 +20,7 @@ class FlowConverter():
     return (path, name)
     
   @staticmethod
-  def _convert_params_def_to_dict(params_def: List[Dict]) -> Dict:
+  def convert_params_def_to_dict(params_def: List[Dict]) -> Dict:
     def _cnv_int(value: str) -> int:
       return int(value)      
 
@@ -37,19 +37,27 @@ class FlowConverter():
       return param_def.get('p_types')      
 
     def _cnv_scale(value: str):
-      return param_def.get('p_types')      
+      p_type = param_def.get('p_types')
+      if p_type == 'int':
+        return int(value)
+      return float(value)
+      
 
     def _cnv_list(value: str):
       return param_def.get('p_types')      
     def _cnv_dict(value_key: str) -> str:
       p_values_str = param_def.get('p_values')
       p_values_str_pairs = p_values_str.split(',')
-      value = {}
+      value = None
       for str_pair in p_values_str_pairs:
         str_pair_k_v = str_pair.split(':')
         if value_key in str_pair_k_v:
-          value[str_pair_k_v[0].strip()] = str_pair_k_v[1].strip()
+          value = str_pair_k_v[1].strip()
           break
+      p_types = param_def.get('p_types')
+      p_types = p_types.split(',')
+      if p_types[1] == 'int':
+        return int(value)
       return value 
 
     def _cnv_button(value: str) -> str:
@@ -79,8 +87,9 @@ class FlowConverter():
       params[name] = v
     return params
 
+
   @staticmethod
-  def _merge_operation_params(params_new: Dict, params_def: List[Dict], params: Dict) -> Dict:
+  def merge_operation_params(params_new: Dict, params_def: List[Dict], params: Dict) -> Dict:
     # Mergre the new param set with current one:
     # for param in new param set:
     #  if a param is in current params set:

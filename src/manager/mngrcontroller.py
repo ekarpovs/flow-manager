@@ -1,3 +1,4 @@
+from tkinter import *
 from typing import Dict, List, Tuple
 import cv2
 import copy
@@ -6,6 +7,7 @@ from tkinter.filedialog import askopenfilename
 
 from flow_storage import FlowDataType
 from flow_model import FlowItemModel, FlowItemType
+from numpy import equal
 
 from .mngrmodel import MngrModel  
 from .mngrrunner import MngrRunner 
@@ -37,11 +39,11 @@ class MngrController():
     self._view.flow.btn_prev.bind("<Button>", self._prev)
     self._view.flow.btn_top.bind("<Button>", self._top)
     self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
-    self._view.flow.oper_params_view.btn_apply.bind("<Button>", self._apply)
-    self._view.flow.oper_params_view.btn_reset.bind("<Button>", self._reset)
-    self._view.flow.oper_params_view.btn_default.bind("<Button>", self._default)
+    self._view.flow.btn_params_apply.bind("<Button>", self._apply)
+    self._view.flow.btn_params_reset.bind("<Button>", self._reset)
+    self._view.flow.btn_params_default.bind("<Button>", self._default)
 
-    self._image_path = ''
+    # self._image_path = ''
     self._start()
     return
 
@@ -99,8 +101,9 @@ class MngrController():
 
   def _tree_selection_changed(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
-    self._view.flow.clear_operation_params()
-    self._update_current_operation_params(idx, name)
+    controls_idx = self._view.flow.get_current_opreation_params_idx()
+    if controls_idx == -1 or controls_idx != idx:
+      self._create_current_operation_params_controls(idx, name)
     return
 
 
@@ -223,48 +226,30 @@ class MngrController():
   def _set_top_state(self) -> None:
     self._set_result(0)
     if self._ready():
-      self._view.flow.set_selection_tree()
+      # self._view.flow.set_selection_tree()
       self._runner.reset()
     return
 
 
 # Operation parameters sub panel's commands
-  def _params_def_contains_button_define(self, params_def) -> bool:
-    ret = False
+  def _bind_param_controls(self, params_def) -> None:
     for param_def in params_def:
-      name = param_def.get('name')
-      type = param_def.get('type')
-      if type == 'button' and name == 'define':
-        ret = True
-        break
-    return ret
-
-  def _set_image_path_to_params(self, params) -> None:
-    path, name = os.path.split(self._image_path)
-    params['path'] = path
-    params['name'] = name
-    self._image_path = ''
+      cname = param_def.get('name')
+      ctype = param_def.get('type')
+      param_control = self._view.flow.get_current_operation_param_control(cname)
+      if ctype == 'button' and cname == 'define':
+        param_control.bind("<Button>", self._get_path)
+      else:
+        if type(param_control) == Scale:
+          param_control.bind("<ButtonRelease-1>", self._apply)
     return
 
-  def _update_current_operation_params(self, idx, name, reset=False) -> None:
-    # get new params values from params view 
-    params_new = self._view.flow.get_current_operation_params_def()
-    # get params defenitions and current flow params from the flow item 
+  def _create_current_operation_params_controls(self, idx, name) -> None:
     flow_item = self._model.flow.get_item(idx)
-
-    params = flow_item.params
-    params_def = flow_item.params_def
-    if reset:
-      params_ws = self._model.flow.get_params_ws(idx)
-      flow_item.params = copy.deepcopy(params_ws)
-    else:
-      params_dict = self._converter.flow._convert_params_def_to_dict(params_def)
-      params = self._converter.flow._merge_operation_params(params_new, params_dict, params)
-    if self._image_path is not '':
-      self._set_image_path_to_params(params)
-    self._view.flow.set_operation_params(idx, name, params, copy.deepcopy(params_def))
-    if self._params_def_contains_button_define(params_def):
-      self._view.flow.oper_params_view.btn_define.bind("<Button>", self._get_path)
+    params_def = flow_item.params_def   
+    params = flow_item.params_ws
+    self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
+    self._bind_param_controls(params_def)
     return
 
   def _run_current(self, idx: int) -> None:
@@ -274,22 +259,31 @@ class MngrController():
 
   def _apply(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
-    self._update_current_operation_params(idx, name)
+    params_new = self._view.flow.get_current_operation_params_def()
     self._run_current(idx)
     return
 
   def _reset(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
-    self._update_current_operation_params(idx, name, reset=True)
+    flow_item = self._model.flow.get_item(idx)
+    params_def = flow_item.params_def   
+    params = copy.deepcopy(flow_item.params_ws)
+    flow_item.params = params
+    self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
+    self._bind_param_controls(params_def)
+
     self._run_current(idx)
     return
 
   def _default(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
-    operation = self._model.module.get_operation_by_name(name)
-    self._view.flow.reset_operation_params(idx, name, operation.params)
-    fitem = self._model.flow.get_item(idx)
-    fitem.params = {}
+    flow_item = self._model.flow.get_item(idx)
+    params_def = flow_item.params_def   
+    params = self._converter.flow.convert_params_def_to_dict(flow_item.params_def)
+    flow_item.params = params
+    self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
+    self._bind_param_controls(params_def)
+
     self._run_current(idx)
     return
 
@@ -309,10 +303,16 @@ class MngrController():
     return
 
 # Data commands
+  def _set_image_location_to_params(self, ffn, params) -> None:
+    path, name = os.path.split(ffn)
+    params['path'] = path
+    params['name'] = name
+    return
+
   def _get_path(self, event) -> None:
-    self._image_path = askopenfilename(title="Select a file", 
+    ffn = askopenfilename(title="Select a file", 
       filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
-    if self._image_path is not '':
+    if ffn is not '':
       idx, name = self._view.flow.get_current_selection_tree()
-      self._update_current_operation_params(idx, name)
+      # self._update_current_operation_params(idx, name)
     return

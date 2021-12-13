@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Tuple
 from ...uiconst import *
 
 class OperParamsView(Frame):
-  def __init__(self, parent):
+  def __init__(self, parent) -> None:
     super().__init__(parent)
     self.parent = parent 
     # self['bd'] = 2
@@ -29,50 +29,68 @@ class OperParamsView(Frame):
     self.btn_apply['state']=DISABLED
     self.btn_default['state']=DISABLED
     self.btn_reset['state']=DISABLED
-
-    self.btn_define = None
     return
 
-  def clear_operation_params(self):
+# API
+  def create_operation_params_controls(self, idx: int, item_name: str, params: Dict, params_def: List[Dict]) -> None:
+    self._clear_operation_params()
+    params_list = self._convert_to_list_of_dict(params, params_def)
+    self._create_controls(idx, item_name, params_list)
+    return
+
+  def get_current_opreation_params_idx(self) -> int:
+    return self.operation_param_controls.get('idx')
+
+  def get_current_operation_param_control(self, cname) -> Widget:   
+    for control in self.operation_param_controls['param_controls']:
+      name = control['label']['text'].split('-')[0].strip()
+      if cname == name:
+        return control['control']
+    return None
+
+  def get_current_operation_params_def(self) -> Dict:
+    params = {}
+    for control in self.operation_param_controls['param_controls']:
+      name = control['label']['text'].split('-')[0].strip()
+      t = type(control['control'])
+      if t in [Entry, Combobox, Spinbox, Checkbutton, Button, Scale]:
+        value = control['getter']()
+      else:
+        print("wrong control type", type(control['control']))    
+      # params.append({"name": name, "value": value})     
+      params[name] =  value     
+    return params
+
+
+# Local methods
+  def _clear_operation_params(self) -> None:
     for control in self.operation_param_controls['param_controls']:
       control['control'].grid_forget()
       control['label'].grid_forget()   
-      self.operation_param_controls['idx'] = -1
-      self.operation_param_controls['exec'] = ""
-      self.operation_param_controls['param_controls'] = []
+    self.operation_param_controls['idx'] = -1
+    self.operation_param_controls['exec'] = ''
+    self.operation_param_controls['param_controls'] = []
     return
 
-  def init_operation_params(self, idx: int, item_name: str) -> None:
+  def _init_operation_params(self, idx: int, item_name: str) -> None:
     self.operation_param_controls["idx"] = idx
     self.operation_param_controls["exec"] = item_name
     return
 
-  @staticmethod
-  def _convert_to_list_of_dict(params: Dict, params_def: List[Dict]) -> List[Dict]:
-    for param_def in params_def:
-      name = param_def.get('name')
-      pvalue = params.get(name, None)
-      if pvalue is not None:
-        param_def['default'] = pvalue
-    return params_def
-
-  def set_operation_params_from_dict(self, idx: int, item_name: str, params: Dict, params_def: List[Dict]) -> None:
-    params_list = self._convert_to_list_of_dict(params, params_def)
-    self.set_operation_params(idx, item_name, params_list)
-    return
-
-  def set_operation_params(self, idx, item_name: str, oper_params: List[Dict]) -> None:
+  def _create_controls(self, idx, item_name: str, oper_params: List[Dict]) -> None:
     self.btn_apply['state']=NORMAL
     self.btn_default['state']=NORMAL
     self.btn_reset['state']=NORMAL
 
-    self.clear_operation_params()
-    self.init_operation_params(idx, item_name)
+    self._init_operation_params(idx, item_name)
 
     for i, param in enumerate(oper_params):
-      param_command, param_control, param_label = self.controls_factory(param)
+      param_getter, param_setter, param_control, param_label = self._controls_factory(param)
       self.operation_param_controls['idx'] = idx
-      self.operation_param_controls['param_controls'].append({"command": param_command, "control": param_control,"label": param_label})
+      # self.params_controls[param.get('name')] = param_control
+      self.operation_param_controls['param_controls'].append({
+        "getter": param_getter, "setter": param_setter, "control": param_control,"label": param_label
+        })
 
       param_control.grid(row=i+1, column=0, padx=PADX, pady=PADY, sticky=W+N)
       param_label.grid(row=i+1, column=1, columnspan=2, padx=PADX, pady=PADY, sticky=W+S)
@@ -81,75 +99,79 @@ class OperParamsView(Frame):
       self.btn_reset['state']=DISABLED
     return
 
-  def get_current_operation_params_def(self) -> List[Dict]:
-    params = []
-    for control in self.operation_param_controls['param_controls']:
-      name = control['label']['text'].split('-')[0].strip()
-      t = type(control['control'])
-      if t in [Entry, Combobox, Spinbox, Checkbutton, Button, Scale]:
-        value = control['command']()
-      else:
-        print("wrong control type", type(control['control']))    
-      params.append({"name": name, "value": value})     
-    return params
-
-  def controls_factory(self, param: Dict) -> Tuple[Callable, Entry, Label]:
+  def _controls_factory(self, param: Dict) -> Tuple[Callable, Callable, Widget, Label]:
     # {"type": t, "domain": d, "p_values": pvs, "name": p_name, "value": p_value, "label": l}    
-    param_command, param_control = self.create_param_control(param)
+    param_getter, param_setter, param_control = self._create_control(param)
     name = param.get('name')
     comment = param.get('comment')
     label_text = f"{name} - {comment}"
     param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
-    return param_command, param_control, param_label
+    return param_getter, param_setter, param_control, param_label
 
-  def create_param_control(self, param: Dict) -> Tuple[Callable, Entry]:   
+  def _create_control(self, param: Dict) -> Tuple[Callable, Callable, Widget]:   
     param_type = param.get('type')
 
-    def _pint(param: Dict) -> Tuple[Callable, Entry]:
+    def _pint(param: Dict) -> Tuple[Callable, Callable, Entry]:
       def get():
         return int(param_control.get())
+      
+      def set(value: int):
+        param_control.set(value)
 
       param_value = param.get('default')
       var = tk.IntVar()
       var.set(param_value)
       param_control = Entry(self, textvariable=var)
-      param_command = get
-      return param_command, param_control
+      param_getter = get
+      param_setter = set
+      return param_getter, param_setter, param_control
 
-    def _pfloat(param: Dict) -> Tuple[Callable, Entry]:
+    def _pfloat(param: Dict) -> Tuple[Callable, Callable, Entry]:
       def get():
         return float(param_control.get())
+
+      def set(value: float):
+        param_control.set(value)
 
       param_value = param.get('default')
       var = tk.DoubleVar()
       var.set(param_value)
       param_control = Entry(self, textvariable=var)
-      param_command = get
-      return param_command, param_control
+      param_getter = get
+      param_setter = set
+      return param_getter, param_setter, param_control
 
-    def _pstr(param: Dict) -> Tuple[Callable, Entry]:
+    def _pstr(param: Dict) -> Tuple[Callable, Callable, Entry]:
       def get():
         return param_control.get()
+
+      def set(value: str):
+        var.set(value)
 
       param_value = param.get('default')
       var = tk.StringVar()
       var.set(param_value)
       param_control = Entry(self, textvariable=var)
-      param_command = get
-      return param_command, param_control
+      param_getter = get
+      param_setter = set
+      return param_getter, param_setter, param_control
 
-    def _pbool(param: Dict) -> Tuple[Callable, Checkbutton]:
+    def _pbool(param: Dict) -> Tuple[Callable, Callable, Checkbutton]:
       item = tk.BooleanVar()
       def get():
         return item.get()
 
+      def set(value: bool):
+        param_control.set(value)
+
       param_value = param.get('default')
       item.set(param_value)
       param_control = Checkbutton(self, variable=item, onvalue=True, offvalue=False, command=get)
-      param_command = get
-      return param_command, param_control
+      param_getter = get
+      param_setter = set
+      return param_getter, param_setter, param_control
 
-    def _plist(param: Dict) -> Tuple[Callable, Combobox]:
+    def _plist(param: Dict) -> Tuple[Callable, Callable, Combobox]:
       p_types = param.get('p_types')
       param_control = Combobox(self)
       def get():
@@ -162,6 +184,9 @@ class OperParamsView(Frame):
           pass
         return value
 
+      def set(value):
+        param_control.set(value)
+
       param_possible_values = param.get('p_values')
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       param_control['values'] = param_values_tuple
@@ -169,16 +194,20 @@ class OperParamsView(Frame):
       param_default_value = param.get('default')    
       param_control.set(param_default_value)
       param_control.textvariable = var
-      param_command = get
-      return param_command, param_control
+      param_getter = get
+      param_setter = set
+      return param_getter, param_setter, param_control
 
-    def _pdict(param: Dict) -> Tuple[Callable, Combobox]:
+    def _pdict(param: Dict) -> Tuple[Callable, Callable, Combobox]:
       param_control = Combobox(self)
 
       def get():
         key = param_control.get()
         value = param_dict.get(key, 0)
         return value
+
+      def set(value):
+        param_control.set(value)
 
       # return key for any value
       def get_key(val):
@@ -198,10 +227,11 @@ class OperParamsView(Frame):
       param_control.set(param_default_value)
       item = tk.StringVar()
       param_control.textvariable = item
-      param_command = get
-      return param_command, param_control
+      param_getter = get
+      param_setter = set
+      return param_getter, param_setter, param_control
 
-    def _prange(param: Dict) -> Tuple[Callable, Spinbox]:
+    def _prange(param: Dict) -> Tuple[Callable, Callable, Spinbox]:
       param_possible_values = param.get('p_values')
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       from_ = param_values_tuple[0]
@@ -220,13 +250,17 @@ class OperParamsView(Frame):
           pass
         return value
 
+      def set(value):
+        param_control.set(value)
+
       param_default_value = param.get('default')     
       var.set(param_default_value)
       param_control = Spinbox(self, from_=from_, to=to, textvariable=var, wrap=True, command=get)
-      param_command = get
-      return param_command, param_control
+      param_getter = get
+      param_setter = set
+      return param_getter, param_setter, param_control
 
-    def _pscale(param: Dict) -> Tuple[Callable, Spinbox]:
+    def _pscale(param: Dict) -> Tuple[Callable, Callable, Scale]:
       param_possible_values = param.get('p_values')
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
       from_ = param_values_tuple[0]
@@ -245,21 +279,28 @@ class OperParamsView(Frame):
           pass
         return value
 
+      def set(value:float):
+        param_control.set(float(value))
+
       param_default_value = param.get('default')     
       var.set(param_default_value)
       param_control = Scale(self, from_=from_, to=to, resolution=resolution, variable=var, length=170, orient=HORIZONTAL)
-      param_command = get
-      return param_command, param_control
+      param_getter = get
+      param_setter = set
+      return param_getter, param_setter, param_control
 
-    def _pbutton(param: Dict) -> Tuple[Callable, Button]:
+    def _pbutton(param: Dict) -> Tuple[Callable, Callable, Button]:
       def get():
         return param_value
 
+      def set(value):
+        return
+
       param_value = param.get('default')
       param_control = Button(self, text=param_value, width=BTNW_S)
-      self.btn_define = param_control
-      param_command = get
-      return param_command, param_control
+      param_getter = get
+      param_setter = set
+      return param_getter, param_setter, param_control
 
     type_switcher = {
       'int': _pint,
@@ -276,6 +317,7 @@ class OperParamsView(Frame):
     control_builder = type_switcher.get(param_type, 'Invalid type')
     return control_builder(param)
 
+# Class utilities, converters
   @staticmethod
   def get_var_by_type(type: str) -> Variable:
     var = tk.StringVar()
@@ -284,6 +326,15 @@ class OperParamsView(Frame):
     elif type == 'int':
       var = tk.IntVar()
     return var
+
+  @staticmethod
+  def _convert_to_list_of_dict(params: Dict, params_def: List[Dict]) -> List[Dict]:
+    for param_def in params_def:
+      name = param_def.get('name')
+      pvalue = params.get(name, None)
+      if pvalue is not None:
+        param_def['default'] = pvalue
+    return params_def
 
   @staticmethod
   def split_possible_values_string(param_possible_values: str) -> List[str]:

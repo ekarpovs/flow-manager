@@ -94,7 +94,7 @@ class FlowView(View):
     self.clear_flow_tree_view()
     for i, name in enumerate(flow_names):
       self.flow_tree_view.insert(parent='', index='end', iid=i, text=name)
-    self.set_selection_tree(idx)  
+    # self.set_selection_tree(idx)  
     return
 
   def set_selection_tree(self, idx=0):
@@ -133,19 +133,30 @@ class FlowView(View):
     return
 
   # Parameter subpanel Wrappers
+  @property
+  def btn_params_apply(self) -> Button:
+    return self.oper_params_view.btn_apply
+
+  @property
+  def btn_params_reset(self) -> Button:
+    return self.oper_params_view.btn_reset
+
+  @property
+  def btn_params_default(self) -> Button:
+    return self.oper_params_view.btn_default
+
+
   def get_current_operation_params_def(self) -> List[Dict]: 
     return self.oper_params_view.get_current_operation_params_def()
 
-  def set_operation_params(self, idx, name, params, params_def):
-    self.oper_params_view.set_operation_params_from_dict(idx, name, params, params_def)
-    return
+  def get_current_opreation_params_idx(self) -> int:
+    return self.oper_params_view.get_current_opreation_params_idx()
 
-  def reset_operation_params(self, idx, exec, oper_params):
-    self.oper_params_view.set_operation_params(idx, exec, oper_params)
-    return
+  def get_current_operation_param_control(self, cname) -> Widget:
+    return self.oper_params_view.get_current_operation_param_control(cname)
 
-  def clear_operation_params(self):
-    self.oper_params_view.clear_operation_params()
+  def create_operation_params_controls(self, idx, name, params, params_def):
+    self.oper_params_view.create_operation_params_controls(idx, name, params, params_def)
     return
 
   def activate_buttons(self, activate=False):
@@ -163,7 +174,6 @@ class FlowView(View):
     self.btn_prev['state']=state
     self.btn_top['state']=state
     return
-
 
   def edit_flow_links(self, flow: CurrentFlowModel) -> None:
     lnk_dlg = LinksDialog(self.parent, flow)
