@@ -4,7 +4,7 @@ from tkscrolledframe import ScrolledFrame
 from ...uiconst import *
 from ..linksdialog.contentview import ContentView
 from ..models.flow.currentflowmodel import CurrentFlowModel 
-from .ldactionsframe import CdActionsFrame
+from .ldactionsframe import LdActionsFrame
 
 class LinksDialog(Toplevel):
   def __init__(self, parent, flow: CurrentFlowModel):
@@ -33,8 +33,8 @@ class LinksDialog(Toplevel):
     self.content_view.init_content(flow)
     self.content.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+E+N+S)
     
-    self.actions_frame = CdActionsFrame(self)
-    self.actions_frame.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W+E+S)
+    self.actions_frame = LdActionsFrame(self)
+    self.actions_frame.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W+E+N+S)
 
     return
 

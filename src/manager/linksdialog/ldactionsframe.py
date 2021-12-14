@@ -3,7 +3,7 @@ from tkinter import ttk
 
 from ...uiconst import *
 
-class CdActionsFrame(Frame):
+class LdActionsFrame(Frame):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 

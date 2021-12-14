@@ -9,7 +9,7 @@ from ...uiconst import *
 from src.manager.models.flow.currentflowmodel import CurrentFlowModel
 
 
-class ContentView(Frame):
+class ContentView(LabelFrame):
   def __init__(self, parent):
     super().__init__(parent)
     self.parent = parent 
@@ -18,7 +18,6 @@ class ContentView(Frame):
 
     self.grid()
     self.columnconfigure(0, weight=1)
-    self.columnconfigure(1, weight=2)
     return
 
   @property
@@ -29,40 +28,44 @@ class ContentView(Frame):
     self._tmp_flow: FlowModel = copy.deepcopy(flow.flow)
     for i, item in enumerate(self._tmp_flow.items):
       item_frame = self._create_item_view(i, item)
-      item_frame.grid(row=i, column=0, sticky=W)
+      item_frame.grid(row=i, column=0, padx=PADX, pady=PADY, sticky=W+E)
       self._frames.append({'name': f'{i}-{item.name}', 'frame': item_frame})
     return 
 
   def _create_item_view(self, idx, item: FlowItemModel) -> Frame:
-    frame = Frame(self)
+    width = self.parent.winfo_width()
+    print(width)
+    frame = LabelFrame(self)
+    frame.columnconfigure(0, weight=1)
+    frame.columnconfigure(1, weight=1)
     name_lbl = Label(frame, text=f'{idx}-{item.name}')
     name_lbl.grid(row=idx, column=0, sticky=W)
 
     inrefs = item.inrefs_def
     if len(inrefs) > 0:
       input_lbl = Label(frame, text='input:')
-      input_lbl.grid(row=idx+1, column=0, sticky=W)
+      input_lbl.grid(row=idx+1, column=0, padx=PADX, sticky=W)
       aliases = item.aliases
       for i, inref in enumerate(inrefs):
         iname = inref.get('name')
         inref_lbl = Label(frame, text=iname)
-        inref_lbl.grid(row=idx+2+i, column=0, sticky=W)
+        inref_lbl.grid(row=idx+2+i, column=0, padx=PADX*2, sticky=W)
         var = StringVar()
         if len(aliases) > 0:
           alias = aliases.get(iname)
           var.set(alias)
         inref_entry = Entry(frame, name=iname, textvariable=var, width=30)
-        inref_entry.grid(row=idx+2+i, column=1, sticky=W)
+        inref_entry.grid(row=idx+2+i, column=1, padx=PADX, sticky=E)
     
     idx += len(inrefs)+1
     outrefs = item.outrefs_def
     if len(outrefs) > 0:
       output_lbl = Label(frame, text='output:')
-      output_lbl.grid(row=idx+1, column=0, sticky=W)
+      output_lbl.grid(row=idx+1, column=0, padx=PADX, sticky=W)
       outrefs = item.outrefs_def   
       for i, outref in enumerate(outrefs):
         outref_lbl = Label(frame, text=outref.get('name'))
-        outref_lbl.grid(row=idx+2+i, column=0, sticky=W)
+        outref_lbl.grid(row=idx+2+i, column=0, padx=PADX*2, sticky=W)
     return frame
 
   def update_flow(self) -> None:
