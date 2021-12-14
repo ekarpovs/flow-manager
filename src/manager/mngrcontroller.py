@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter.ttk import Combobox
 from typing import Dict, List, Tuple
 import cv2
 import copy
@@ -7,7 +8,6 @@ from tkinter.filedialog import askopenfilename
 
 from flow_storage import FlowDataType
 from flow_model import FlowItemModel, FlowItemType
-from numpy import equal
 
 from .mngrmodel import MngrModel  
 from .mngrrunner import MngrRunner 
@@ -22,10 +22,10 @@ class MngrController():
     self._runner = MngrRunner(self.cfg)
     self._converter = MngrConverter()
     self._view = MngrView(parent)
-# Bind to modules panel
+    # Bind to modules panel
     self._view.module.tree_view.bind('<<TreeviewOpen>>', self._open_all)
     self._view.module.tree_view.bind('<<TreeviewSelect>>', self._module_tree_selection_changed)
-# Bind to flows panel
+    # Bind to flows panel
     self.flows_view_idx = 0  
     self._view.flow.names_combo_box.bind('<<ComboboxSelected>>', self._worksheet_selected)
     self._view.flow.btn_reload.bind("<Button>", self._reload_ws_list)
@@ -43,7 +43,6 @@ class MngrController():
     self._view.flow.btn_params_reset.bind("<Button>", self._reset)
     self._view.flow.btn_params_default.bind("<Button>", self._default)
 
-    # self._image_path = ''
     self._start()
     return
 
@@ -106,8 +105,6 @@ class MngrController():
       self._create_current_operation_params_controls(idx, name)
     return
 
-
-# Parameters 
   def _update_flow_by_operations_params_def(self, names: List[str]) -> None:
     for idx, name in enumerate(names):
       operation = self._model.module.get_operation_by_name(name)
@@ -116,6 +113,7 @@ class MngrController():
       item.inrefs_def = operation.inrefs
       item.outrefs_def = operation.outrefs
     return 
+
 
 # Flows panel's commands 
   def _reload_ws_list(self, event) -> None:
@@ -171,6 +169,7 @@ class MngrController():
   def _edit_flow_links(self, event) -> None:
     self._view.flow.edit_flow_links(self._model.flow)
     return
+
 
 # Execution commands
   def _set_result(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
@@ -230,6 +229,11 @@ class MngrController():
       self._runner.reset()
     return
 
+  def _run_current(self, idx: int) -> None:
+    if self._ready() and self._runner.state_idx == idx:
+      self._current()
+    return
+
 
 # Operation parameters sub panel's commands
   def _bind_param_controls(self, params_def) -> None:
@@ -240,26 +244,34 @@ class MngrController():
       if ctype == 'button' and cname == 'define':
         param_control.bind("<Button>", self._get_path)
       else:
-        if type(param_control) == Scale:
+        t = type(param_control) 
+        if t == Scale:
           param_control.bind("<ButtonRelease-1>", self._apply)
+        elif t == Combobox:
+          param_control.bind("<<ComboboxSelected>>", self._apply)          
     return
 
   def _create_current_operation_params_controls(self, idx, name) -> None:
     flow_item = self._model.flow.get_item(idx)
-    params_def = flow_item.params_def   
-    params = flow_item.params_ws
+    params_def = flow_item.params_def
+    # merge curent params and params_ws
+    params = flow_item.params
+    params_ws = flow_item.params_ws
+    for k in params_ws.keys():
+      if k in params:
+        continue
+      params[k] = params_ws.ket(k)
     self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
     self._bind_param_controls(params_def)
     return
 
-  def _run_current(self, idx: int) -> None:
-    if self._ready() and self._runner.state_idx == idx:
-      self._current()
-    return
-
   def _apply(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
+    flow_item = self._model.flow.get_item(idx)
     params_new = self._view.flow.get_current_operation_params_def()
+    for k in params_new.keys():
+      flow_item.params[k] = params_new.get(k)
+
     self._run_current(idx)
     return
 
@@ -303,7 +315,8 @@ class MngrController():
     return
 
 # Data commands
-  def _set_image_location_to_params(self, ffn, params) -> None:
+  @staticmethod
+  def _set_image_location_to_params(ffn, params) -> None:
     path, name = os.path.split(ffn)
     params['path'] = path
     params['name'] = name
@@ -318,13 +331,9 @@ class MngrController():
       params_def = flow_item.params_def   
       params = flow_item.params
 
-      path, fn = os.path.split(ffn)
-      p = [p for p in params_def if p.get('name') == 'path']
-      n = [n for n in params_def if n.get('name') == 'name']
-      if p is not None and n is not None:
-        params['path'] = path
-        params['name'] = fn
-
+      p = [p for p in params_def if p.get('name') == 'path' or p.get('name') == 'name']
+      if p is not None and len(p) == 2:
+        self._set_image_location_to_params(ffn, params)
       self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
       self._bind_param_controls(params_def)
     return
