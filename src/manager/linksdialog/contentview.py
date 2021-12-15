@@ -82,6 +82,8 @@ class ContentView(LabelFrame):
       for child in children:
         if type(child) == Entry:
           flow_item = self._tmp_flow.get_item(idx)
-          flow_item.aliases[child._name] = child.get()
+          alias = child.get()
+          if alias is not '':
+            flow_item.aliases[child._name] = alias
           # print(child._name, child.get())
     return
