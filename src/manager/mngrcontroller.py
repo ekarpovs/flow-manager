@@ -105,13 +105,21 @@ class MngrController():
       self._create_current_operation_params_controls(idx, name)
     return
 
+  def _assign_oper_params(self, name: str, item: FlowItemModel) -> None:
+    operation = self._model.module.get_operation_by_name(name)
+    item.params_def = operation.params
+    item.inrefs_def = operation.inrefs
+    item.outrefs_def = operation.outrefs
+    return
+
   def _update_flow_by_operations_params_def(self, names: List[str]) -> None:
     for idx, name in enumerate(names):
-      operation = self._model.module.get_operation_by_name(name)
       item = self._model.flow.get_item(idx)
-      item.params_def = operation.params
-      item.inrefs_def = operation.inrefs
-      item.outrefs_def = operation.outrefs
+      self._assign_oper_params(name, item)
+      # operation = self._model.module.get_operation_by_name(name)
+      # item.params_def = operation.params
+      # item.inrefs_def = operation.inrefs
+      # item.outrefs_def = operation.outrefs
     return 
 
 
@@ -131,10 +139,13 @@ class MngrController():
     name = self._view.module.get_selected_item_name()   
     # Perform if operation only selected
     if name is not None:     
-      new_flow_tem = FlowItemModel(FlowItemType.EXEC, name)
-      operation = self._model.module.get_operation_by_name(name)
-      new_flow_tem.params_def = operation.params
-      self._model.flow.set_item(cur_idx, new_flow_tem)
+      new_flow_item = FlowItemModel(FlowItemType.EXEC, name)
+      self._assign_oper_params(name, new_flow_item)
+      # operation = self._model.module.get_operation_by_name(name)
+      # new_flow_tem.params_def = operation.params
+      # new_flow_tem.inrefs_def = operation.inrefs
+      # new_flow_tem.outrefs_def = operation.outrefs
+      self._model.flow.set_item(cur_idx, new_flow_item)
       names = self._model.flow.get_names()
       self._view.flow.set_flow_item_names(names)   
       self._rebuild_runner()
@@ -336,5 +347,6 @@ class MngrController():
         self._set_image_location_to_params(ffn, params)
       self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
       self._bind_param_controls(params_def)
+      self._apply(None)
     return
 
