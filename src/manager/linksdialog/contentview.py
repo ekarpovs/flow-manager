@@ -85,5 +85,7 @@ class ContentView(LabelFrame):
           alias = child.get()
           if alias is not '':
             flow_item.aliases[child._name] = alias
+          elif len(flow_item.aliases) > 0 and flow_item.aliases[child._name] is not '': 
+            del(flow_item.aliases[child._name])
           # print(child._name, child.get())
     return
