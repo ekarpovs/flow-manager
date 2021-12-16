@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import * 
 from tkinter.ttk import Combobox, Spinbox, Button
 from typing import Callable, Dict, List, Tuple
+
+# from ...mix.incscale import IncScale
 from ...uiconst import *
 
 class OperParamsView(Frame):
@@ -263,28 +265,44 @@ class OperParamsView(Frame):
     def _pscale(param: Dict) -> Tuple[Callable, Callable, Scale]:
       param_possible_values = param.get('p_values')
       param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
-      from_ = param_values_tuple[0]
-      to = param_values_tuple[1]
-      resolution = param_values_tuple[2]
       p_types = param.get('p_types')
+      if p_types == 'float':
+        from_ = float(param_values_tuple[0])
+        to = float(param_values_tuple[1])
+        resolution = float(param_values_tuple[2])
+        increment = float(param_values_tuple[3])
+      elif p_types == 'int':
+        from_ = int(param_values_tuple[0])
+        to = int(param_values_tuple[1])
+        resolution = int(param_values_tuple[2])
+        increment = float(param_values_tuple[3])
+      else:
+        pass      
       var = self.get_var_by_type(p_types)  
 
       def get():
+        # x, y = param_control.coords()
+        # clicked = param_control.identify(x, y)
         value = param_control.get()
-        if p_types == 'float':
-          value = float(value)
-        elif p_types == 'int':
-          value = int(value)
-        else:
-          pass
-        return value
+        r = value %2
+        if r == 0:
+          value += increment
+        # param_control.set(value)
+        if p_types == 'int':
+          return int(value)
+        return float(value)
 
-      def set(value:float):
-        param_control.set(float(value))
+      def set(value):
+        if p_types == 'int':
+          param_control.set(int(value))
+        else:
+          param_control.set(float(value))
+        return
 
       param_default_value = param.get('default')     
       var.set(param_default_value)
       param_control = Scale(self, from_=from_, to=to, resolution=resolution, variable=var, length=170, orient=HORIZONTAL)
+      # param_control = IncScale(self, from_=from_, to=to, resolution=resolution, increment=increment, variable=var, length=170, orient=HORIZONTAL)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
