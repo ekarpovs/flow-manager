@@ -53,7 +53,8 @@ class ContentView(LabelFrame):
         var = StringVar()
         if len(aliases) > 0:
           alias = aliases.get(iname)
-          var.set(alias)
+          if alias is not None:
+            var.set(alias)
         inref_entry = Entry(frame, name=iname, textvariable=var, width=30)
         inref_entry.grid(row=idx+2+i, column=1, padx=PADX, sticky=E)
     
@@ -85,7 +86,7 @@ class ContentView(LabelFrame):
           alias = child.get()
           if alias is not '':
             flow_item.aliases[child._name] = alias
-          elif len(flow_item.aliases) > 0 and flow_item.aliases[child._name] is not '': 
+          elif len(flow_item.aliases) > 0 and flow_item.aliases.get(child._name, '') is not '': 
             del(flow_item.aliases[child._name])
           # print(child._name, child.get())
     return
