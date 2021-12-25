@@ -252,7 +252,7 @@ class MngrController():
       cname = param_def.get('name')
       ctype = param_def.get('type')
       param_control = self._view.flow.get_current_operation_param_control(cname)
-      if ctype == 'button' and cname == 'define':
+      if ctype == 'button' and cname == 'location':
         param_control.bind("<Button>", self._get_path)
       else:
         t = type(param_control) 
