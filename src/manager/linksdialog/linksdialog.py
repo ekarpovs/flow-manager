@@ -15,7 +15,7 @@ class LinksDialog(Toplevel):
     self.grab_set()
     # Define the dialog size
     self.title(f'Configure links: {flow.flow.info}')
-    self.geometry("400x600+%d+%d" % (parent.winfo_rootx() +920, parent.winfo_rooty() + 30))
+    self.geometry("450x650+%d+%d" % (parent.winfo_rootx() +920, parent.winfo_rooty() + 30))
     self.resizable(height=FALSE, width=FALSE) 
     
     self.grid()
