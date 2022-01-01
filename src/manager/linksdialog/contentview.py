@@ -1,10 +1,13 @@
 import copy
 from tkinter import *
 from tkinter.ttk import Combobox
-from typing import Dict, List
+from typing import Dict, List, Tuple
+
+import operation_loader
 
 from flow_model.flowitemmodel import FlowItemModel
 from flow_model.flowmodel import FlowModel
+from tkscrolledframe import widget
 
 from src.uiconst import *
 from src.manager.models.flow.currentflowmodel import CurrentFlowModel
@@ -15,7 +18,7 @@ class ContentView(LabelFrame):
     super().__init__(parent)
     self.parent = parent 
     self._tmp_flow: FlowModel = None
-    # self._out_link_names: List[str] = []
+    self._refs: List[Tuple] = []
     self._frames: List[Dict] = []
 
     self.grid()
@@ -28,65 +31,82 @@ class ContentView(LabelFrame):
 
   def init_content(self, flow: CurrentFlowModel) -> None:
     self._tmp_flow: FlowModel = copy.deepcopy(flow.flow)
+    self._init_flow_refs()
     for i, item in enumerate(self._tmp_flow.items):
       item_frame = self._create_item_view(i, item)
       item_frame.grid(row=i, column=0, padx=PADX, pady=PADY, sticky=W+E)
       self._frames.append({'name': f'{i}-{item.name}', 'frame': item_frame})
     return 
 
-  def _create_out_link_names_list(self, idx: int) -> List[str]:
-    out_link_names: List[str] = []
+  def _init_flow_refs(self) -> None:
     for i, item in enumerate(self._tmp_flow.items):
-      if i >= idx: 
+      func = operation_loader.get(item.name)
+      (_, _, input_refs, output_refs) = operation_loader.parse_oper_doc(func.__doc__)
+      irefs = []
+      for inr in input_refs:
+        irefs.append(f'{inr[0: inr.index(":")].strip()}')
+      orefs = []
+      oextrefs = []
+      for outr in output_refs:
+        oref = f'{outr[0: outr.index(":")].strip()}'
+        orefs.append(oref)
+        oextrefs.append(f'{i}-{item.name}-{oref}')
+      self._refs.append((irefs, orefs, oextrefs))
+    return
+
+  def _get_external_refs(self, idx) -> List[str]:
+    extrefs = []
+    for i, trefs in enumerate(self._refs):
+      (_,_,refs) = trefs
+      for ref in refs:
+        extrefs.append(ref)
+      if i == idx-1:
         break
-      for outref in item.outrefs_def:
-        outref_name = outref.get('name')
-        out_link_names.append(f'{i}-{item.name}-{outref_name}')
-    return out_link_names 
+    return extrefs  
 
   def _create_item_view(self, idx: int, item: FlowItemModel) -> Frame:
+    widget_idx = idx
     frame = LabelFrame(self)
     frame.columnconfigure(0, weight=1)
     frame.columnconfigure(1, weight=1)
     name_lbl = Label(frame, text=f'{idx}-{item.name}')
     name_lbl.grid(row=idx, column=0, sticky=W)
-    self._create_input_view(frame, idx, item)
-    idx += len(item.inrefs_def)+1
-    self._create_output_view(frame, idx, item)
+    self._create_input_view(frame, widget_idx, idx, item)
+    # (input_refs, _, _) = self._refs[idx]
+    # idx += len(input_refs)+1
+    self._create_output_view(frame, widget_idx, idx, item)
     return frame
 
-  def _create_input_view(self, parent: LabelFrame, idx: int, item: FlowItemModel) -> None:
-    out_link_names = self._create_out_link_names_list(idx)
-    inrefs = item.inrefs_def
-    if len(inrefs) > 0:
+  def _create_input_view(self, parent: LabelFrame, widget_idx: int, idx: int, item: FlowItemModel) -> None:
+    (input_refs, _, _) = self._refs[idx]
+    if len(input_refs) > 0:
       input_lbl = Label(parent, text='input:')
-      input_lbl.grid(row=idx+1, column=0, padx=PADX, sticky=W)
+      input_lbl.grid(row=widget_idx+1, column=0, padx=PADX, sticky=W)
       links = item.links
-      for i, inref in enumerate(inrefs):
-        iname = inref.get('name')
-        inref_lbl = Label(parent, text=iname)
-        inref_lbl.grid(row=idx+2+i, column=0, padx=PADX*2, sticky=W)
+      for i, inref in enumerate(input_refs):
+        inref_lbl = Label(parent, text=inref)
+        inref_lbl.grid(row=widget_idx+2+i, column=0, padx=PADX*2, sticky=W)
         var = StringVar()
-        inref_combo = Combobox(parent, name=iname, justify=LEFT, width=30)
-        inref_combo['values'] = out_link_names
+        inref_combo = Combobox(parent, name=inref, justify=LEFT, width=30)
+        inref_combo['values'] = self._get_external_refs(idx)
         # Current value
         if len(links) > 0:
-          link = links.get(iname)
+          link = links.get(inref)
           if link is not None:
             inref_combo.set(link)
             inref_combo.textvariable = var
-        inref_combo.grid(row=idx+2+i, column=1, padx=PADX, sticky=E)
+        inref_combo.grid(row=widget_idx+2+i, column=1, padx=PADX, sticky=E)
     return
 
-  def _create_output_view(self, parent: LabelFrame, idx: int, item: FlowItemModel) -> None:
-    outrefs = item.outrefs_def
-    if len(outrefs) > 0:
+  def _create_output_view(self, parent: LabelFrame, widget_idx: int, idx: int, item: FlowItemModel) -> None:
+    (input_refs, output_refs, _) = self._refs[idx]
+    widget_idx += len(input_refs)+1
+    if len(output_refs) > 0:
       output_lbl = Label(parent, text='output:')
-      output_lbl.grid(row=idx+1, column=0, padx=PADX, sticky=W)
-      outrefs = item.outrefs_def   
-      for i, outref in enumerate(outrefs):
-        outref_lbl = Label(parent, text=outref.get('name'))
-        outref_lbl.grid(row=idx+2+i, column=0, padx=PADX*2, sticky=W)
+      output_lbl.grid(row=widget_idx+1, column=0, padx=PADX, sticky=W)
+      for i, outref in enumerate(output_refs):
+        outref_lbl = Label(parent, text=outref)
+        outref_lbl.grid(row=widget_idx+2+i, column=0, padx=PADX*2, sticky=W)
     return
 
   def update_flow(self) -> None:

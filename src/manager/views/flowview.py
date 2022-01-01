@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import Callable, List, Dict, Tuple
 from tkinter import *
 from tkinter.ttk import Combobox, Treeview, Button 
 from tkscrolledframe import ScrolledFrame
@@ -175,6 +175,6 @@ class FlowView(View):
     self.btn_top['state']=state
     return
 
-  def edit_flow_links(self, flow: CurrentFlowModel) -> None:
-    lnk_dlg = LinksDialog(self.parent, flow)
+  def edit_flow_links(self, flow: CurrentFlowModel, callback: Callable) -> None:
+    lnk_dlg = LinksDialog(self.parent, flow, callback)
     return

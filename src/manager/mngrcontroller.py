@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter.ttk import Combobox
+from tkinter.ttk import Combobox, Spinbox
 from typing import Dict, List, Tuple
 import cv2
 import copy
@@ -108,8 +108,8 @@ class MngrController():
   def _assign_oper_params(self, name: str, item: FlowItemModel) -> None:
     operation = self._model.module.get_operation_by_name(name)
     item.params_def = operation.params
-    item.inrefs_def = operation.inrefs
-    item.outrefs_def = operation.outrefs
+    # item.inrefs_def = operation.inrefs
+    # item.outrefs_def = operation.outrefs
     return
 
   def _update_flow_by_operations_params_def(self, names: List[str]) -> None:
@@ -178,7 +178,7 @@ class MngrController():
     return
 
   def _edit_flow_links(self, event) -> None:
-    self._view.flow.edit_flow_links(self._model.flow)
+    self._view.flow.edit_flow_links(self._model.flow, self._rebuild_runner)
     return
 
 
@@ -205,7 +205,7 @@ class MngrController():
   def _run(self, event) -> int:
     idx = self._runner.state_idx
     if self._ready():
-      self._runner.run_all()
+      self._runner.run_all(self._model.flow.flow)
       idx = self._runner.state_idx
       out = self._runner.get_current_output()
       self._set_result(idx, out)
@@ -214,7 +214,7 @@ class MngrController():
   def _step(self, event_name: str) -> None:
     idx, _ = self._view.flow.get_current_selection_tree()
     if self._ready():
-      self._runner.run_one(event_name, idx)
+      self._runner.run_one(event_name, idx, self._model.flow.flow)
       idx = self._runner.state_idx
       out = self._runner.get_current_output()
       self._set_result(idx, out)
@@ -257,6 +257,8 @@ class MngrController():
       else:
         t = type(param_control) 
         if t == Scale:
+          param_control.bind("<ButtonRelease-1>", self._apply)
+        elif t == Spinbox:
           param_control.bind("<ButtonRelease-1>", self._apply)
         elif t == Combobox:
           param_control.bind("<<ComboboxSelected>>", self._apply)          

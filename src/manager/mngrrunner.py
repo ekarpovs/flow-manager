@@ -16,7 +16,6 @@ class MngrRunner():
     self._cfg = cfg
     self._runner = Runner()
     self._stotage = None
-    self._model = None
     return
 
   @property
@@ -44,7 +43,6 @@ class MngrRunner():
   
 
   def build(self, model: FlowModel) -> None:
-    self._model = model
     self._stotage = FlowStorage(self._cfg.cfg_storage, model.get_as_ws())
     self.runner.storage = self._stotage
     flow_converter = FlowConverter(model)
@@ -57,12 +55,12 @@ class MngrRunner():
     self.runner.start()
     return
 
-  def run_all(self) -> None:
-    self.runner.run_all(self._model)
+  def run_all(self, model: FlowModel) -> None:
+    self.runner.run_all(model)
     return
 
-  def run_one(self, event: str, idx: int) -> None:
-    flow_item = self._model.get_item(idx)
+  def run_one(self, event: str, idx: int, model: FlowModel) -> None:
+    flow_item = model.get_item(idx)
     self.runner.run_step(event, flow_item)
     return
   

@@ -1,4 +1,7 @@
+import copy
+
 from tkinter import *
+from typing import Callable
 from tkscrolledframe import ScrolledFrame
 
 from ...uiconst import *
@@ -7,9 +10,10 @@ from ..models.flow.currentflowmodel import CurrentFlowModel
 from .ldactionsframe import LdActionsFrame
 
 class LinksDialog(Toplevel):
-  def __init__(self, parent, flow: CurrentFlowModel):
+  def __init__(self, parent, flow: CurrentFlowModel, callback: Callable):
     super().__init__(parent)
     self._flow = flow
+    self._callback = callback
     # Do the dialog modal
     self.transient(parent)
     self.grab_set()
@@ -40,7 +44,8 @@ class LinksDialog(Toplevel):
 
   def apply(self) -> None:
     self.content_view.update_flow()
-    self._flow.flow = self.content_view.tmp_flow
+    self._flow.flow = copy.deepcopy(self.content_view.tmp_flow)
+    self._callback()
     self.destroy()
     return
 
