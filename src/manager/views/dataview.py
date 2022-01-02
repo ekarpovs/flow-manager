@@ -30,7 +30,6 @@ class DataView(View):
     return
 
   def get(self):
-    print('check', self.chk_item.get())
     if not self.chk_item.get():
       plt.close()
     else:
@@ -39,12 +38,14 @@ class DataView(View):
 
   def set_result_image(self, cv2image: np.dtype = None) -> None:
     if not self.chk_item.get():
+      plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
       return
     plt.clf()
     # !!! Memory leak
     # plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
     canvas = FigureCanvasTkAgg(self.figure, self)
     canvas.draw()
+    canvas.mpl_connect('button_press_event', self.onclick)
     tk_wd = canvas.get_tk_widget()
     tk_wd.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
     nb = NavigationToolbar2Tk(canvas, tk_wd)
@@ -54,3 +55,9 @@ class DataView(View):
     plt.imshow(cv2image, cmap='gray')
     return
 
+  def onclick(self,event):
+    if event.xdata is None or event.ydata is None:
+      return
+    ix, iy = float(event.xdata), float(event.ydata)
+    print('x = %f, y = %f' % (ix, iy))
+    return
