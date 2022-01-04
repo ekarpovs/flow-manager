@@ -1,10 +1,10 @@
 from tkinter import *
-from tkinter.ttk import Combobox, Spinbox
+from tkinter.ttk import Combobox, Spinbox, Button
 from typing import Dict, List, Tuple
 import cv2
 import copy
 import os
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 from flow_storage import FlowDataType
 from flow_model import FlowItemModel, FlowItemType
@@ -242,16 +242,22 @@ class MngrController():
       cname = param_def.get('name')
       ctype = param_def.get('type')
       param_control = self._view.flow.get_current_operation_param_control(cname)
-      if ctype == 'button' and cname == 'location':
-        param_control.bind("<Button>", self._get_path)
+      t = type(param_control) 
+      if t == Button:
+        if cname == 'loadfrom':
+          param_control.bind("<Button>", self._get_path)
+        if cname == 'saveas':
+          param_control.bind("<Button>", self._store_to)
+      elif t == Scale: 
+        param_control.bind("<ButtonRelease-1>", self._apply)
+      elif t == Spinbox:
+        param_control.bind("<ButtonRelease-1>", self._apply)
+      elif t == Checkbutton:
+        param_control.bind("<Button>", self._apply)
+      elif t == Combobox:
+        param_control.bind("<<ComboboxSelected>>", self._apply)
       else:
-        t = type(param_control) 
-        if t == Scale:
-          param_control.bind("<ButtonRelease-1>", self._apply)
-        elif t == Spinbox or t == Checkbutton:
-          param_control.bind("<ButtonRelease-1>", self._apply)
-        elif t == Combobox:
-          param_control.bind("<<ComboboxSelected>>", self._apply)          
+        print("unsupported control type", t)
     return
 
   def _create_current_operation_params_controls(self, idx, name) -> None:
@@ -319,26 +325,38 @@ class MngrController():
 
 # Data commands
   @staticmethod
-  def _set_image_location_to_params(ffn, params) -> None:
+  def _set_image_location_to_params(ffn: str, params: Dict) -> None:
     path, name = os.path.split(ffn)
     params['path'] = path
     params['name'] = name
     return
 
+  def _assign_location(self, ffn:str) -> None:
+    idx, name = self._view.flow.get_current_selection_tree()
+    flow_item = self._model.flow.get_item(idx)
+    params_def = flow_item.params_def   
+    params = flow_item.params
+
+    p = [p for p in params_def if p.get('name') == 'path' or p.get('name') == 'name']
+    if p is not None and len(p) == 2:
+      self._set_image_location_to_params(ffn, params)
+    self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
+    self._bind_param_controls(params_def)
+    self._apply(None)
+    return
+  
   def _get_path(self, event) -> None:
     ffn = askopenfilename(title="Select a file", 
       filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
     if ffn is not '':
-      idx, name = self._view.flow.get_current_selection_tree()
-      flow_item = self._model.flow.get_item(idx)
-      params_def = flow_item.params_def   
-      params = flow_item.params
-
-      p = [p for p in params_def if p.get('name') == 'path' or p.get('name') == 'name']
-      if p is not None and len(p) == 2:
-        self._set_image_location_to_params(ffn, params)
-      self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
-      self._bind_param_controls(params_def)
-      self._apply(None)
+      self._assign_location(ffn)
     return
 
+  def _store_to(self, event) -> None:
+    ffn = asksaveasfilename(initialfile = '',
+      initialdir = '',
+      defaultextension=".tiff",
+      filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
+    if ffn is not '':
+      self._assign_location(ffn)
+    return
