@@ -61,6 +61,7 @@ class MngrController():
 
   def _update_worksheet_list(self) -> None:
     names = self._model.flow.worksheetnames
+    names.sort()
     names.insert(0, 'new <>')
     self._view.ws_names = names
     return
@@ -257,7 +258,7 @@ class MngrController():
       elif t == Combobox:
         param_control.bind("<<ComboboxSelected>>", self._apply)
       else:
-        print("unsupported control type", t)
+        pass
     return
 
   def _create_current_operation_params_controls(self, idx, name) -> None:
