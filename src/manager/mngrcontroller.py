@@ -96,6 +96,7 @@ class MngrController():
     names = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names)   
     self._update_flow_by_operations_params_def(names)
+    self._create_current_operation_params_controls(0, names[0])
     self._rebuild_runner()
     return
 
