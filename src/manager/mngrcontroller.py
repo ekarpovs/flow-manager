@@ -125,6 +125,7 @@ class MngrController():
     names = self._model.flow.worksheetnames
     names.insert(0, 'new <>')
     self._view.ws_names = names
+    self._view.flow.clear_flow_tree_view()
     return
 
   def _add_operation_to_flow_model(self, event) -> None:
