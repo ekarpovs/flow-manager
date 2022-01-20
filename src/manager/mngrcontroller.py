@@ -184,7 +184,7 @@ class MngrController():
       for ref in out_refs:
         (ref_name, ref_type) = ref
         data = out_data[ref_name]
-        if ref_type == FlowDataType.CV2_IMAGE:
+        if ref_type == FlowDataType.NP_ARRAY:
           if data is not None:
             image = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
             self._view.data.set_result_image(image)
