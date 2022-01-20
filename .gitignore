@@ -9,5 +9,6 @@ src/manager/models/worksheet/__pycache__
 src/manager/models/flow/__pycache__
 src/manager/models/module/__pycache__
 src/manager/converters/__pycache__
-config.json
+src/mix
+config*.json
 .vscode
