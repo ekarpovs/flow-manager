@@ -75,7 +75,7 @@ class MngrController():
   def _module_tree_selection_changed(self, event) -> None:
     name = self._view.module.get_current_selection_tree()
     doc = ''
-    if name is not '':
+    if name != '':
       operation = self._model.module.get_operation_by_name(name)
       doc = operation._doc
     self._view.module.set_operation_doc(doc)
@@ -178,23 +178,12 @@ class MngrController():
 
 
 # Execution commands
-  def _set_result(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
-    if out is not None:
-      out_refs, out_data = out
-      for ref in out_refs:
-        (ref_name, ref_type) = ref
-        data = out_data[ref_name]
-        if ref_type == FlowDataType.NP_ARRAY:
-          if data is not None:
-            image = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
-            self._view.data.set_result_image(image)
-          else:  
-            self._view.data.set_result_image(None)
-        else:
-          print(f'{ref_name}: ', data)
-    else:
-      self._view.data.set_result_image(None)
-    self._view.flow.set_selection_tree(idx)
+  def _set_step_result(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
+    self._view.data.set_step_result(idx, out)
+    return
+
+  def _clear_step_result(self, idx: int) -> None:
+    self._view.data.clear_step_result(idx)
     return
 
   def _run(self, event) -> int:
@@ -203,16 +192,23 @@ class MngrController():
       self._runner.run_all(self._model.flow.flow)
       idx = self._runner.state_idx
       out = self._runner.get_current_output()
-      self._set_result(idx, out)
+      self._set_step_result(idx, out)
+      self._view.flow.set_selection_tree(idx)
     return idx
 
   def _step(self, event_name: str) -> None:
     idx, _ = self._view.flow.get_current_selection_tree()
+    if idx == 0 and event_name == 'prev':
+      return
     if self._ready():
       self._runner.run_one(event_name, idx, self._model.flow.flow)
       idx = self._runner.state_idx
       out = self._runner.get_current_output()
-      self._set_result(idx, out)
+      if event_name != 'prev':
+        self._set_step_result(idx, out)
+      else:
+        self._clear_step_result(idx)
+    self._view.flow.set_selection_tree(idx)
     return
 
   def _next(self, event)  -> int:
@@ -229,7 +225,8 @@ class MngrController():
     return
   
   def _set_top_state(self) -> None:
-    self._set_result(0)
+    self._view.data.clear_view()
+    self._view.flow.set_selection_tree()
     if self._ready():
       # self._view.flow.set_selection_tree()
       self._runner.reset()
@@ -353,7 +350,7 @@ class MngrController():
   def _get_path(self, event) -> None:
     ffn = askopenfilename(title="Select a file", 
       filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
-    if ffn is not '':
+    if ffn != '':
       self._assign_location(ffn)
     return
 
@@ -362,6 +359,6 @@ class MngrController():
       initialdir = '',
       defaultextension=".tiff",
       filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
-    if ffn is not '':
+    if ffn != '':
       self._assign_location(ffn)
     return

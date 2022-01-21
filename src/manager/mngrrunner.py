@@ -38,8 +38,8 @@ class MngrRunner():
     state_id = self.runner.output_from_state
     data = self.storage.get_state_output_data(state_id)
     refs = self.storage.get_state_output_refs(state_id)
-    int_refs = [(ref.int_ref,ref.data_type) for ref in refs]  
-    return (int_refs, data)
+    t_refs = [(ref.ext_ref, ref.int_ref,ref.data_type) for ref in refs]  
+    return (t_refs, data)
   
 
   def build(self, model: FlowModel) -> None:

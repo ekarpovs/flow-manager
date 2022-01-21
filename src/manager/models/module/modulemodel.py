@@ -57,7 +57,7 @@ class ModuleModel():
     oper = None
     for item in self._items:
       iname = item.name
-      if iname is not '' and iname == name:
+      if iname != '' and iname == name:
         oper = item
         break;
     return oper

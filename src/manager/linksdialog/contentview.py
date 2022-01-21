@@ -124,9 +124,9 @@ class ContentView(LabelFrame):
         if type(child) == Combobox:
           flow_item = self._tmp_flow.get_item(idx)
           link = child.get()
-          if link is not '':
+          if link != '':
             flow_item.links[child._name] = link
-          elif len(flow_item.links) > 0 and flow_item.links.get(child._name, '') is not '': 
+          elif len(flow_item.links) > 0 and flow_item.links.get(child._name, '') != '': 
             del(flow_item.links[child._name])
           # print(child._name, child.get())
     return

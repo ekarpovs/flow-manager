@@ -16,7 +16,6 @@ Edit config.json from . folder:
 
 ```json
 {
-  "factory": "path_to<operation-loader>",
   "modules": [
     "path_to<modules>",
     "path_to<modules-common>"
@@ -29,7 +28,7 @@ Edit config.json from . folder:
     "path_to<input>",
     "path_to<another_folder_with_images>"
   ],
-  "results": "path_to<output>"
+  "fsm-cfg": "path_to<fsm-cfg.json>"
 }
 ```
 
@@ -63,8 +62,9 @@ Constarains:
 
 ## Road map
 
-- [ ] Implement data link (aliases) editor
-- [ ] Implement Statements (IF, FOR, WHILE...)
+- [x] Implement data link (links) editor
 - [x] Improve operation parameters editor builder (add combo boxes, sliders, etc)
 - [x] Change flow listview to tree view
-- [ ] Improve data view with matplotlib
+- [x] Improve data view with matplotlib
+- [ ] Implement Global Statements (IF, FOR, WHILE...)
+- [ ] Extend Flow Storage by h5py DB

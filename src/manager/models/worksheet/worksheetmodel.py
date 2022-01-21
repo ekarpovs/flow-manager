@@ -41,7 +41,7 @@ class WorksheetModel():
     ffn = asksaveasfilename(initialfile = '{}.json'.format(name),
       initialdir = path,
       defaultextension=".json",filetypes=[("All Files","*.*"),("Json Documents","*.json")])
-    if ffn is not '':
+    if ffn != '':
       with open(ffn, 'w') as fp:
         json.dump(ws, fp, indent=2)
         new_path, fn = os.path.split(ffn)
