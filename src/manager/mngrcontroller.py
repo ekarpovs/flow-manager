@@ -6,7 +6,7 @@ import copy
 import os
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
-from flow_storage import FlowDataType
+from flow_storage import *
 from flow_model import FlowItemModel, FlowItemType
 
 from .mngrmodel import MngrModel  
@@ -89,7 +89,6 @@ class MngrController():
 
   # When a worksheet item is selected
   def _init_flow_model(self, ws_name: str) -> None:
-    self._view.flow.activate_buttons()
     (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
     # Create current flow model regarding ws defintion
     self._model.init_flow_model(ws_path, ws_name)
@@ -322,8 +321,11 @@ class MngrController():
   def _rebuild_runner(self) -> None:
     if self._model.flow:
       self._runner.build(self._model.flow.flow)
+      # for plotting
+      self._view.data.storage = self._runner.storage
     self._set_top_state()
     return
+
 
 # Data commands
   @staticmethod

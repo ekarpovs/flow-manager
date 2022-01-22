@@ -3,21 +3,16 @@ from typing import List, Dict, Tuple, Callable
 from tkinter import *
 import cv2
 from PIL import Image, ImageTk
-# import matplotlib
-# import numpy as np
 
-# matplotlib.use("agg")
-# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-# import matplotlib.pyplot as plt
+from flow_storage import *
 
 from ...uiconst import *
 from .view import View
-from flow_storage import FlowDataType
+from .plotdialog import PlotDialog 
 
 class DataView(View):
   def __init__(self, parent):
     super().__init__(parent)
-    self.parent = parent 
     self['text'] = 'Data'
    
     self.grid()
@@ -26,7 +21,18 @@ class DataView(View):
     self.panel_width = 300
 
     self._grid_rows: List[Widget] = []
+    self._storage: FlowStorage = None
     return
+
+  @property
+  def storage(self) -> FlowStorage:
+    return self._storage
+  
+  @storage.setter
+  def storage(self, storage) -> None:
+    self._storage = storage
+    return
+
 
   def clear_view(self) -> None:
     for row in self._grid_rows:
@@ -53,16 +59,16 @@ class DataView(View):
     image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
     return image
 
-  def _image_view(self, parent, data: Dict, ref_extr: str) -> Widget:
+  def _image_view(self, parent, data: Dict, name: str) -> Widget:
     data = self._fit_image_to_view(data)
     image = Image.fromarray(data)
     photo = ImageTk.PhotoImage(image)
-    view = Label(parent, name='clickable-image', image=photo)
+    view = Label(parent, name=name, image=photo)
     view.image = photo   
     return view
 
-  def _object_view(self, parent, data: Dict, ref_extr: str) -> Widget:
-    view = Label(parent, name='clickable-object', border=1)
+  def _object_view(self, parent, data: Dict, name: str) -> Widget:
+    view = Label(parent, name=name, border=1)
     view.config(text = data)
     return view
 
@@ -81,24 +87,40 @@ class DataView(View):
   def set_step_result(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
     if out is None:
       return
+    i = max(idx-1, 0)
     (out_refs, out_data) = out
     if len(out_refs) > 0:
-      frame = Frame(self, name=f'{idx-1}-output-frame', highlightbackground="blue", highlightthickness=5)
-      frame.grid(row=idx-1, column=0, sticky=W)
+      # container for a step outputs:
+      frame = Frame(self, name=f'--{i}--', highlightbackground="blue", highlightthickness=5)
+      frame.grid(row=i, column=0, sticky=W)
       frame.columnconfigure(0, weight=1)
       frame.columnconfigure(1, weight=1)
-
+      # previews for a step outputs 
       for ref in out_refs:
         (ref_extr, ref_intr, ref_type) = ref
         data = out_data.get(ref_intr)
         view = self._get_view(ref_type)
-        widget = view(frame, data, ref_extr)
+        # convert to conventional format (without '.')
+        name = ref_extr.replace('.', '-')
+        widget = view(frame, data, name)
         widget.grid(row=0, column=ref_type, sticky=W)
-        widget.bind('<Button-1>', self.on_click)
-      self._grid_rows.insert(idx-1, frame)
+        widget.bind('<Button-1>', self._on_click)
+      self._grid_rows.insert(i, frame)
     return
 
-
-  def on_click(self, event) -> None:
+  def _on_click(self, event) -> None:
     event.widget.focus_set()
-    return print(event.widget)
+    active_widget_name = event.widget._name
+    print(active_widget_name)
+    for row in self._grid_rows:
+      for child in row.children:
+        if child == active_widget_name:
+          self._plot(child)
+    return
+
+  def _plot(self, name: str) -> None:
+    parts = name.split('-')
+    state_id = parts[0] + '-' + parts[2]
+    data = self._storage.get_state_output_data(state_id)   
+    plot_dlg = PlotDialog(self, name, data.get(parts[3]))
+    return
