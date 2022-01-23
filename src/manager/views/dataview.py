@@ -32,7 +32,7 @@ class DataView(View):
     self.thumbnail_view = self.content.display_widget(Frame)
     self.content.grid(row=0, column=0, sticky=W + E + N + S)
     
-    self.thumbnail_height = 100
+    self.thumbnail_height = 300
     self.thumbnail_width = 300
 
     self._grid_rows: List[Widget] = []
@@ -63,7 +63,7 @@ class DataView(View):
       w = int(h*ratio)
     elif w > self.thumbnail_width:    
       w = self.thumbnail_width
-      h = int(w/ratio)   
+      h = int(w/ratio)
     self.h = h
     self.w = w
     return
@@ -75,9 +75,9 @@ class DataView(View):
     return image
 
   def _image_view(self, parent, data: Dict, name: str) -> Widget:
-    data = self._thumbnail(data)
-    image = Image.fromarray(data)
-    photo = ImageTk.PhotoImage(image)
+    thumbnail = self._thumbnail(data)
+    pil_image = Image.fromarray(thumbnail)
+    photo = ImageTk.PhotoImage(pil_image)
     view = Label(parent, name=name, image=photo)
     view.image = photo   
     return view
