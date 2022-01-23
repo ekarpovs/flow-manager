@@ -32,8 +32,8 @@ class DataView(View):
     self.thumbnail_view = self.content.display_widget(Frame)
     self.content.grid(row=0, column=0, sticky=W + E + N + S)
     
-    self.thumbnail_height = 300
-    self.thumbnail_width = 300
+    self.thumbnail_height = 150
+    self.thumbnail_width = 150
 
     self._grid_rows: List[Widget] = []
     self._storage: FlowStorage = None
@@ -74,7 +74,7 @@ class DataView(View):
     image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
     return image
 
-  def _image_view(self, parent, data: Dict, name: str) -> Widget:
+  def _thumbnail_view(self, parent, data: Dict, name: str) -> Widget:
     thumbnail = self._thumbnail(data)
     pil_image = Image.fromarray(thumbnail)
     photo = ImageTk.PhotoImage(pil_image)
@@ -89,7 +89,7 @@ class DataView(View):
 
   def _get_view(self, ref_type: str) -> Callable:
     views = {
-      FlowDataType.NP_ARRAY: self._image_view
+      FlowDataType.NP_ARRAY: self._thumbnail_view
     }
     return views.get(ref_type, self._object_view)
 
@@ -99,22 +99,32 @@ class DataView(View):
       self._grid_rows.pop().grid_remove()
     return
 
+  def _calc_row_idx(self, row_idx: str) -> int:
+    if len(self._grid_rows) == 0:
+      return 0
+    name = f'--{row_idx}--'
+    for i,row in enumerate(self._grid_rows):
+      if row._name == name:
+        return i
+    return i+1  
+  
+
   def set_step_result(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
     if out is None:
       return
-    i = max(idx-1, 0)
     (out_refs, out_data) = out
     if len(out_refs) > 0:
       parts =out_refs[0][0].split('-')
       title = '-'.join(parts[0:len(parts)-1])
+      row_idx = self._calc_row_idx(parts[0])
       # container for a step outputs:
-      state_frame = LabelFrame(self.thumbnail_view, name=f'--{i}--', text=title)
+      state_frame = LabelFrame(self.thumbnail_view, name=f'--{row_idx}--', text=title)
       state_frame.rowconfigure(0, pad=15)
       state_frame.columnconfigure(0, weight=1)
       state_frame.columnconfigure(0, pad=15)
       state_frame.columnconfigure(1, weight=1)
       state_frame.columnconfigure(1, pad=15)
-      state_frame.grid(row=i, column=0, sticky=W)
+      state_frame.grid(row=row_idx, column=0, sticky=W)
       # previews for a step outputs 
       for ref in out_refs:
         (ref_extr, ref_intr, ref_type) = ref
@@ -125,7 +135,12 @@ class DataView(View):
         widget = view(state_frame, data, name)
         widget.grid(row=0, column=ref_type)
         widget.bind('<Button-1>', self._on_click)
-      self._grid_rows.insert(i, state_frame)
+      # remove existing item with the row_idx
+      try:
+        self._grid_rows.pop(row_idx)
+      except IndexError:
+        pass
+      self._grid_rows.insert(row_idx, state_frame)
     return
 
   def _on_click(self, event) -> None:
