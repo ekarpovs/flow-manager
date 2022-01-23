@@ -1,6 +1,7 @@
 from re import I
 from typing import List, Dict, Tuple, Callable
 from tkinter import *
+from tkscrolledframe import ScrolledFrame
 import cv2
 from PIL import Image, ImageTk
 
@@ -18,24 +19,19 @@ class DataView(View):
     self.grid()
     self.grid_propagate(False)
 
-    self.rowconfigure(0, weight=20)
-    # self.rowconfigure(1, weight=1)
-    # self.rowconfigure(1, minsize=20)
-    self.columnconfigure(0, minsize=800)
+    self.rowconfigure(0, weight=1)
     self.columnconfigure(0, pad=15)
+    self.columnconfigure(0, weight=1)
 
-    # self.thumbnails_farme = LabelFrame(self, name='thumbnails', text='Thumbnails',highlightbackground="green", highlightthickness=5)
-    self.thumbnails_farme = LabelFrame(self, name='thumbnails', text='Thumbnails')
-    self.thumbnails_farme.grid(row=0, column=0, sticky=W + E + N + S)
+    # Content will be scrolable
+    self.content = ScrolledFrame(self)
+    # Bind the arrow keys and scroll wheel
+    self.content.bind_arrow_keys(self)
+    self.content.bind_scroll_wheel(self)
+    # Create the Thumbnail frame within the ScrolledFrame
+    self.thumbnail_view = self.content.display_widget(Frame)
+    self.content.grid(row=0, column=0, sticky=W + E + N + S)
     
-    # self.controls_frame = Frame(self, name='controls', highlightbackground="red", highlightthickness=5)
-    # self.controls_frame.grid(row=1, column=0, sticky=W + E + N + S)
-
-    # scale_var_x = IntVar()
-    # scale_var_x.set(100)
-    # self.thumbnails_x = Scale(self, from_=100, to=300, resolution=10, variable=scale_var_x, length=200, orient=HORIZONTAL)
-    # self.thumbnails_x.grid(row=1, column=0, sticky=W)
-
     self.thumbnail_height = 100
     self.thumbnail_width = 300
 
@@ -112,8 +108,7 @@ class DataView(View):
       parts =out_refs[0][0].split('-')
       title = '-'.join(parts[0:len(parts)-1])
       # container for a step outputs:
-      # state_frame = LabelFrame(self.thumbnails_farme, name=f'--{i}--', text=title, highlightbackground="blue", highlightthickness=2)
-      state_frame = LabelFrame(self.thumbnails_farme, name=f'--{i}--', text=title)
+      state_frame = LabelFrame(self.thumbnail_view, name=f'--{i}--', text=title)
       state_frame.rowconfigure(0, pad=15)
       state_frame.columnconfigure(0, weight=1)
       state_frame.columnconfigure(0, pad=15)
