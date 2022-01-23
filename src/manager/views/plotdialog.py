@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import numpy as np
+import pandas as pd
 
 import matplotlib
 matplotlib.use("TkAgg")
@@ -32,11 +33,9 @@ class PlotDialog(Toplevel):
     self.columnconfigure(1, weight=1)
     self.columnconfigure(2, weight=1)
 
-    self._btn_cancel = ttk.Button(self, text='Cancel', width=BTNW_S, command=self._close)
+    self._btn_cancel = ttk.Button(self, text='Close', width=BTNW_S, command=self._close)
     self._btn_cancel.grid(row=1, column=2, padx=PADX, pady=PADY, sticky=S+E)
-    # self._image = None
 
-    # self._load_image()
     self._plot()
     return
 
@@ -47,7 +46,19 @@ class PlotDialog(Toplevel):
     return
 
   def _plot(self) -> None:
-    f = plt.figure(num=1, figsize=(8,8))
+    t = type(self._data)
+    if t == np.ndarray:
+      return self._plot_image()
+    return self._plot_object()
+
+  def _plot_object(self) -> None:
+    df = pd.DataFrame(self._data)
+    print(df)
+    df.plot()
+    return
+
+  def _plot_image(self) -> None:
+    f = plt.figure(num=0, figsize=(8,8))
 
     canvas = FigureCanvasTkAgg(f, self)
     canvas.draw()
@@ -56,7 +67,3 @@ class PlotDialog(Toplevel):
     nb = NavigationToolbar2Tk(canvas, tk_wd)
     plt.imshow(self._data, cmap='gray')    
     return
-
-  # def _load_image(self) -> None:
-  #   self._image = np.zeros((300,300), dtype="uint8")
-  #   return 
