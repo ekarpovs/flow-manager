@@ -1,3 +1,4 @@
+from re import A
 from typing import Callable, List, Dict, Tuple
 from tkinter import *
 from tkinter.ttk import Combobox, Treeview, Button 
@@ -159,7 +160,7 @@ class FlowView(View):
     self.oper_params_view.create_operation_params_controls(idx, name, params, params_def)
     return
 
-  def activate_buttons(self, activate=False):
+  def activate_edit_buttons(self, activate=False) -> None:
     state = DISABLED
     if activate:
       state = NORMAL
@@ -168,11 +169,21 @@ class FlowView(View):
     self.btn_reset['state']=state
     self.btn_save['state']=state
     self.btn_links['state']=state
+    return
 
+  def activate_runtime_buttons(self, activate=False) -> None:
+    state = DISABLED
+    if activate:
+      state = NORMAL
     self.btn_run['state']=state
     self.btn_next['state']=state
     self.btn_prev['state']=state
     self.btn_top['state']=state
+    return
+
+  def activate_buttons(self, activate=False) -> None:
+    self.activate_edit_buttons(activate)
+    self.activate_runtime_buttons(activate)
     return
 
   def edit_flow_links(self, flow: CurrentFlowModel, callback: Callable) -> None:

@@ -187,21 +187,24 @@ class MngrController():
     self._view.data.clear_state_result(idx)
     return
 
-  def _run(self, event) -> int:
+  def _run(self, event) -> None:
     idx = self._runner.state_idx
     if self._ready():
+      self._view.flow.activate_buttons()
       self._runner.run_all(self._model.flow.flow)
       idx = self._runner.state_idx
       self._view.flow.set_selection_tree(idx)
-      self._set_step_result()
-    return idx
+      self._view.flow.activate_runtime_buttons(True)
+    return
 
   def _step(self, event_name: str) -> None:
     if self._ready():
+      self._view.flow.activate_buttons()
       idx, _ = self._view.flow.get_current_selection_tree()
       self._runner.run_one(event_name, idx, self._model.flow.flow)
       new_idx = self._runner.state_idx
       self._view.flow.set_selection_tree(new_idx)
+      self._view.flow.activate_runtime_buttons(True)
     return
 
   def _next(self, event)  -> int:
@@ -311,12 +314,9 @@ class MngrController():
 
 # Runner
   def _ready(self) -> bool:
-    if self._runner.initialized and self._model.flow.loaded:
-      self._view.flow.activate_buttons(True)
-      return True
-    else:
-      self._view.flow.activate_buttons()
-      return False
+    activate = self._runner.initialized and self._model.flow.loaded
+    self._view.flow.activate_buttons(activate)
+    return activate
 
   def _rebuild_runner(self) -> None:
     if self._model.flow:
