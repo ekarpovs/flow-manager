@@ -93,9 +93,15 @@ class DataView(View):
     }
     return views.get(ref_type, self._object_view)
 
-  def clear_state_result(self) -> None:
+  def clear_state_result(self, idx: int) -> None:
     if len(self._grid_rows) > 0:
-      self._grid_rows.pop().grid_remove()
+      # self._grid_rows.pop(idx).grid_remove()
+      try:
+        # remove existing item with the idx
+        res = self._grid_rows.pop(idx)
+        res.grid_remove()
+      except IndexError:
+        pass
     return
 
   def _calc_row_idx(self, row_idx: str) -> int:

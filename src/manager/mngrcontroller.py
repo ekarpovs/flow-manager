@@ -183,7 +183,8 @@ class MngrController():
     return
 
   def _clear_step_result(self) -> None:
-    self._view.data.clear_state_result()
+    idx = self._runner.state_idx
+    self._view.data.clear_state_result(idx)
     return
 
   def _run(self, event) -> int:
