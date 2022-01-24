@@ -197,13 +197,11 @@ class MngrController():
     return idx
 
   def _step(self, event_name: str) -> None:
-    idx, _ = self._view.flow.get_current_selection_tree()
-    if idx == 0 and event_name == 'prev':
-      return
     if self._ready():
+      idx, _ = self._view.flow.get_current_selection_tree()
       self._runner.run_one(event_name, idx, self._model.flow.flow)
-      idx = self._runner.state_idx
-      self._view.flow.set_selection_tree(idx)
+      new_idx = self._runner.state_idx
+      self._view.flow.set_selection_tree(new_idx)
     return
 
   def _next(self, event)  -> int:
