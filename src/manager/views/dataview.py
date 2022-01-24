@@ -93,9 +93,8 @@ class DataView(View):
     }
     return views.get(ref_type, self._object_view)
 
-  def clear_step_result(self, idx: int) -> None:
-    num_of_widgets = len(self._grid_rows)
-    if num_of_widgets > 0 and (idx < num_of_widgets):
+  def clear_state_result(self) -> None:
+    if len(self._grid_rows) > 0:
       self._grid_rows.pop().grid_remove()
     return
 
@@ -108,8 +107,17 @@ class DataView(View):
         return i
     return i+1  
   
+  def _create_state_output_container(self, row_idx: int, title: str) -> Widget:
+    state_frame = LabelFrame(self.thumbnail_view, name=f'--{row_idx}--', text=title)
+    state_frame.rowconfigure(0, pad=15)
+    state_frame.columnconfigure(0, weight=1)
+    state_frame.columnconfigure(0, pad=15)
+    state_frame.columnconfigure(1, weight=1)
+    state_frame.columnconfigure(1, pad=15)
+    state_frame.grid(row=row_idx, column=0, sticky=W)
+    return state_frame
 
-  def set_step_result(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
+  def set_state_result(self, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
     if out is None:
       return
     (out_refs, out_data) = out
@@ -117,26 +125,20 @@ class DataView(View):
       parts =out_refs[0][0].split('-')
       title = '-'.join(parts[0:len(parts)-1])
       row_idx = self._calc_row_idx(parts[0])
-      # container for a step outputs:
-      state_frame = LabelFrame(self.thumbnail_view, name=f'--{row_idx}--', text=title)
-      state_frame.rowconfigure(0, pad=15)
-      state_frame.columnconfigure(0, weight=1)
-      state_frame.columnconfigure(0, pad=15)
-      state_frame.columnconfigure(1, weight=1)
-      state_frame.columnconfigure(1, pad=15)
-      state_frame.grid(row=row_idx, column=0, sticky=W)
-      # previews for a step outputs 
-      for ref in out_refs:
+      # container for a state outputs:
+      state_frame = self._create_state_output_container(row_idx, title)
+      # previews for a state outputs 
+      for i, ref in enumerate(out_refs):
         (ref_extr, ref_intr, ref_type) = ref
         data = out_data.get(ref_intr)
         view = self._get_view(ref_type)
-        # convert to conventional format (without '.')
+        # convert to a conventional format (without '.')
         name = ref_extr.replace('.', '-')
         widget = view(state_frame, data, name)
-        widget.grid(row=0, column=ref_type)
+        widget.grid(row=0, column=i)
         widget.bind('<Button-1>', self._on_click)
-      # remove existing item with the row_idx
       try:
+        # remove existing item with the row_idx
         self._grid_rows.pop(row_idx)
       except IndexError:
         pass

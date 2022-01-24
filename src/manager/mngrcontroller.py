@@ -177,12 +177,13 @@ class MngrController():
 
 
 # Execution commands
-  def _set_step_result(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
-    self._view.data.set_step_result(idx, out)
+  def _set_step_result(self) -> None:
+    out = self._runner.get_current_output()
+    self._view.data.set_state_result(out)
     return
 
-  def _clear_step_result(self, idx: int) -> None:
-    self._view.data.clear_step_result(idx)
+  def _clear_step_result(self) -> None:
+    self._view.data.clear_state_result()
     return
 
   def _run(self, event) -> int:
@@ -190,9 +191,8 @@ class MngrController():
     if self._ready():
       self._runner.run_all(self._model.flow.flow)
       idx = self._runner.state_idx
-      out = self._runner.get_current_output()
-      self._set_step_result(idx, out)
       self._view.flow.set_selection_tree(idx)
+      self._set_step_result()
     return idx
 
   def _step(self, event_name: str) -> None:
@@ -202,22 +202,23 @@ class MngrController():
     if self._ready():
       self._runner.run_one(event_name, idx, self._model.flow.flow)
       idx = self._runner.state_idx
-      out = self._runner.get_current_output()
-      if event_name != 'prev':
-        self._set_step_result(idx, out)
-      else:
-        self._clear_step_result(idx)
-    self._view.flow.set_selection_tree(idx)
+      self._view.flow.set_selection_tree(idx)
     return
 
   def _next(self, event)  -> int:
     self._step('next')
+    self._set_step_result()
+    return 
 
   def _current(self) -> int:
-    return self._step('current')
+    self._step('current')
+    self._set_step_result()
+    return 
 
   def _prev(self, event) -> int:
-    return self._step('prev')
+    self._step('prev')
+    self._clear_step_result()
+    return 
 
   def _top(self, event) -> None:
     self._set_top_state()
