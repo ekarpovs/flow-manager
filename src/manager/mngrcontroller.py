@@ -179,12 +179,12 @@ class MngrController():
 # Execution commands
   def _set_step_result(self) -> None:
     out = self._runner.get_current_output()
-    self._view.data.set_state_result(out)
+    self._view.data.set_preview(out)
     return
 
   def _clear_step_result(self) -> None:
     idx = self._runner.state_idx
-    self._view.data.clear_state_result(idx)
+    self._view.data.clear_preview(idx)
     return
 
   def _run(self, event) -> None:
