@@ -29,19 +29,23 @@ class MngrController():
     self.flows_view_idx = 0  
     self._view.flow.names_combo_box.bind('<<ComboboxSelected>>', self._worksheet_selected)
     self._view.flow.btn_reload.bind("<Button>", self._reload_ws_list)
-    self._view.flow.btn_add.bind("<Button>", self._add_operation_to_flow_model)
-    self._view.flow.btn_remove.bind("<Button>", self._remove_operation_from_flow_model)
-    self._view.flow.btn_reset.bind("<Button>", self._reset_flow_model)
-    self._view.flow.btn_save.bind("<Button>", self._store_flow_model_as_ws)
-    self._view.flow.btn_links.bind("<Button>", self._edit_flow_links)
-    self._view.flow.btn_run.bind("<Button>", self._run)
-    self._view.flow.btn_next.bind("<Button>", self._next)
-    self._view.flow.btn_prev.bind("<Button>", self._prev)
-    self._view.flow.btn_top.bind("<Button>", self._top)
+    
+    self._view.flow.btn_add.configure(command=self._add_operation_to_flow_model)
+    self._view.flow.btn_remove.configure(command=self._remove_operation_from_flow_model)
+    self._view.flow.btn_reset.configure(command=self._reset_flow_model)
+    self._view.flow.btn_save.configure(command=self._store_flow_model_as_ws)
+    self._view.flow.btn_links.configure(command=self._edit_flow_links)
+    
+    self._view.flow.btn_run.configure(command=self._run)   
+    self._view.flow.btn_next.configure(command=self._next)
+    self._view.flow.btn_prev.configure(command=self._prev)
+    self._view.flow.btn_top.configure(command=self._top)
+
     self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
-    self._view.flow.btn_params_apply.bind("<Button>", self._apply)
-    self._view.flow.btn_params_reset.bind("<Button>", self._reset)
-    self._view.flow.btn_params_default.bind("<Button>", self._default)
+
+    self._view.flow.btn_params_apply.configure(command=self._apply)
+    self._view.flow.btn_params_reset.configure(command=self._reset)
+    self._view.flow.btn_params_default.configure(command=self._default)
 
     self._start()
     return
@@ -129,7 +133,7 @@ class MngrController():
       self._view.flow.clear_flow_tree_view()
     return
 
-  def _add_operation_to_flow_model(self, event) -> None:
+  def _add_operation_to_flow_model(self) -> None:
     # Get destination item position before that will be added new one
     cur_idx, _ = self._view.flow.get_current_selection_tree()
     cur_idx = max(1, cur_idx)
@@ -145,7 +149,7 @@ class MngrController():
       self._rebuild_runner()
     return
 
-  def _remove_operation_from_flow_model(self, event) -> None:
+  def _remove_operation_from_flow_model(self) -> None:
     cur_idx, _ = self._view.flow.get_current_selection_tree()
     if cur_idx == 0 or cur_idx == len(self._model.flow.items) -1:
       return
@@ -155,13 +159,13 @@ class MngrController():
     self._rebuild_runner()
     return
 
-  def _reset_flow_model(self, event) -> None:
+  def _reset_flow_model(self) -> None:
     ws_name = self._view.flow.names_combo_box.get()
     self._init_flow_model(ws_name)
     self._rebuild_runner()
     return
 
-  def _store_flow_model_as_ws(self, event) -> None:
+  def _store_flow_model_as_ws(self) -> None:
     flow_name = self._view.flow.names_combo_box.get()
     path, name = self._converter.flow.split_ws_name(flow_name)
     (new_path, stored_as) = self._model.flow.store_flow_model_as_ws(path, name)
@@ -171,7 +175,7 @@ class MngrController():
     self._view.flow.names_combo_box.set(ws_name)
     return
 
-  def _edit_flow_links(self, event) -> None:
+  def _edit_flow_links(self) -> None:
     self._view.flow.edit_flow_links(self._model.flow, self._rebuild_runner)
     return
 
@@ -187,7 +191,7 @@ class MngrController():
     self._view.data.clear_preview(idx)
     return
 
-  def _run(self, event) -> None:
+  def _run(self) -> None:
     idx = self._runner.state_idx
     if self._ready():
       self._view.flow.activate_buttons()
@@ -207,7 +211,7 @@ class MngrController():
       self._view.flow.activate_runtime_buttons(True)
     return
 
-  def _next(self, event)  -> int:
+  def _next(self)  -> int:
     self._step('next')
     self._set_step_result()
     return 
@@ -217,12 +221,12 @@ class MngrController():
     self._set_step_result()
     return 
 
-  def _prev(self, event) -> int:
+  def _prev(self) -> int:
     self._step('prev')
     self._clear_step_result()
     return 
 
-  def _top(self, event) -> None:
+  def _top(self) -> None:
     self._set_top_state()
     return
   
@@ -278,7 +282,7 @@ class MngrController():
     self._bind_param_controls(params_def)
     return
 
-  def _apply(self, event) -> None:
+  def _apply(self) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     flow_item = self._model.flow.get_item(idx)
     params_new = self._view.flow.get_current_operation_params_def()
@@ -288,7 +292,7 @@ class MngrController():
     self._run_current(idx)
     return
 
-  def _reset(self, event) -> None:
+  def _reset(self) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     flow_item = self._model.flow.get_item(idx)
     params_def = flow_item.params_def   
@@ -300,7 +304,7 @@ class MngrController():
     self._run_current(idx)
     return
 
-  def _default(self, event) -> None:
+  def _default(self) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     flow_item = self._model.flow.get_item(idx)
     params_def = flow_item.params_def   
