@@ -44,7 +44,13 @@ class FlowConverter():
       
 
     def _cnv_list(value: str):
-      return param_def.get('p_types')      
+      p_type = param_def.get('p_types')
+      if p_type == 'int':
+        return int(value)
+      if p_type == 'float':
+        return float(value)
+      return value
+         
     def _cnv_dict(value_key: str) -> str:
       p_values_str = param_def.get('p_values')
       p_values_str_pairs = p_values_str.split(',')
