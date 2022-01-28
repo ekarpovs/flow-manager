@@ -20,15 +20,12 @@ class OperParamsView(Frame):
 
     self.buttons_frame = Frame(self)
     self.buttons_frame.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY, sticky=W+N+E)
-    self.btn_apply = Button(self.buttons_frame, text='Apply', width=BTNW_S)
     self.btn_reset = Button(self.buttons_frame, text='Reset', width=BTNW_S)
     self.btn_default = Button(self.buttons_frame, text='Default', width=BTNW_S)
-    self.btn_apply.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
     self.btn_reset.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W+N)
     self.btn_default.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
 
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
-    self.btn_apply['state']=DISABLED
     self.btn_default['state']=DISABLED
     self.btn_reset['state']=DISABLED
     return
@@ -80,7 +77,6 @@ class OperParamsView(Frame):
     return
 
   def _create_controls(self, idx, item_name: str, oper_params: List[Dict]) -> None:
-    self.btn_apply['state']=NORMAL
     self.btn_default['state']=NORMAL
     self.btn_reset['state']=NORMAL
 

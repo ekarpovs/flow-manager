@@ -64,15 +64,17 @@ class FlowView(View):
 
     # Setup flow actions buttons
     flow_actions = Frame(self, highlightbackground='gray', highlightthickness=1)
-    self.btn_run = Button(flow_actions, text='Run', width=BTNW)
-    self.btn_next = Button(flow_actions, text='Next', width=BTNW)
-    self.btn_prev = Button(flow_actions, text='Prev', width=BTNW)
-    self.btn_top = Button(flow_actions, text='Top', width=BTNW)
+    self.btn_run = Button(flow_actions, text='Run', width=BTNW_S)
+    self.btn_curr = Button(flow_actions, text='Current', width=BTNW_S)
+    self.btn_next = Button(flow_actions, text='Next', width=BTNW_S)
+    self.btn_prev = Button(flow_actions, text='Prev', width=BTNW_S)
+    self.btn_top = Button(flow_actions, text='Top', width=BTNW_S)
 
     self.btn_run.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + N)
-    self.btn_next.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W + N)
-    self.btn_prev.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=E + N)
-    self.btn_top.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
+    self.btn_curr.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W + N)
+    self.btn_next.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W + N)
+    self.btn_prev.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
+    self.btn_top.grid(row=0, column=4, padx=PADX, pady=PADY, sticky=E + N)
     # Setup widgets layout
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
     self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=N+S+W+E)
@@ -135,10 +137,6 @@ class FlowView(View):
 
   # Parameter subpanel Wrappers
   @property
-  def btn_params_apply(self) -> Button:
-    return self.oper_params_view.btn_apply
-
-  @property
   def btn_params_reset(self) -> Button:
     return self.oper_params_view.btn_reset
 
@@ -176,6 +174,7 @@ class FlowView(View):
     if activate:
       state = NORMAL
     self.btn_run['state']=state
+    self.btn_curr['state']=state
     self.btn_next['state']=state
     self.btn_prev['state']=state
     self.btn_top['state']=state

@@ -37,13 +37,13 @@ class MngrController():
     self._view.flow.btn_links.configure(command=self._edit_flow_links)
     
     self._view.flow.btn_run.configure(command=self._run)   
+    self._view.flow.btn_curr.configure(command=self._apply)   
     self._view.flow.btn_next.configure(command=self._next)
     self._view.flow.btn_prev.configure(command=self._prev)
     self._view.flow.btn_top.configure(command=self._top)
 
     self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
 
-    self._view.flow.btn_params_apply.configure(command=self._apply)
     self._view.flow.btn_params_reset.configure(command=self._reset)
     self._view.flow.btn_params_default.configure(command=self._default)
 
@@ -253,17 +253,21 @@ class MngrController():
       t = type(param_control) 
       if t == Button:
         if cname == 'loadfrom':
-          param_control.bind("<Button>", self._get_path)
+          # param_control.bind("<Button>", self._get_path)
+          param_control.configure(command=self._get_path)
         if cname == 'saveas':
-          param_control.bind("<Button>", self._store_to)
+          # param_control.bind("<Button>", self._store_to)
+          param_control.configure(command=self._store_to)
       elif t == Scale: 
         param_control.bind("<ButtonRelease-1>", self._apply)
       elif t == Spinbox:
         param_control.bind("<ButtonRelease-1>", self._apply)
       elif t == Checkbutton:
-        param_control.bind("<Button>", self._apply)
+        param_control.configure(command=self._apply)
       elif t == Combobox:
         param_control.bind("<<ComboboxSelected>>", self._apply)
+      elif t == Entry:
+        param_control.bind("<Key>", self._key_pressed)
       else:
         pass
     return
@@ -282,13 +286,17 @@ class MngrController():
     self._bind_param_controls(params_def)
     return
 
-  def _apply(self) -> None:
+  def _key_pressed(self, event) -> None:
+    if event.keycode == 13:
+      self._apply()
+    return
+
+  def _apply(self, event=None) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     flow_item = self._model.flow.get_item(idx)
     params_new = self._view.flow.get_current_operation_params_def()
     for k in params_new.keys():
       flow_item.params[k] = params_new.get(k)
-
     self._run_current(idx)
     return
 
@@ -353,14 +361,14 @@ class MngrController():
     self._apply(None)
     return
   
-  def _get_path(self, event) -> None:
+  def _get_path(self) -> None:
     ffn = askopenfilename(title="Select a file", 
       filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
     if ffn != '':
       self._assign_location(ffn)
     return
 
-  def _store_to(self, event) -> None:
+  def _store_to(self) -> None:
     ffn = asksaveasfilename(initialfile = '',
       initialdir = '',
       defaultextension=".tiff",
