@@ -1,9 +1,9 @@
-from re import I
-from turtle import bgcolor
+import cv2
+import numpy as np 
 from typing import List, Dict, Tuple, Callable
 from tkinter import *
+from tkinter.ttk import Button 
 from tkscrolledframe import ScrolledFrame
-import cv2
 from PIL import Image, ImageTk
 
 from flow_storage import *
@@ -106,6 +106,8 @@ class DataView(View):
 
   def _object_view(self, parent, data: Dict, name: str) -> Widget:
     view = Label(parent, name=name, border=1)
+    # text = json.dumps(data, indent = 3)
+    # df = pd.DataFrame(data)
     view.config(text = data)
     return view
 
@@ -136,7 +138,7 @@ class DataView(View):
         return i
     return i+1  
   
-  def _create_state_output_container(self, row_idx: int, title: str) -> Widget:
+  def _create_row_output_container(self, row_idx: int, title: str) -> Widget:
     state_frame = LabelFrame(self.preview_view, name=f'--{row_idx}--', text=title)
     state_frame.rowconfigure(0, pad=15)
     state_frame.columnconfigure(0, weight=1)
@@ -147,11 +149,13 @@ class DataView(View):
     return state_frame
 
   def _create_preview(self, row_idx, title, out_data, out_refs) -> None:
-    preview_frame = self._create_state_output_container(row_idx, title)
+    preview_frame = self._create_row_output_container(row_idx, title)
     # previews for a state outputs 
     for i, ref in enumerate(out_refs):
       (ref_extr, ref_intr, ref_type) = ref
       data = out_data.get(ref_intr)
+      if data == None:
+        continue
       view = self._get_view(ref_type)
       # convert to a conventional format (without '.')
       name = ref_extr.replace('.', '-')
@@ -196,8 +200,11 @@ class DataView(View):
     parts = name.split('-')
     state_id = parts[0] + '-' + parts[2]
     key = parts[3]
-    data = self._storage.get_state_output_data(state_id)   
-    plot_dlg = PlotDialog(self, name, data.get(key))
+    data_dict = self._storage.get_state_output_data(state_id)
+    data = data_dict.get(key)
+    t = type(data)
+    if t == np.ndarray:
+      plot_dlg = PlotDialog(self, name, data)
     return
 
   def _set_h(self, event) -> None:
