@@ -18,16 +18,7 @@ class OperParamsView(Frame):
     self.columnconfigure(1, weight=1)
     self.columnconfigure(2, weight=1)
 
-    self.buttons_frame = Frame(self)
-    self.buttons_frame.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY, sticky=W+N+E)
-    self.btn_reset = Button(self.buttons_frame, text='Reset', width=BTNW_S)
-    self.btn_default = Button(self.buttons_frame, text='Default', width=BTNW_S)
-    self.btn_reset.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W+N)
-    self.btn_default.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
-
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
-    self.btn_default['state']=DISABLED
-    self.btn_reset['state']=DISABLED
     return
 
 # API
@@ -77,11 +68,7 @@ class OperParamsView(Frame):
     return
 
   def _create_controls(self, idx, item_name: str, oper_params: List[Dict]) -> None:
-    self.btn_default['state']=NORMAL
-    self.btn_reset['state']=NORMAL
-
     self._init_operation_params(idx, item_name)
-
     for i, param in enumerate(oper_params):
       param_getter, param_setter, param_control, param_label = self._controls_factory(param)
       self.operation_param_controls['idx'] = idx
@@ -89,12 +76,8 @@ class OperParamsView(Frame):
       self.operation_param_controls['param_controls'].append({
         "getter": param_getter, "setter": param_setter, "control": param_control,"label": param_label
         })
-
       param_control.grid(row=i+1, column=0, padx=PADX, pady=PADY, sticky=W+N)
       param_label.grid(row=i+1, column=1, columnspan=2, padx=PADX, pady=PADY, sticky=W+S)
-    if len(oper_params) == 0:
-      self.btn_default['state']=DISABLED
-      self.btn_reset['state']=DISABLED
     return
 
   def _controls_factory(self, param: Dict) -> Tuple[Callable, Callable, Widget, Label]:

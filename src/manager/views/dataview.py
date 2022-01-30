@@ -154,7 +154,7 @@ class DataView(View):
     for i, ref in enumerate(out_refs):
       (ref_extr, ref_intr, ref_type) = ref
       data = out_data.get(ref_intr)
-      if data == None:
+      if data is None:
         continue
       view = self._get_view(ref_type)
       # convert to a conventional format (without '.')

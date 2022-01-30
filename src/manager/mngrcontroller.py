@@ -194,21 +194,17 @@ class MngrController():
   def _run(self) -> None:
     idx = self._runner.state_idx
     if self._ready():
-      self._view.flow.activate_buttons()
       self._runner.run_all(self._model.flow.flow)
       idx = self._runner.state_idx
       self._view.flow.set_selection_tree(idx)
-      self._view.flow.activate_runtime_buttons(True)
     return
 
   def _step(self, event_name: str) -> None:
     if self._ready():
-      self._view.flow.activate_buttons()
       idx, _ = self._view.flow.get_current_selection_tree()
       self._runner.run_one(event_name, idx, self._model.flow.flow)
       new_idx = self._runner.state_idx
       self._view.flow.set_selection_tree(new_idx)
-      self._view.flow.activate_runtime_buttons(True)
     return
 
   def _next(self)  -> int:

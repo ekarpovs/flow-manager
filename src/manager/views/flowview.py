@@ -19,7 +19,7 @@ class FlowView(View):
 
     self.grid()
     self.rowconfigure(1, weight=1)
-    self.rowconfigure(3, weight=4)
+    self.rowconfigure(4, weight=4)
     self.columnconfigure(0, weight=10)
     self.columnconfigure(1, weight=1)
 
@@ -62,6 +62,13 @@ class FlowView(View):
     self.btn_save.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
     self.btn_links.grid(row=0, column=4, padx=PADX, pady=PADY, sticky=E + N)
 
+    # Setup param actions buttons
+    param_actions = Frame(self, highlightbackground='gray', highlightthickness=1)
+    self.btn_params_reset = Button(param_actions, text='Reset', width=BTNW_S)
+    self.btn_params_default = Button(param_actions, text='Default', width=BTNW_S)
+    self.btn_params_reset.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
+    self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W+N)
+
     # Setup flow actions buttons
     flow_actions = Frame(self, highlightbackground='gray', highlightthickness=1)
     self.btn_run = Button(flow_actions, text='Run', width=BTNW_S)
@@ -75,13 +82,15 @@ class FlowView(View):
     self.btn_next.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W + N)
     self.btn_prev.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
     self.btn_top.grid(row=0, column=4, padx=PADX, pady=PADY, sticky=E + N)
+
     # Setup widgets layout
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
-    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=N+S+W+E)
-    self.flow_tree_view.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=N+S+W+E)   
+    self.flow_tree_view.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)   
     oper_actions.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
-    self.params.grid(row=3, column=0, columnspan=2,padx=PADX, pady=PADY, sticky=N+S+W+E)
-    flow_actions.grid(row=4, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    param_actions.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    self.params.grid(row=4, column=0, columnspan=2,padx=PADX, pady=PADY, sticky=N+S+W+E)
+    flow_actions.grid(row=5, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
     # Set the buttons initial state
     self.activate_buttons()
     return
@@ -135,16 +144,6 @@ class FlowView(View):
     self.names_combo_box.current(0)
     return
 
-  # Parameter subpanel Wrappers
-  @property
-  def btn_params_reset(self) -> Button:
-    return self.oper_params_view.btn_reset
-
-  @property
-  def btn_params_default(self) -> Button:
-    return self.oper_params_view.btn_default
-
-
   def get_current_operation_params_def(self) -> List[Dict]: 
     return self.oper_params_view.get_current_operation_params_def()
 
@@ -169,6 +168,14 @@ class FlowView(View):
     self.btn_links['state']=state
     return
 
+  def activate_params_buttons(self, activate=False) -> None:
+    state = DISABLED
+    if activate:
+      state = NORMAL
+    self.btn_params_reset['state']=state
+    self.btn_params_default['state']=state
+    return
+
   def activate_runtime_buttons(self, activate=False) -> None:
     state = DISABLED
     if activate:
@@ -182,6 +189,7 @@ class FlowView(View):
 
   def activate_buttons(self, activate=False) -> None:
     self.activate_edit_buttons(activate)
+    self.activate_params_buttons(activate)
     self.activate_runtime_buttons(activate)
     return
 
