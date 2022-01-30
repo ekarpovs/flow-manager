@@ -66,8 +66,10 @@ class FlowView(View):
     param_actions = Frame(self, highlightbackground='gray', highlightthickness=1)
     self.btn_params_reset = Button(param_actions, text='Reset', width=BTNW_S)
     self.btn_params_default = Button(param_actions, text='Default', width=BTNW_S)
+    self.btn_params_io = Button(param_actions, text='I/O', width=BTNW_S)
     self.btn_params_reset.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
     self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W+N)
+    self.btn_params_io.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
 
     # Setup flow actions buttons
     flow_actions = Frame(self, highlightbackground='gray', highlightthickness=1)
@@ -174,6 +176,7 @@ class FlowView(View):
       state = NORMAL
     self.btn_params_reset['state']=state
     self.btn_params_default['state']=state
+    self.btn_params_io['state']=state
     return
 
   def activate_runtime_buttons(self, activate=False) -> None:

@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 import cv2
 import copy
 import os
-from tkinter.filedialog import askopenfilename, asksaveasfilename
+from tkinter.filedialog import askdirectory, askopenfilename, asksaveasfilename
 
 from flow_storage import *
 from flow_model import FlowItemModel, FlowItemType
@@ -45,7 +45,8 @@ class MngrController():
     self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
 
     self._view.flow.btn_params_reset.configure(command=self._reset)
-    self._view.flow.btn_params_default.configure(command=self._default)
+    self._view.flow.btn_params_default.configure(command=self._default) 
+    self._view.flow.btn_params_io.configure(command=self._get_io_object) 
 
     self._start()
     return
@@ -247,14 +248,7 @@ class MngrController():
       ctype = param_def.get('type')
       param_control = self._view.flow.get_current_operation_param_control(cname)
       t = type(param_control) 
-      if t == Button:
-        if cname == 'loadfrom':
-          # param_control.bind("<Button>", self._get_path)
-          param_control.configure(command=self._get_path)
-        if cname == 'saveas':
-          # param_control.bind("<Button>", self._store_to)
-          param_control.configure(command=self._store_to)
-      elif t == Scale: 
+      if t == Scale: 
         param_control.bind("<ButtonRelease-1>", self._apply)
       elif t == Spinbox:
         param_control.bind("<ButtonRelease-1>", self._apply)
@@ -337,38 +331,66 @@ class MngrController():
 
 # Data commands
   @staticmethod
-  def _set_image_location_to_params(ffn: str, params: Dict) -> None:
-    path, name = os.path.split(ffn)
+  def _set_image_location_to_params(io_obj: str, params: Dict) -> None:
+    if '.' in io_obj: 
+      path, name = os.path.split(io_obj)
+    else:
+      path = io_obj
+      name = ''
     params['path'] = path
     params['name'] = name
     return
 
-  def _assign_location(self, ffn:str) -> None:
-    idx, name = self._view.flow.get_current_selection_tree()
+  def _assign_location(self, idx: int, name: str, io_obj:str) -> None:
     flow_item = self._model.flow.get_item(idx)
     params_def = flow_item.params_def   
     params = flow_item.params
 
     p = [p for p in params_def if p.get('name') == 'path' or p.get('name') == 'name']
-    if p is not None and len(p) == 2:
-      self._set_image_location_to_params(ffn, params)
+    if p is not None:
+      self._set_image_location_to_params(io_obj, params)
     self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
     self._bind_param_controls(params_def)
     self._apply(None)
     return
   
-  def _get_path(self) -> None:
-    ffn = askopenfilename(title="Select a file", 
-      filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
-    if ffn != '':
-      self._assign_location(ffn)
+  def _get_io_object(self) -> None:
+    init_dir ='../data-kupon'
+    idx, name = self._view.flow.get_current_selection_tree()
+    flow_item = self._model.flow.get_item(idx)
+    params_def = flow_item.params_def
+    io_obj = ''
+    full = False
+    for p_def in params_def:
+      if p_def.get('name') == 'name':
+        full = True
+        break;
+    if full:
+      io_obj = self._get_full_file_name(init_dir)
+      # io_obj = self._store_to(init_dir)
+    else:
+      io_obj = self._get_directory(init_dir)
+    if io_obj != '':
+      self._assign_location(idx, name, io_obj)
     return
 
-  def _store_to(self) -> None:
-    ffn = asksaveasfilename(initialfile = '',
-      initialdir = '',
-      defaultextension=".tiff",
-      filetypes=(("image files","*.png"), ("image files","*.jpeg"), ("image files","*.jpg"), ("image files","*.tiff"), ("all files","*.*")))
-    if ffn != '':
-      self._assign_location(ffn)
-    return
+  def _get_directory(self, init_dir: str) -> str:
+    dir = askdirectory(initialdir=init_dir)
+    return dir
+
+  def _get_full_file_name(self, init_dir: str) -> str:
+    ffn = askopenfilename(initialdir=init_dir, title="Select a file", filetypes=self._file_types)
+    return ffn
+
+  def _store_to(self, init_dir: str) -> str:
+    ffn = asksaveasfilename(initialdir = init_dir, initialfile = '', defaultextension=".tiff", filetypes=self._file_types)
+    return ffn
+
+  @property
+  def _file_types(self) -> str:
+    return (("image files","*.png"), 
+            ("image files","*.jpeg"), 
+            ("image files","*.jpg"), 
+            ("image files","*.tiff"), 
+            ("json files","*.json"), 
+            ("all files","*.*"))
