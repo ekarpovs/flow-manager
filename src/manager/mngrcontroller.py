@@ -17,9 +17,9 @@ from ..configuration import Configuration
 
 class MngrController():
   def __init__(self, parent):
-    self.cfg = Configuration()
-    self._model = MngrModel(self.cfg)
-    self._runner = MngrRunner(self.cfg)
+    self._cfg = Configuration()
+    self._model = MngrModel(self._cfg)
+    self._runner = MngrRunner(self._cfg)
     self._converter = MngrConverter()
     self._view = MngrView(parent)
     # Bind to modules panel
@@ -355,7 +355,7 @@ class MngrController():
     return
   
   def _get_io_object(self) -> None:
-    init_dir ='../data-kupon'
+    init_dir = self._cfg.input_paths
     idx, name = self._view.flow.get_current_selection_tree()
     flow_item = self._model.flow.get_item(idx)
     params_def = flow_item.params_def

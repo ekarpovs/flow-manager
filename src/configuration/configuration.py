@@ -29,7 +29,7 @@ class Configuration():
 
   @property
   def input_paths(self) ->List[str]:
-    return self._cfg.get('images', '.')
+    return self._cfg.get('data-root', '.')
 
   @property
   def result_path(self) ->str:
