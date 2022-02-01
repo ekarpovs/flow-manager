@@ -274,6 +274,9 @@ class MngrController():
       params[k] = params_ws.ket(k)
     self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
     self._bind_param_controls(params_def)
+    self._view.flow.btn_params_io['state'] = DISABLED
+    if 'path' in params:
+      self._view.flow.btn_params_io['state'] = NORMAL
     return
 
   def _key_pressed(self, event) -> None:
