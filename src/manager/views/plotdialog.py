@@ -50,9 +50,29 @@ class PlotDialog(Toplevel):
     return self._plot_object()
 
   def _plot_object(self) -> None:
+    #Set the size of the matplotlib canvas
+    f = plt.figure(num=0, figsize=(8,8))
+
+    # creating dataframe
+    # df = pd.DataFrame({
+    #     'X': [1, 2, 3, 4, 5],
+    #     'Y': [2, 4, 6, 10, 15]
+    # })
     df = pd.DataFrame(self._data)
-    print(df)
-    df.plot()
+      
+    # plotting a line graph
+    # plt.plot(df["cX"], df["cY"])
+    # # plotting a scatter plot
+    # print("Scatter Plot:  ")
+    plt.scatter(df["cX"], df["cY"])
+
+
+    canvas = FigureCanvasTkAgg(f, self)
+    canvas.draw()
+    tk_wd = canvas.get_tk_widget()
+    tk_wd.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    nb = NavigationToolbar2Tk(canvas, tk_wd)
+      
     return
 
   def _plot_image(self) -> None:

@@ -202,9 +202,7 @@ class DataView(View):
     key = parts[3]
     data_dict = self._storage.get_state_output_data(state_id)
     data = data_dict.get(key)
-    t = type(data)
-    if t == np.ndarray:
-      plot_dlg = PlotDialog(self, name, data)
+    plot_dlg = PlotDialog(self, name, data)
     return
 
   def _set_h(self, event) -> None:
