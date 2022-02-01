@@ -275,7 +275,8 @@ class MngrController():
     self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
     self._bind_param_controls(params_def)
     self._view.flow.btn_params_io['state'] = DISABLED
-    if 'path' in params:
+    path_in_def = [p for p in params_def if p.get('name') == 'path']
+    if len(path_in_def) > 0:
       self._view.flow.btn_params_io['state'] = NORMAL
     return
 
