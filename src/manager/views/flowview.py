@@ -119,7 +119,8 @@ class FlowView(View):
       idx = max_idx-1
     self.flow_tree_view.focus_set()
     self.flow_tree_view.selection_set(idx)
-    self.flow_tree_view.focus(idx)   
+    self.flow_tree_view.focus(idx)
+    self.flow_tree_view.see(idx) 
     return
 
   def get_current_selection_tree(self) -> Tuple[int, str]:
