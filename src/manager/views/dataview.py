@@ -29,13 +29,13 @@ class DataView(View):
     self.columnconfigure(0, weight=1)
 
     # Content will be scrolable
-    self.content = ScrolledFrame(self)
+    self.content = ScrolledFrame(self, use_ttk=True)
     # Bind the arrow keys and scroll wheel
-    self.content.bind_arrow_keys(self)
-    self.content.bind_scroll_wheel(self)
+    # self.content.bind_arrow_keys(self)
+    # self.content.bind_scroll_wheel(self)
+    self.content.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + E + N + S)
     # Create the preview frame within the ScrolledFrame
     self.preview_view = self.content.display_widget(Frame)
-    self.content.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + E + N + S)
     
     self.data_actions = Frame(self, highlightbackground='gray', highlightthickness=1)
     self.data_actions.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + S)
