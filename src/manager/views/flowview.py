@@ -33,7 +33,7 @@ class FlowView(View):
     self.flow_tree_view = Treeview(self, columns=("description"), selectmode="browse")
     # Setup the treview heading
     self.flow_tree_view.heading('#0', text='Exec/Statement', anchor=W)
-    # self.flow_tree_view.heading('#1', text='Parameters', anchor=W)  
+    self.flow_tree_view.heading('#1', text='Title', anchor=W)  
     self.flow_tree_view.column('#0', minwidth=90, width=100)
     self.tree_view_scrollbar = Scrollbar(self, orient=VERTICAL, command=self.flow_tree_view.yview)
     self.tree_view_scrollbar.grid(row=1, column=1, sticky=N+S+E)
@@ -104,10 +104,10 @@ class FlowView(View):
       self.flow_tree_view.delete(item)
     return
     
-  def set_flow_item_names(self, flow_names, idx=0):
+  def set_flow_item_names(self, flow_names, flow_titles, idx=0):
     self.clear_flow_tree_view()
     for i, name in enumerate(flow_names):
-      self.flow_tree_view.insert(parent='', index='end', iid=i, text=name)
+      self.flow_tree_view.insert(parent='', index='end', iid=i, text=name, values=[flow_titles[i]])
     # self.set_selection_tree(idx)  
     return
 

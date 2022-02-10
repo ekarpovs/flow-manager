@@ -97,8 +97,8 @@ class MngrController():
     (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
     # Create current flow model regarding ws defintion
     self._model.init_flow_model(ws_path, ws_name)
-    names = self._model.flow.get_names()
-    self._view.flow.set_flow_item_names(names)   
+    names, titles = self._model.flow.get_names()
+    self._view.flow.set_flow_item_names(names, titles)   
     self._update_flow_by_operations_params_def(names)
     self._create_current_operation_params_controls(0, names[0])
     self._rebuild_runner()
@@ -145,8 +145,8 @@ class MngrController():
       new_flow_item = FlowItemModel(FlowItemType.EXEC, name)
       self._assign_oper_params(name, new_flow_item)
       self._model.flow.set_item(cur_idx, new_flow_item)
-      names = self._model.flow.get_names()
-      self._view.flow.set_flow_item_names(names)   
+      names, titles = self._model.flow.get_names()
+      self._view.flow.set_flow_item_names(names, titles)   
       self._rebuild_runner()
     return
 
@@ -155,8 +155,8 @@ class MngrController():
     if cur_idx == 0 or cur_idx == len(self._model.flow.items) -1:
       return
     self._model.flow.remove_item(cur_idx)
-    names = self._model.flow.get_names()
-    self._view.flow.set_flow_item_names(names)   
+    names, titles = self._model.flow.get_names()
+    self._view.flow.set_flow_item_names(names, titles)   
     self._rebuild_runner()
     return
 

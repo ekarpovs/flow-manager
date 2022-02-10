@@ -70,7 +70,8 @@ class CurrentFlowModel():
 
   def get_names(self) -> List[str]:
     names = [item.name for item in self._flow.items]
-    return names
+    titles = [item.title for item in self._flow.items]
+    return names, titles
 
   @property
   def worksheetnames(self) -> List[Dict]:
@@ -84,11 +85,13 @@ class CurrentFlowModel():
               },
               {
                 "exec": "glbstm.begin",
+                "title": "begin statement",
                 "params": {
                 }
               },
               {
-                "exec": "glbstm.end"
+                "exec": "glbstm.end",
+                "title": "end statement",
               }
             ]
     else:
