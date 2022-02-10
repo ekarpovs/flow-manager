@@ -71,6 +71,12 @@ class ContentView(LabelFrame):
     frame.columnconfigure(1, weight=1)
     name_lbl = Label(frame, text=f'{idx}-{item.name}')
     name_lbl.grid(row=idx, column=0, sticky=W)
+    
+    title_var = StringVar()
+    title_var.set(item.title)
+    title_entry = Entry(frame, width=30, textvariable=title_var)
+    title_entry.grid(row=idx, column=1, sticky=W)
+
     self._create_input_view(frame, widget_idx, idx, item)
     # (input_refs, _, _) = self._refs[idx]
     # idx += len(input_refs)+1
@@ -121,12 +127,16 @@ class ContentView(LabelFrame):
       frame_widget = frame.get('frame')
       children = frame_widget.winfo_children()
       for child in children:
+        flow_item = self._tmp_flow.get_item(idx)
         if type(child) == Combobox:
-          flow_item = self._tmp_flow.get_item(idx)
           link = child.get()
           if link != '':
             flow_item.links[child._name] = link
           elif len(flow_item.links) > 0 and flow_item.links.get(child._name, '') != '': 
             del(flow_item.links[child._name])
-          # print(child._name, child.get())
+        elif type(child) == Entry:
+          title = child.get()
+          flow_item.title = title
+        else:
+          pass
     return

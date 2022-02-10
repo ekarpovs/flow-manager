@@ -176,8 +176,14 @@ class MngrController():
     return
 
   def _edit_flow_links(self) -> None:
-    self._view.flow.edit_flow_links(self._model.flow, self._rebuild_runner)
+    self._view.flow.edit_flow_links(self._model.flow, self._update_flow)
     return
+
+  def _update_flow(self) -> None:
+    names, titles = self._model.flow.get_names()
+    self._view.flow.set_flow_item_names(names, titles)   
+    self._rebuild_runner()
+    return 
 
 
 # Execution commands
