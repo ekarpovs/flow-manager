@@ -185,7 +185,9 @@ class DataView(View):
   def set_preview(self, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
     self._out = out
     self._preview()
+    self.content.yview_moveto(1.0)
     return
+    
   def _on_click(self, event) -> None:
     event.widget.focus_set()
     active_widget_name = event.widget._name
