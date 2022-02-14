@@ -1,5 +1,7 @@
 PADX = 10
+PADX_S = 5
 PADY = 10
+PADY_S = 5
 BTNW = 10
 BTNW_S = 7
 

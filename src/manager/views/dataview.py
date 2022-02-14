@@ -12,6 +12,8 @@ from ...uiconst import *
 from .view import View
 from .plotdialog import PlotDialog 
 
+DEFAULT_VIEW_SIZE = 50
+
 class DataView(View):
   def __init__(self, parent):
     super().__init__(parent)
@@ -39,21 +41,23 @@ class DataView(View):
     
     self.data_actions = Frame(self, highlightbackground='gray', highlightthickness=1)
     self.data_actions.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + S)
-    self.data_actions.columnconfigure(0, weight=2)
-    self.data_actions.columnconfigure(1, weight=2)
+    self.data_actions.columnconfigure(0, weight=1)
+    self.data_actions.columnconfigure(1, weight=5)
     self.data_actions.columnconfigure(2, weight=1)
     
-    self.preview_height = 150
-    self.preview_width = 150
+    self.preview_height = DEFAULT_VIEW_SIZE
+    self.preview_width = DEFAULT_VIEW_SIZE
 
-    var_h = IntVar()
-    var_h.set(self.preview_height)
-    self.scale_h = Scale(self.data_actions, from_=50, to=500, resolution=50, variable=var_h, orient=HORIZONTAL)
-    self.scale_h.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+E)
+    self.scale_label = Label(self.data_actions, text='Preview size:', width=10)
+    self.scale_label.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
+    self.var_h = IntVar()
+    self.var_h.set(self.preview_height)
+    self.scale_h = Scale(self.data_actions, from_=50, to=500, resolution=50, variable=self.var_h, orient=HORIZONTAL)
+    self.scale_h.grid(row=0, column=1, padx=PADX_S, pady=PADY_S, sticky=W+E+N+S)
     self.scale_h.bind("<ButtonRelease-1>", self._set_h)
 
     self.btn_save = Button(self.data_actions, text='Save', width=BTNW, command=self._save)
-    self.btn_save.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=E)
+    self.btn_save.grid(row=0, column=2, padx=PADX_S, pady=PADY_S, sticky=E)
     
     self._out = None
     self._grid_rows: List[Widget] = []
@@ -75,6 +79,10 @@ class DataView(View):
     for row in self._grid_rows:
       row.grid_remove()  
     self._grid_rows.clear()
+
+    self.preview_height = DEFAULT_VIEW_SIZE
+    self.preview_width = DEFAULT_VIEW_SIZE
+    self.var_h.set(self.preview_height)    
     return
 
   def _preview_size(self, image):
