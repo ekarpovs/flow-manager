@@ -214,8 +214,12 @@ class MngrController():
     return
 
   def _next(self)  -> int:
-    self._step('next')
-    self._set_step_result()
+    idx, _ = self._view.flow.get_current_selection_tree()
+    if self._ready() and self._runner.state_idx == idx:
+      self._step('next')
+      self._set_step_result()
+    else:
+      self._set_top_state()
     return 
 
   def _current(self) -> int:
@@ -243,6 +247,8 @@ class MngrController():
   def _run_current(self, idx: int) -> None:
     if self._ready() and self._runner.state_idx == idx:
       self._current()
+    else:
+      self._set_top_state()
     return
 
 
