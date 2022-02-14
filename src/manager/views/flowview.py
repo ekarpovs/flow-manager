@@ -30,14 +30,20 @@ class FlowView(View):
     self.btn_reload = Button(self, text='Reload', width=BTNW_S)
 
     # Setup Treeview
-    self.flow_tree_view = Treeview(self, columns=("description"), selectmode="browse")
+    self.flow_tree_view = Treeview(self, columns=['#0','#1','#2'], selectmode="browse")
     # Setup the treview heading
-    self.flow_tree_view.heading('#0', text='Exec/Statement', anchor=W)
-    self.flow_tree_view.heading('#1', text='Title', anchor=W)  
-    self.flow_tree_view.column('#0', minwidth=90, width=100)
-    self.tree_view_scrollbar = Scrollbar(self, orient=VERTICAL, command=self.flow_tree_view.yview)
-    self.tree_view_scrollbar.grid(row=1, column=1, sticky=N+S+E)
-    self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar.set)
+    self.flow_tree_view.heading('#0', text='idx', anchor=W)
+    self.flow_tree_view.heading('#1', text='Exec/Statement', anchor=W)
+    self.flow_tree_view.heading('#2', text='Title', anchor=W)  
+    self.flow_tree_view.column('#0', minwidth=50, width=50)
+    self.flow_tree_view.column('#1', minwidth=100, width=150)
+    self.flow_tree_view.column('#1', minwidth=150, width=200)
+    self.tree_view_scrollbar_y = Scrollbar(self, orient=VERTICAL, command=self.flow_tree_view.yview)
+    self.tree_view_scrollbar_y.grid(row=1, column=1, sticky=N+S+E)
+    self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar_y.set)
+    self.tree_view_scrollbar_x = Scrollbar(self, orient=HORIZONTAL, command=self.flow_tree_view.xview)
+    self.tree_view_scrollbar_x.grid(row=1, column=0, columnspan=3, sticky=S+W+E)
+    self.flow_tree_view.configure(xscrollcommand=self.tree_view_scrollbar_x.set)
 
     # Setup operation parameters view
     # Create a ScrolledFrame widget
@@ -107,7 +113,8 @@ class FlowView(View):
   def set_flow_item_names(self, flow_names, flow_titles, idx=0):
     self.clear_flow_tree_view()
     for i, name in enumerate(flow_names):
-      self.flow_tree_view.insert(parent='', index='end', iid=i, text=name, values=[flow_titles[i]])
+      idx_s = f'{i:02}'
+      self.flow_tree_view.insert(parent='', index='end', iid=i, text=idx_s, values=[name, flow_titles[i]])
     # self.set_selection_tree(idx)  
     return
 
