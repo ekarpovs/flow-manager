@@ -45,7 +45,7 @@ class PlotDialog(Toplevel):
 
   def _plot(self) -> None:
     t = type(self._data)
-    if t == np.ndarray:
+    if t == np.ndarray or t == list:
       return self._plot_image()
     return self._plot_object()
 
@@ -83,5 +83,19 @@ class PlotDialog(Toplevel):
     tk_wd = canvas.get_tk_widget()
     tk_wd.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY, sticky=W + E + S + N)
     nb = NavigationToolbar2Tk(canvas, tk_wd)
-    plt.imshow(self._data, cmap='gray')    
+    if type(self._data) == np.ndarray: 
+      images = [self._data]
+    else:
+      images = self._data
+    self._display_multiple_img(f, images, 1, len(images))
+    # plt.imshow(self._data, cmap='gray')    
+    return
+
+
+  @staticmethod
+  def _display_multiple_img(fig, images, rows = 1, cols=1):
+    axes = []
+    for idx,title in enumerate(images):
+      axes.append( fig.add_subplot(rows, cols, idx+1))
+      plt.imshow(images[idx], cmap='gray')    
     return

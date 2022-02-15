@@ -101,10 +101,20 @@ class DataView(View):
   def _fit_image(self, image):
     self._preview_size(image)   
     dim = (self.w, self.h)
-    image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+    image = cv2.resize(image, dim, interpolation=cv2.INTER_NEAREST)
     return image
 
-  def _preview_view(self, parent, data: Dict, name: str) -> Widget:
+
+  def _preview_image_list(self, parent, data: any, name: str) -> Widget:
+    image = cv2.hconcat(data)
+    preview = self._fit_image(image)
+    pil_image = Image.fromarray(preview)
+    photo = ImageTk.PhotoImage(pil_image)
+    view = Label(parent, name=name, image=photo)
+    view.image = photo   
+    return view
+
+  def _preview_image(self, parent, data: any, name: str) -> Widget:
     preview = self._fit_image(data)
     pil_image = Image.fromarray(preview)
     photo = ImageTk.PhotoImage(pil_image)
@@ -112,18 +122,19 @@ class DataView(View):
     view.image = photo   
     return view
 
-  def _object_view(self, parent, data: Dict, name: str) -> Widget:
+  def _preview_object(self, parent, data: any, name: str) -> Widget:
     view = Label(parent, name=name, border=1)
     # text = json.dumps(data, indent = 3)
     # df = pd.DataFrame(data)
     view.config(text = data)
     return view
 
-  def _get_view(self, ref_type: str) -> Callable:
+  def _get_preview(self, ref_type: FlowDataType) -> Callable:
     views = {
-      FlowDataType.NP_ARRAY: self._preview_view
+      FlowDataType.NP_ARRAY: self._preview_image,
+      FlowDataType.LIST_NP_ARRAYS: self._preview_image_list
     }
-    return views.get(ref_type, self._object_view)
+    return views.get(ref_type, self._preview_object)
 
   def clear_preview(self, idx: int) -> None:
     if len(self._grid_rows) > 0:
@@ -164,10 +175,10 @@ class DataView(View):
       data = out_data.get(ref_intr)
       if data is None:
         continue
-      view = self._get_view(ref_type)
+      preview = self._get_preview(ref_type)
       # convert to a conventional format (without '.')
       name = ref_extr.replace('.', '-')
-      widget = view(preview_frame, data, name)
+      widget = preview(preview_frame, data, name)
       widget.grid(row=0, column=i)
       widget.bind('<Button-1>', self._on_click)
     try:
