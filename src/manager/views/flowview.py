@@ -18,8 +18,12 @@ class FlowView(View):
     self['text'] = 'Flows'
 
     self.grid()
-    self.rowconfigure(1, weight=1)
-    self.rowconfigure(4, weight=4)
+    self.rowconfigure(0, weight=1)
+    self.rowconfigure(1, weight=16)
+    self.rowconfigure(2, weight=1)
+    self.rowconfigure(3, weight=1)
+    self.rowconfigure(4, weight=2)
+    self.rowconfigure(5, weight=1)
     self.columnconfigure(0, weight=10)
     self.columnconfigure(1, weight=1)
 
