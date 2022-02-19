@@ -22,7 +22,7 @@ class PlotDialog(Toplevel):
     self.grab_set()
     # Define the dialog size
     self.title(f'Inspect: {name}')
-    self.geometry("850x750+%d+%d" % (parent.winfo_rootx() +50, parent.winfo_rooty() + 50))
+    self.geometry("950x850+%d+%d" % (parent.winfo_rootx() +20, parent.winfo_rooty() + 20))
     self.resizable(height=FALSE, width=FALSE) 
 
     self.rowconfigure(0, weight=10)
@@ -51,7 +51,7 @@ class PlotDialog(Toplevel):
 
   def _plot_object(self) -> None:
     #Set the size of the matplotlib canvas
-    f = plt.figure(num=0, figsize=(8,8))
+    f = plt.figure(num=0, figsize=(12,12), dpi=600)
 
     # creating dataframe
     # df = pd.DataFrame({
@@ -69,10 +69,10 @@ class PlotDialog(Toplevel):
 
     canvas = FigureCanvasTkAgg(f, self)
     canvas.draw()
+    canvas.mpl_connect('button_press_event', self.onclick)
     tk_wd = canvas.get_tk_widget()
     tk_wd.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY, sticky=W + E + S + N)
-    nb = NavigationToolbar2Tk(canvas, tk_wd)
-      
+    nb = NavigationToolbar2Tk(canvas, tk_wd)     
     return
 
   def _plot_image(self) -> None:
@@ -99,3 +99,11 @@ class PlotDialog(Toplevel):
       axes.append( fig.add_subplot(rows, cols, idx+1))
       plt.imshow(images[idx], cmap='gray')    
     return
+
+  def onclick(self,event):
+    if event.xdata is None or event.ydata is None:
+      return
+    ix, iy = float(event.xdata), float(event.ydata)
+    print('x = %f, y = %f' % (ix, iy))
+    return 
+
