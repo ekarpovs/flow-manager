@@ -79,13 +79,14 @@ class DataView(View):
     for row in self._grid_rows:
       row.grid_remove()  
     self._grid_rows.clear()
+    self.content.scroll_to_top()
 
     self.preview_height = DEFAULT_VIEW_SIZE
     self.preview_width = DEFAULT_VIEW_SIZE
     self.var_h.set(self.preview_height)    
     return
 
-  def _preview_size(self, image):
+  def _preview_size(self, image) -> Tuple[int,int]:
     (h, w) = image.shape[:2]
     ratio = w/h
     if h > self.preview_height:
@@ -94,28 +95,25 @@ class DataView(View):
     elif w > self.preview_width:    
       w = self.preview_width
       h = int(w/ratio)
-    self.h = h
-    self.w = w
-    return
+    elif h < self.preview_height and w < self.preview_width:
+      h = self.preview_height
+      w = int(h*ratio)
+    else:
+      pass
+    return (w, h)
 
-  def _fit_image(self, image):
-    self._preview_size(image)   
-    dim = (self.w, self.h)
+  def _fit_image(self, image):  
+    dim = self._preview_size(image)
     image = cv2.resize(image, dim, interpolation=cv2.INTER_NEAREST)
     return image
 
 
-  def _preview_image_list(self, parent, data: any, name: str) -> Widget:
-    image = cv2.hconcat(data)
-    preview = self._fit_image(image)
-    pil_image = Image.fromarray(preview)
-    photo = ImageTk.PhotoImage(pil_image)
-    view = Label(parent, name=name, image=photo)
-    view.image = photo   
-    return view
+  def _preview_image_list(self, parent, image: List[np.ndarray], name: str) -> Widget:
+    image = cv2.hconcat(image)
+    return self._preview_image(parent, image, name)
 
-  def _preview_image(self, parent, data: any, name: str) -> Widget:
-    preview = self._fit_image(data)
+  def _preview_image(self, parent, image: np.ndarray, name: str) -> Widget:
+    preview = self._fit_image(image)
     pil_image = Image.fromarray(preview)
     photo = ImageTk.PhotoImage(pil_image)
     view = Label(parent, name=name, image=photo)
@@ -205,6 +203,7 @@ class DataView(View):
     self._out = out
     self._preview()
     self.content.yview_moveto(1.0)
+    # self.content._canvas.yview_scroll(2, 'units')
     return
     
   def _on_click(self, event) -> None:
