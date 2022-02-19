@@ -132,6 +132,7 @@ class MngrController():
     if event is not None:
       # don't clear after store ws
       self._view.flow.clear_flow_tree_view()
+      self._view.data.clear_view()
     return
 
   def _add_operation_to_flow_model(self) -> None:
