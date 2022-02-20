@@ -19,7 +19,7 @@ class LinksDialog(Toplevel):
     self.grab_set()
     # Define the dialog size
     self.title('Configure:')
-    self.geometry("450x650+%d+%d" % (parent.winfo_rootx() +920, parent.winfo_rooty() + 30))
+    self.geometry("550x845+%d+%d" % (parent.winfo_rootx() +920, parent.winfo_rooty() + 30))
     self.resizable(height=FALSE, width=FALSE) 
     
     self.grid()
@@ -36,7 +36,7 @@ class LinksDialog(Toplevel):
     self._info_name_var = StringVar()
     self._info_name_var.set(flow.flow.info)
     self._info_entry = Entry(self._info, width=50, textvariable=self._info_name_var)
-    self._info_entry.grid(row=0, column=1, sticky=W)
+    self._info_entry.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W+E+N+S)
     self._info.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W+E+N+S)
 
     # Content will be scrolable

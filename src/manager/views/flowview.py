@@ -36,12 +36,12 @@ class FlowView(View):
     # Setup Treeview
     self.flow_tree_view = Treeview(self, columns=['#0','#1','#2'], selectmode="browse")
     # Setup the treview heading
-    self.flow_tree_view.heading('#0', text='idx', anchor=W)
+    self.flow_tree_view.heading('#0', text='Index', anchor=CENTER)
     self.flow_tree_view.heading('#1', text='Exec/Statement', anchor=W)
     self.flow_tree_view.heading('#2', text='Title', anchor=W)  
-    self.flow_tree_view.column('#0', minwidth=50, width=50)
-    self.flow_tree_view.column('#1', minwidth=100, width=150)
-    self.flow_tree_view.column('#1', minwidth=150, width=200)
+    self.flow_tree_view.column('#0', minwidth=30, width=40)
+    self.flow_tree_view.column('#1', minwidth=120, width=140)
+    self.flow_tree_view.column('#2', minwidth=250, width=400)
     self.tree_view_scrollbar_y = Scrollbar(self, orient=VERTICAL, command=self.flow_tree_view.yview)
     self.tree_view_scrollbar_y.grid(row=1, column=1, sticky=N+S+E)
     self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar_y.set)
@@ -97,7 +97,7 @@ class FlowView(View):
 
     # Setup widgets layout
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
-    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=N+S+W+E)   
+    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=N+S+E)   
     self.flow_tree_view.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)   
     oper_actions.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
     param_actions.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)

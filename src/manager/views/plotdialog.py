@@ -20,9 +20,12 @@ class PlotDialog(Toplevel):
     # Do the dialog modal
     self.transient(parent)
     self.grab_set()
-    # Define the dialog size
+    # Define the dialog size and location
     self.title(f'Inspect: {name}')
-    self.geometry("950x850+%d+%d" % (parent.winfo_rootx() +20, parent.winfo_rooty() + 20))
+    width = 950
+    heigth = 850
+    self.geometry(f'{width}x{heigth}+%d+%d' % (parent.winfo_rootx() + parent.winfo_width() - (width+PADX*2), parent.winfo_rooty()+PADY*2))
+    # self.geometry("950x850+%d+%d" % (parent.winfo_rootx() + parent.winfo_width() - 975, parent.winfo_rooty()+PADY))
     self.resizable(height=FALSE, width=FALSE) 
 
     self.rowconfigure(0, weight=10)

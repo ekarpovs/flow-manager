@@ -74,13 +74,13 @@ class ContentView(LabelFrame):
     
     title_var = StringVar()
     title_var.set(item.title)
-    title_entry = Entry(frame, width=30, textvariable=title_var)
-    title_entry.grid(row=idx, column=1, sticky=W)
+    title_entry = Entry(frame, width=45, textvariable=title_var)
+    title_entry.grid(row=idx, column=1, padx=PADX, sticky=W+E)
 
     self._create_input_view(frame, widget_idx, idx, item)
     # (input_refs, _, _) = self._refs[idx]
     # idx += len(input_refs)+1
-    self._create_output_view(frame, widget_idx, idx, item)
+    # self._create_output_view(frame, widget_idx, idx, item)
     return frame
 
   def _create_input_view(self, parent: LabelFrame, widget_idx: int, idx: int, item: FlowItemModel) -> None:
@@ -93,7 +93,7 @@ class ContentView(LabelFrame):
         inref_lbl = Label(parent, text=inref)
         inref_lbl.grid(row=widget_idx+2+i, column=0, padx=PADX*2, sticky=W)
         var = StringVar()
-        inref_combo = Combobox(parent, name=inref, justify=LEFT, width=30)
+        inref_combo = Combobox(parent, name=inref, justify=LEFT, width=45)
         inref_combo['values'] = self._get_external_refs(idx)
         # Current value
         if len(links) > 0:
@@ -101,7 +101,7 @@ class ContentView(LabelFrame):
           if link is not None:
             inref_combo.set(link)
             inref_combo.textvariable = var
-        inref_combo.grid(row=widget_idx+2+i, column=1, padx=PADX, sticky=E)
+        inref_combo.grid(row=widget_idx+2+i, column=1, padx=PADX, sticky=W+E)
     return
 
   def _create_output_view(self, parent: LabelFrame, widget_idx: int, idx: int, item: FlowItemModel) -> None:
