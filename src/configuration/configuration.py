@@ -7,7 +7,7 @@ from flow_storage import FlowStorageConfig
 class Configuration():
   def __init__(self):
     (self._cfg, self._cfg_fsm) = self._load()
-    self._cfg_storage = FlowStorageConfig(self._cfg_fsm.get('storage-path', '.'))
+    self._cfg_storage = FlowStorageConfig(self._cfg_fsm.get('storage'))
     
 
   # Loaders
@@ -29,11 +29,11 @@ class Configuration():
 
   @property
   def input_paths(self) ->List[str]:
-    return self._cfg.get('data-root', '.')
+    return self._cfg.get('data-root', '../data')
 
   @property
   def result_path(self) ->str:
-    return self._cfg.get('results', '.')
+    return self._cfg.get('results', '../data')
 
   @property
   def modules_paths(self) ->List[str]:

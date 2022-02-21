@@ -11,4 +11,5 @@ src/manager/models/module/__pycache__
 src/manager/converters/__pycache__
 src/mix
 config*.json
+fsm-cfg.json
 .vscode

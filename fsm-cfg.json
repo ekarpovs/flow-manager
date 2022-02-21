@@ -12,5 +12,8 @@
       "prev",
       "current"
     ],
-    "storage-path": "../data/storage"
+    "storage": {
+      "type": "fs",
+      "location": "../data/storage"
+    }
   }
