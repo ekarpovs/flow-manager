@@ -15,7 +15,7 @@ class MngrRunner():
   def __init__(self, cfg: Configuration) -> None:
     self._cfg = cfg
     self._runner = Runner()
-    self._stotage = None
+    self._storage = None
     return
 
   @property
@@ -24,7 +24,7 @@ class MngrRunner():
 
   @property
   def storage(self) -> FlowStorage:
-    return self._stotage
+    return self._storage
 
   @property
   def initialized(self) -> bool:
@@ -43,8 +43,10 @@ class MngrRunner():
   
 
   def build(self, model: FlowModel) -> None:
-    self._stotage = FlowStorage(self._cfg.cfg_storage, model.get_as_ws())
-    self.runner.storage = self._stotage
+    if self._storage is not None:
+      self._storage.close()
+    self._storage = FlowStorage(self._cfg.cfg_storage, model.get_as_ws())
+    self.runner.storage = self._storage
     flow_converter = FlowConverter(model)
     fsm_def = flow_converter.convert()
     self.runner.create_frfsm(self._cfg.cfg_fsm, fsm_def)
