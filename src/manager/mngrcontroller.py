@@ -347,24 +347,27 @@ class MngrController():
 
 # Data commands
   @staticmethod
-  def _set_image_location_to_params(io_obj: str, params: Dict) -> None:
+  def _set_image_location_to_params(io_obj: str, params: Dict, key: str) -> None:
     if '.' in io_obj: 
       path, name = os.path.split(io_obj)
     else:
       path = io_obj
       name = ''
     params['path'] = path
-    params['name'] = name
+    if key == 'src':
+      params['src'] = name
+    else:
+      params['dest'] = name
     return
 
-  def _assign_location(self, idx: int, name: str, io_obj:str) -> None:
+  def _assign_location(self, idx: int, name: str, io_obj:str, key: str) -> None:
     flow_item = self._model.flow.get_item(idx)
     params_def = flow_item.params_def   
     params = flow_item.params
 
-    p = [p for p in params_def if p.get('name') == 'path' or p.get('name') == 'name']
+    p = [p for p in params_def if p.get('name') == 'path' or p.get('name') == 'src' or p.get('name') == 'dest']
     if p is not None:
-      self._set_image_location_to_params(io_obj, params)
+      self._set_image_location_to_params(io_obj, params, key)
     self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
     self._bind_param_controls(params_def)
     self._apply(None)
@@ -377,17 +380,20 @@ class MngrController():
     params_def = flow_item.params_def
     io_obj = ''
     full = False
+    key = ''
     for p_def in params_def:
-      if p_def.get('name') == 'name':
+      key = p_def.get('name')
+      if key == 'src' or key == 'dest':
         full = True
         break;
-    if full:
+    if full and key == 'src':
       io_obj = self._get_full_file_name(init_dir)
-      # io_obj = self._store_to(init_dir)
+    elif full and key == 'dest':
+      io_obj = self._store_to(init_dir)
     else:
       io_obj = self._get_directory(init_dir)
     if io_obj != '':
-      self._assign_location(idx, name, io_obj)
+      self._assign_location(idx, name, io_obj, key)
     return
 
   def _get_directory(self, init_dir: str) -> str:
