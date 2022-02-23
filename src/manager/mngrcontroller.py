@@ -215,6 +215,7 @@ class MngrController():
     return
 
   def _next(self)  -> int:
+    self._view.data.default()
     idx, _ = self._view.flow.get_current_selection_tree()
     if self._ready() and self._runner.state_idx == idx:
       self._step('next')
@@ -229,8 +230,8 @@ class MngrController():
     return 
 
   def _prev(self) -> int:
-    self._step('prev')
     self._clear_step_result()
+    self._step('prev')
     return 
 
   def _top(self) -> None:
