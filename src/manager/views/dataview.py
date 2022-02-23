@@ -80,10 +80,13 @@ class DataView(View):
       row.grid_remove()  
     self._grid_rows.clear()
     self.content.scroll_to_top()
+    return
 
+  def default(self) -> None:
     self.preview_height = DEFAULT_VIEW_SIZE
     self.preview_width = DEFAULT_VIEW_SIZE
-    self.var_h.set(self.preview_height)    
+    self.var_h.set(self.preview_height)
+    self._preview() 
     return
 
   def _preview_size(self, image) -> Tuple[int,int]:
