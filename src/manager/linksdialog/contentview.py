@@ -33,7 +33,7 @@ class ContentView(LabelFrame):
     self._tmp_flow: FlowModel = copy.deepcopy(flow.flow)
     self._init_flow_refs()
     for i, item in enumerate(self._tmp_flow.items):
-      item_frame = self._create_item_view(i, item)
+      item_frame = self._create_item_view(i, copy.copy(item))
       item_frame.grid(row=i, column=0, padx=PADX, pady=PADY, sticky=W+E)
       self._frames.append({'name': f'{i}-{item.name}', 'frame': item_frame})
     return 
