@@ -124,10 +124,10 @@ class ContentView(LabelFrame):
     for frame in self._frames:
       frame_name = frame.get('name')
       idx = int(frame_name.split('-')[0])
+      flow_item = copy.copy(self._tmp_flow.get_item(idx))
       frame_widget = frame.get('frame')
       children = frame_widget.winfo_children()
       for child in children:
-        flow_item = self._tmp_flow.get_item(idx)
         if type(child) == Combobox:
           link = child.get()
           if link != '':
@@ -139,4 +139,5 @@ class ContentView(LabelFrame):
           flow_item.title = title
         else:
           pass
+      self._tmp_flow.set_item(idx, copy.copy(flow_item))
     return
