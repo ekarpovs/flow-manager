@@ -85,13 +85,13 @@ class CurrentFlowModel():
               },
               {
                 "exec": "glbstm.begin",
-                "title": "begin statement",
+                "title": "",
                 "params": {
                 }
               },
               {
                 "exec": "glbstm.end",
-                "title": "end statement",
+                "title": "",
               }
             ]
     else:

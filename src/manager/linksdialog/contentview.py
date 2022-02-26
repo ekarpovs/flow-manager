@@ -139,5 +139,5 @@ class ContentView(LabelFrame):
           flow_item.title = title
         else:
           pass
-      self._tmp_flow.set_item(idx, copy.copy(flow_item))
+      self._tmp_flow.replace_item(idx, copy.copy(flow_item))
     return
