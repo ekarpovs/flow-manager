@@ -45,19 +45,19 @@ class DataView(View):
     self.data_actions.columnconfigure(1, weight=5)
     self.data_actions.columnconfigure(2, weight=1)
     
-    self.preview_height = DEFAULT_VIEW_SIZE
-    self.preview_width = DEFAULT_VIEW_SIZE
+    self._preview_height = DEFAULT_VIEW_SIZE
+    self._preview_width = DEFAULT_VIEW_SIZE
 
     self.scale_label = Label(self.data_actions, text='Preview size:', width=10)
     self.scale_label.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
     self.var_h = IntVar()
-    self.var_h.set(self.preview_height)
+    self.var_h.set(self._preview_height)
     self.scale_h = Scale(self.data_actions, from_=50, to=500, resolution=50, variable=self.var_h, orient=HORIZONTAL)
     self.scale_h.grid(row=0, column=1, padx=PADX_S, pady=PADY_S, sticky=W+E+N+S)
     self.scale_h.bind("<ButtonRelease-1>", self._set_h)
 
-    self.btn_save = Button(self.data_actions, text='Save', width=BTNW, command=self._save)
-    self.btn_save.grid(row=0, column=2, padx=PADX_S, pady=PADY_S, sticky=E)
+    self.btn_save = Button(self.data_actions, text='Save', width=BTNW_S, command=self._save)
+    self.btn_save.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=E)
     
     self._out = None
     self._grid_rows: List[Widget] = []
@@ -83,23 +83,23 @@ class DataView(View):
     return
 
   def default(self) -> None:
-    self.preview_height = DEFAULT_VIEW_SIZE
-    self.preview_width = DEFAULT_VIEW_SIZE
-    self.var_h.set(self.preview_height)
+    self._preview_height = DEFAULT_VIEW_SIZE
+    self._preview_width = DEFAULT_VIEW_SIZE
+    self.var_h.set(self._preview_height)
     self._preview() 
     return
 
   def _preview_size(self, image) -> Tuple[int,int]:
     (h, w) = image.shape[:2]
     ratio = w/h
-    if h > self.preview_height:
-      h = self.preview_height
+    if h > self._preview_height:
+      h = self._preview_height
       w = int(h*ratio)
-    elif w > self.preview_width:    
-      w = self.preview_width
+    elif w > self._preview_width:    
+      w = self._preview_width
       h = int(w/ratio)
-    elif h < self.preview_height and w < self.preview_width:
-      h = self.preview_height
+    elif h < self._preview_height and w < self._preview_width:
+      h = self._preview_height
       w = int(h*ratio)
     else:
       pass
@@ -140,7 +140,6 @@ class DataView(View):
   def clear_preview(self, idx: int) -> None:
     if len(self._grid_rows) > 0:
       self._out = None
-      # self._grid_rows.pop(idx).grid_remove()
       try:
         # remove existing item with the idx
         res = self._grid_rows.pop(idx)
@@ -205,8 +204,10 @@ class DataView(View):
   def set_preview(self, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
     self._out = out
     self._preview()
-    self.content.yview_moveto(1.0)
-    # self.content._canvas.yview_scroll(2, 'units')
+    # self.content._canvas.configure(yscrollincrement=self._preview_height)
+    self.content.focus_set()
+    # self.content.yview_moveto(1.0)
+    self.content.yview(SCROLL, 1, UNITS)
     return
     
   def _on_click(self, event) -> None:
@@ -229,7 +230,7 @@ class DataView(View):
     return
 
   def _set_h(self, event) -> None:
-    self.preview_height = self.scale_h.get()
+    self._preview_height = self.scale_h.get()
     self._preview()
     return
 
