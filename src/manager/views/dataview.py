@@ -13,6 +13,7 @@ from .view import View
 from .plotdialog import PlotDialog 
 
 DEFAULT_VIEW_SIZE = 50
+WITHOUT_PREVIEW_DATA = -1
 
 class DataView(View):
   def __init__(self, parent):
@@ -74,7 +75,6 @@ class DataView(View):
     self._storage = storage
     return
 
-
   def clear_view(self) -> None:
     self._out = None
     self._idx_map = {}
@@ -112,7 +112,6 @@ class DataView(View):
     image = cv2.resize(image, dim, interpolation=cv2.INTER_NEAREST)
     return image
 
-
   def _preview_image_list(self, parent, image: List[np.ndarray], name: str) -> Widget:
     image = cv2.hconcat(image)
     return self._preview_image(parent, image, name)
@@ -142,27 +141,20 @@ class DataView(View):
   def clear_preview(self, idx: int) -> None:
     if len(self._grid_rows) > 0:
       self._out = None
+      # map idx to preview idx
       row_idx = max(len(self._idx_map)-1, self._get_row_idx(f'{idx}'))
-      self._idx_map.pop(f'{row_idx}')
-      print(self._idx_map)
-
+      if row_idx == WITHOUT_PREVIEW_DATA:
+        return
       try:
-        # remove existing item with the idx
+        # remove idx mapping for the idx
+        self._idx_map.pop(f'{row_idx}')
+        # remove existing preview item with the idx
         res = self._grid_rows.pop(row_idx)
         res.grid_remove()
       except IndexError:
         pass
     return
-
-  def _calc_row_idx(self, row_idx: str) -> int:
-    if len(self._grid_rows) == 0:
-      return 0
-    name = f'--{row_idx}--'
-    for i,row in enumerate(self._grid_rows):
-      if row._name == name:
-        return i
-    return i+1  
-  
+ 
   def _create_row_output_container(self, row_idx: int, title: str) -> Widget:
     state_frame = LabelFrame(self.preview_view, name=f'--{row_idx}--', text=title)
     state_frame.rowconfigure(0, pad=15)
@@ -209,25 +201,28 @@ class DataView(View):
       parts =out_refs[0][0].split('-')
       idx = parts[0]
       title = '-'.join(parts[0:len(parts)-1])
-      # row_idx = self._calc_row_idx(parts[0])
       row_idx = self._get_row_idx(idx)
       self._create_preview(row_idx, title, out_data, out_refs)
     return
 
+  def _map_idx_to_row_idx(self, idx: int) -> None:
+    preview_row = len(self._idx_map)
+    (refs, data) = self._out
+    if len(refs) == 0 and len(data) == 0:
+      # No data for preview
+      self._idx_map[f'{idx}'] = WITHOUT_PREVIEW_DATA
+      return
+    # map idx to row_idx
+    self._idx_map[f'{idx}'] = min(idx, preview_row)
+    return
+
   def set_preview(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
     self._out = out
-    preview_row = len(self._idx_map)
-    if self._out is None:
-      self._idx_map[f'{idx}'] = -1
-      return
-
-    self._idx_map[f'{idx}'] = min(idx, preview_row)
-    print(self._idx_map)
+    self._map_idx_to_row_idx(idx)
 
     self._preview()
-    # self.content._canvas.configure(yscrollincrement=self._preview_height)
+    
     self.content.focus_set()
-    # self.content.yview_moveto(1.0)
     self.content.yview(SCROLL, 1, UNITS)
     return
     
