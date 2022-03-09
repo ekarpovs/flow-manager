@@ -60,6 +60,7 @@ class DataView(View):
     self.btn_save.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=E)
     
     self._out = None
+    self._idx_map :Dict = {}
     self._grid_rows: List[Widget] = []
     self._storage: FlowStorage = None
     return
@@ -76,6 +77,7 @@ class DataView(View):
 
   def clear_view(self) -> None:
     self._out = None
+    self._idx_map = {}
     for row in self._grid_rows:
       row.grid_remove()  
     self._grid_rows.clear()
@@ -140,9 +142,13 @@ class DataView(View):
   def clear_preview(self, idx: int) -> None:
     if len(self._grid_rows) > 0:
       self._out = None
+      row_idx = max(len(self._idx_map)-1, self._get_row_idx(f'{idx}'))
+      self._idx_map.pop(f'{row_idx}')
+      print(self._idx_map)
+
       try:
         # remove existing item with the idx
-        res = self._grid_rows.pop(idx)
+        res = self._grid_rows.pop(row_idx)
         res.grid_remove()
       except IndexError:
         pass
@@ -190,19 +196,34 @@ class DataView(View):
     self._grid_rows.insert(row_idx, preview_frame)
     return
 
+  def _get_row_idx(self, idx: str) -> int:
+    row_idx = self._idx_map.get(idx)
+    return row_idx
+
   def _preview(self) -> None:
     if self._out is None:
       return
+
     (out_refs, out_data) = self._out
     if len(out_refs) > 0:
       parts =out_refs[0][0].split('-')
+      idx = parts[0]
       title = '-'.join(parts[0:len(parts)-1])
-      row_idx = self._calc_row_idx(parts[0])
+      # row_idx = self._calc_row_idx(parts[0])
+      row_idx = self._get_row_idx(idx)
       self._create_preview(row_idx, title, out_data, out_refs)
     return
 
-  def set_preview(self, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
+  def set_preview(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
     self._out = out
+    preview_row = len(self._idx_map)
+    if self._out is None:
+      self._idx_map[f'{idx}'] = -1
+      return
+
+    self._idx_map[f'{idx}'] = min(idx, preview_row)
+    print(self._idx_map)
+
     self._preview()
     # self.content._canvas.configure(yscrollincrement=self._preview_height)
     self.content.focus_set()

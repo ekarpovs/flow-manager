@@ -188,13 +188,12 @@ class MngrController():
 
 
 # Execution commands
-  def _set_step_result(self) -> None:
+  def _set_step_result(self, idx: int) -> None:
     out = self._runner.get_current_output()
-    self._view.data.set_preview(out)
+    self._view.data.set_preview(idx, out)
     return
 
-  def _clear_step_result(self) -> None:
-    idx = self._runner.state_idx
+  def _clear_step_result(self, idx: int) -> None:
     self._view.data.clear_preview(idx)
     return
 
@@ -219,19 +218,21 @@ class MngrController():
     idx, _ = self._view.flow.get_current_selection_tree()
     if self._ready() and self._runner.state_idx == idx:
       self._step('next')
-      self._set_step_result()
+      self._set_step_result(idx)
     else:
       self._set_top_state()
     return 
 
   def _current(self) -> int:
     self._step('current')
-    self._set_step_result()
+    idx, _ = self._view.flow.get_current_selection_tree()
+    self._set_step_result(idx)
     return 
 
   def _prev(self) -> int:
-    self._clear_step_result()
     self._step('prev')
+    idx = self._runner.state_idx
+    self._clear_step_result(idx)
     return 
 
   def _top(self) -> None:
