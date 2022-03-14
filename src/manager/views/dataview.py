@@ -64,9 +64,9 @@ class DataView(View):
     self.scale_h.grid(row=0, column=0, columnspan=3, padx=PADX_S, pady=PADY_S, sticky=W+E)
     self.scale_h.bind("<ButtonRelease-1>", self._set_h)
 
-    self.var_const_size = BooleanVar()
-    self.const_size = Checkbutton(self.scale_frame, variable=self.var_const_size, text='Fixed size', onvalue=True, offvalue=False)
-    self.const_size.grid(row=0, column=3, padx=PADX_S, pady=PADY_S, sticky=W+E)
+    self.var_fixed_size = BooleanVar()
+    self.fixed_size = Checkbutton(self.scale_frame, variable=self.var_fixed_size, text='Fixed size', onvalue=True, offvalue=False, command=self._fix_size)
+    self.fixed_size.grid(row=0, column=3, padx=PADX_S, pady=PADY_S, sticky=W+E)
 
     self.btn_save = Button(self.data_actions, text='Save', width=BTNW_S, command=self._save)
     self.btn_save.grid(row=0, column=4, padx=PADX, pady=PADY)
@@ -96,7 +96,7 @@ class DataView(View):
     return
 
   def default(self) -> None:
-    if self.var_const_size.get():
+    if self.var_fixed_size.get():
       return
     self._preview_height = DEFAULT_VIEW_SIZE
     self._preview_width = DEFAULT_VIEW_SIZE
@@ -261,6 +261,12 @@ class DataView(View):
   def _set_h(self, event) -> None:
     self._preview_height = self.scale_h.get()
     self._preview()
+    return
+
+  def _fix_size(self) -> None:
+    self.scale_h['state'] = NORMAL
+    if self.var_fixed_size.get() == True:
+      self.scale_h['state'] = DISABLED
     return
 
   def _save(self) -> None:
