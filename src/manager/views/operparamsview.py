@@ -76,8 +76,8 @@ class OperParamsView(Frame):
       self.operation_param_controls['param_controls'].append({
         "getter": param_getter, "setter": param_setter, "control": param_control,"label": param_label
         })
-      param_control.grid(row=i+1, column=0, padx=PADX, pady=PADY, sticky=W+N)
-      param_label.grid(row=i+1, column=1, columnspan=2, padx=PADX, pady=PADY, sticky=W+S)
+      param_control.grid(row=i+1, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W)
+      param_label.grid(row=i+1, column=2, padx=PADX, pady=PADY, sticky=W)
     return
 
   def _controls_factory(self, param: Dict) -> Tuple[Callable, Callable, Widget, Label]:
@@ -86,7 +86,7 @@ class OperParamsView(Frame):
     name = param.get('name')
     comment = param.get('comment')
     label_text = f"{name} - {comment}"
-    param_label = Label(self, text=label_text, width=50, anchor=W, justify=LEFT, wraplength=300)
+    param_label = Label(self, text=label_text, anchor=W, justify=LEFT)
     return param_getter, param_setter, param_control, param_label
 
   def _create_control(self, param: Dict) -> Tuple[Callable, Callable, Widget]:   
@@ -102,7 +102,7 @@ class OperParamsView(Frame):
       param_value = param.get('default')
       var = tk.IntVar()
       var.set(param_value)
-      param_control = Entry(self, textvariable=var)
+      param_control = Entry(self, textvariable=var, width=10)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
@@ -117,7 +117,7 @@ class OperParamsView(Frame):
       param_value = param.get('default')
       var = tk.DoubleVar()
       var.set(param_value)
-      param_control = Entry(self, textvariable=var)
+      param_control = Entry(self, textvariable=var, width=10)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
@@ -132,7 +132,7 @@ class OperParamsView(Frame):
       param_value = param.get('default')
       var = tk.StringVar()
       var.set(param_value)
-      param_control = Entry(self, textvariable=var)
+      param_control = Entry(self, textvariable=var, width=50)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
@@ -154,7 +154,7 @@ class OperParamsView(Frame):
 
     def _plist(param: Dict) -> Tuple[Callable, Callable, Combobox]:
       p_types = param.get('p_types')
-      param_control = Combobox(self)
+      param_control = Combobox(self, width=10)
       def get():
         value = param_control.get()
         if p_types == 'float':
@@ -180,7 +180,7 @@ class OperParamsView(Frame):
       return param_getter, param_setter, param_control
 
     def _pdict(param: Dict) -> Tuple[Callable, Callable, Combobox]:
-      param_control = Combobox(self)
+      param_control = Combobox(self, width=10)
 
       def get():
         key = param_control.get()
@@ -280,7 +280,7 @@ class OperParamsView(Frame):
 
       param_default_value = param.get('default')     
       var.set(param_default_value)
-      param_control = Scale(self, from_=from_, to=to, resolution=resolution, variable=var, length=170, orient=HORIZONTAL)
+      param_control = Scale(self, from_=from_, to=to, resolution=resolution, variable=var, length=250, orient=HORIZONTAL)
       # param_control = IncScale(self, from_=from_, to=to, resolution=resolution, increment=increment, variable=var, length=170, orient=HORIZONTAL)
       param_getter = get
       param_setter = set
