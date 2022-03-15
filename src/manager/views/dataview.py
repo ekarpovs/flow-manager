@@ -170,12 +170,12 @@ class DataView(View):
  
   def _create_row_output_container(self, row_idx: int, title: str) -> Widget:
     state_frame = LabelFrame(self.preview_view, name=f'--{row_idx}--', text=title)
+    state_frame.grid(row=row_idx, column=0, sticky=W)
     state_frame.rowconfigure(0, pad=15)
     state_frame.columnconfigure(0, weight=1)
     state_frame.columnconfigure(0, pad=15)
-    state_frame.columnconfigure(1, weight=1)
-    state_frame.columnconfigure(1, pad=15)
-    state_frame.grid(row=row_idx, column=0, sticky=W)
+    # state_frame.columnconfigure(1, weight=1)
+    # state_frame.columnconfigure(1, pad=15)
     return state_frame
 
   def _create_preview(self, row_idx, title, out_data, out_refs) -> None:
@@ -190,7 +190,7 @@ class DataView(View):
       # convert to a conventional format (without '.')
       name = ref_extr.replace('.', '-')
       widget = preview(preview_frame, data, name)
-      widget.grid(row=0, column=i)
+      widget.grid(row=i, column=0, sticky=W)
       widget.bind('<Button-1>', self._on_click)
     try:
       # remove existing item with the row_idx
