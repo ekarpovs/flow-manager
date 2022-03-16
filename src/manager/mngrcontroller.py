@@ -250,8 +250,8 @@ class MngrController():
   def _run_current(self, idx: int) -> None:
     if self._ready() and self._runner.state_idx == idx:
       self._current()
-    else:
-      self._set_top_state()
+    # else:
+    #   self._set_top_state()
     return
 
 
