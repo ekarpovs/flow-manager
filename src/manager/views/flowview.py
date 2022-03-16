@@ -37,8 +37,8 @@ class FlowView(View):
     self.names_combo_box['state'] = 'readonly'
     # setup button
     self.btn_reload = Button(self._flow_names_frame, text='Reload', width=BTNW_S)
-    self.names_combo_box.grid(row=0, column=0, padx=PADX, sticky=W+E)
-    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=E)   
+    self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+E)
+    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E)   
 
     # Setup flow steps view
     self._flow_steps_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
@@ -55,7 +55,7 @@ class FlowView(View):
     self.flow_tree_view.column('#0', minwidth=30, width=40)
     self.flow_tree_view.column('#1', minwidth=120, width=140)
     self.flow_tree_view.column('#2', minwidth=250, width=400)
-    self.flow_tree_view.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY,sticky=W+E+S+N)   
+    self.flow_tree_view.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY_S,sticky=W+E+S+N)   
     # setup scrollbars
     self.tree_view_scrollbar_y = Scrollbar(self._flow_steps_frame, orient=VERTICAL, command=self.flow_tree_view.yview)
     self.tree_view_scrollbar_y.grid(row=0, column=1, sticky=N+S+E)
@@ -86,20 +86,20 @@ class FlowView(View):
     self.btn_save = Button(self._oper_actions_frame, text='Save', width=BTNW_S)
     self.btn_links = Button(self._oper_actions_frame, text='Links', width=BTNW_S)
 
-    self.btn_add.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + N)   
-    self.btn_remove.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=E + N)
-    self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=E + N)
-    self.btn_save.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
-    self.btn_links.grid(row=0, column=4, padx=PADX, pady=PADY, sticky=E + N)
+    self.btn_add.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + N)   
+    self.btn_remove.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E + N)
+    self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=E + N)
+    self.btn_save.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=E + N)
+    self.btn_links.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
 
     # Setup param actions view
     self._param_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self.btn_params_reset = Button(self._param_actions_frame, text='Reset', width=BTNW_S)
     self.btn_params_default = Button(self._param_actions_frame, text='Default', width=BTNW_S)
     self.btn_params_io = Button(self._param_actions_frame, text='I/O', width=BTNW_S)
-    self.btn_params_reset.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W+N)
-    self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W+N)
-    self.btn_params_io.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W+N)
+    self.btn_params_reset.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+N)
+    self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W+N)
+    self.btn_params_io.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W+N)
 
     # Setup flow actions buttons
     self._flow_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
@@ -109,11 +109,11 @@ class FlowView(View):
     self.btn_prev = Button(self._flow_actions_frame, text='Prev', width=BTNW_S)
     self.btn_top = Button(self._flow_actions_frame, text='Top', width=BTNW_S)
 
-    self.btn_run.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + N)
-    self.btn_curr.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=W + N)
-    self.btn_next.grid(row=0, column=2, padx=PADX, pady=PADY, sticky=W + N)
-    self.btn_prev.grid(row=0, column=3, padx=PADX, pady=PADY, sticky=E + N)
-    self.btn_top.grid(row=0, column=4, padx=PADX, pady=PADY, sticky=E + N)
+    self.btn_run.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + N)
+    self.btn_curr.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W + N)
+    self.btn_next.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W + N)
+    self.btn_prev.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=E + N)
+    self.btn_top.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
 
     # Setup widgets groups layout
     self._flow_names_frame.grid(row=0, column=0, columnspan=2, padx=PADX, sticky=W+E)

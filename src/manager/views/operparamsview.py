@@ -15,9 +15,14 @@ class OperParamsView(Frame):
 
     self.grid()
     self.columnconfigure(0, weight=1)
-    self.columnconfigure(1, weight=1)
-    self.columnconfigure(2, weight=1)
+    self.rowconfigure(0, weight=1)
 
+    self._params_label = Label(self, anchor=W, justify=LEFT)
+    self._params_label.grid(row=0, column=0, pady=PADY_S, sticky=W+N+S+E)
+    self._params_label.columnconfigure(0, weight=1)
+    self._params_label.columnconfigure(1, weight=1)
+    self._params_label.columnconfigure(2, weight=1)
+    self._params_label.rowconfigure(0, weight=1)
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
     return
 
@@ -76,8 +81,8 @@ class OperParamsView(Frame):
       self.operation_param_controls['param_controls'].append({
         "getter": param_getter, "setter": param_setter, "control": param_control,"label": param_label
         })
-      param_control.grid(row=i+1, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W)
-      param_label.grid(row=i+1, column=2, padx=PADX, pady=PADY, sticky=W)
+      param_control.grid(row=i+1, column=0, padx=PADX, sticky=W)
+      param_label.grid(row=i+1, column=1, padx=PADX, sticky=W)
     return
 
   def _controls_factory(self, param: Dict) -> Tuple[Callable, Callable, Widget, Label]:
@@ -86,7 +91,7 @@ class OperParamsView(Frame):
     name = param.get('name')
     comment = param.get('comment')
     label_text = f"{name} - {comment}"
-    param_label = Label(self, text=label_text, anchor=W, justify=LEFT)
+    param_label = Label(self._params_label, text=label_text, anchor=W, justify=LEFT)
     return param_getter, param_setter, param_control, param_label
 
   def _create_control(self, param: Dict) -> Tuple[Callable, Callable, Widget]:   
@@ -102,7 +107,7 @@ class OperParamsView(Frame):
       param_value = param.get('default')
       var = tk.IntVar()
       var.set(param_value)
-      param_control = Entry(self, textvariable=var, width=10)
+      param_control = Entry(self._params_label, textvariable=var, width=10)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
@@ -117,7 +122,7 @@ class OperParamsView(Frame):
       param_value = param.get('default')
       var = tk.DoubleVar()
       var.set(param_value)
-      param_control = Entry(self, textvariable=var, width=10)
+      param_control = Entry(self._params_label, textvariable=var, width=10)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
@@ -132,7 +137,7 @@ class OperParamsView(Frame):
       param_value = param.get('default')
       var = tk.StringVar()
       var.set(param_value)
-      param_control = Entry(self, textvariable=var, width=50)
+      param_control = Entry(self._params_label, textvariable=var, width=50)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
@@ -147,14 +152,14 @@ class OperParamsView(Frame):
 
       param_value = param.get('default')
       item.set(param_value)
-      param_control = Checkbutton(self, variable=item, onvalue=True, offvalue=False, command=get)
+      param_control = Checkbutton(self._params_label, variable=item, onvalue=True, offvalue=False, command=get)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
 
     def _plist(param: Dict) -> Tuple[Callable, Callable, Combobox]:
       p_types = param.get('p_types')
-      param_control = Combobox(self, width=10)
+      param_control = Combobox(self._params_label, width=15)
       def get():
         value = param_control.get()
         if p_types == 'float':
@@ -180,7 +185,7 @@ class OperParamsView(Frame):
       return param_getter, param_setter, param_control
 
     def _pdict(param: Dict) -> Tuple[Callable, Callable, Combobox]:
-      param_control = Combobox(self, width=10)
+      param_control = Combobox(self._params_label, width=15)
 
       def get():
         key = param_control.get()
@@ -236,7 +241,7 @@ class OperParamsView(Frame):
 
       param_default_value = param.get('default')     
       var.set(param_default_value)
-      param_control = Spinbox(self, from_=from_, to=to, textvariable=var, wrap=True, command=get)
+      param_control = Spinbox(self._params_label, from_=from_, to=to, textvariable=var, wrap=True, command=get)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
@@ -280,7 +285,7 @@ class OperParamsView(Frame):
 
       param_default_value = param.get('default')     
       var.set(param_default_value)
-      param_control = Scale(self, from_=from_, to=to, resolution=resolution, variable=var, length=250, orient=HORIZONTAL)
+      param_control = Scale(self._params_label, from_=from_, to=to, resolution=resolution, variable=var, length=250, orient=HORIZONTAL)
       # param_control = IncScale(self, from_=from_, to=to, resolution=resolution, increment=increment, variable=var, length=170, orient=HORIZONTAL)
       param_getter = get
       param_setter = set
@@ -294,7 +299,7 @@ class OperParamsView(Frame):
         return
 
       param_value = param.get('default')
-      param_control = Button(self, text=param_value, width=BTNW_S)
+      param_control = Button(self._params_label, text=param_value, width=BTNW_S)
       param_getter = get
       param_setter = set
       return param_getter, param_setter, param_control
