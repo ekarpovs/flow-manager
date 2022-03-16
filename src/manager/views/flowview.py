@@ -19,33 +19,48 @@ class FlowView(View):
 
     self.grid()
     self.rowconfigure(0, weight=1)
-    self.rowconfigure(1, weight=16)
+    self.rowconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
     self.rowconfigure(3, weight=1)
-    self.rowconfigure(4, weight=2)
+    self.rowconfigure(4, weight=4)
     self.rowconfigure(5, weight=1)
     self.columnconfigure(0, weight=10)
     self.columnconfigure(1, weight=1)
 
-    # Setup combobox
-    self.namesvar = StringVar()
-    self.names_combo_box = Combobox(self, textvariable=self.namesvar, font=("TkDefaultFont"))
+    # Setup flow names list view
+    self._flow_names_list = Frame(self, highlightbackground='gray', highlightthickness=1)
+    self._flow_names_list.columnconfigure(0, weight=5)
+    self._flow_names_list.columnconfigure(1, weight=1)
+    # setup combo box
+    self._namesvar = StringVar()
+    self.names_combo_box = Combobox(self._flow_names_list, textvariable=self._namesvar, font=("TkDefaultFont"))
     self.names_combo_box['state'] = 'readonly'
-    self.btn_reload = Button(self, text='Reload', width=BTNW_S)
+    # setup button
+    self.btn_reload = Button(self._flow_names_list, text='Reload', width=BTNW_S)
+    self.names_combo_box.grid(row=0, column=0, padx=PADX, sticky=W+E)
+    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=E)   
 
-    # Setup Treeview
-    self.flow_tree_view = Treeview(self, columns=['#0','#1','#2'], selectmode="browse")
-    # Setup the treview heading
+    # Setup flow steps view
+    self._flow_steps_list = Frame(self, highlightbackground='gray', highlightthickness=1)
+    self._flow_steps_list.columnconfigure(0, weight=5)
+    self._flow_steps_list.columnconfigure(1, weight=1)
+    self._flow_steps_list.rowconfigure(0, weight=5)
+    self._flow_steps_list.rowconfigure(1, weight=1)
+    # setup Treeview
+    self.flow_tree_view = Treeview(self._flow_steps_list, columns=['#0','#1','#2'], selectmode="browse")
+    # setup the treview heading
     self.flow_tree_view.heading('#0', text='Index', anchor=CENTER)
     self.flow_tree_view.heading('#1', text='Exec/Statement', anchor=W)
     self.flow_tree_view.heading('#2', text='Title', anchor=W)  
     self.flow_tree_view.column('#0', minwidth=30, width=40)
     self.flow_tree_view.column('#1', minwidth=120, width=140)
     self.flow_tree_view.column('#2', minwidth=250, width=400)
-    self.tree_view_scrollbar_y = Scrollbar(self, orient=VERTICAL, command=self.flow_tree_view.yview)
-    self.tree_view_scrollbar_y.grid(row=1, column=1, sticky=N+S+E)
-    self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar_y.set)
-    self.tree_view_scrollbar_x = Scrollbar(self, orient=HORIZONTAL, command=self.flow_tree_view.xview)
+    self.flow_tree_view.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY,sticky=W+E+S+N)   
+    # setup scrollbars
+    self.tree_view_scrollbar_y = Scrollbar(self._flow_steps_list, orient=VERTICAL, command=self.flow_tree_view.yview)
+    self.tree_view_scrollbar_y.grid(row=0, column=1, sticky=N+S+E)
+    self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar_y.set)   
+    self.tree_view_scrollbar_x = Scrollbar(self._flow_steps_list, orient=HORIZONTAL, command=self.flow_tree_view.xview)
     self.tree_view_scrollbar_x.grid(row=1, column=0, columnspan=3, sticky=S+W+E)
     self.flow_tree_view.configure(xscrollcommand=self.tree_view_scrollbar_x.set)
 
@@ -53,8 +68,8 @@ class FlowView(View):
     # Create a ScrolledFrame widget
     self.params = ScrolledFrame(self)
     # Bind the arrow keys and scroll wheel
-    self.params.bind_arrow_keys(self)
-    self.params.bind_scroll_wheel(self)
+    self.params.bind_arrow_keys(self.params)
+    self.params.bind_scroll_wheel(self.params)
     # Create a frame within the ScrolledFrame
     self.oper_params_view = self.params.display_widget(OperParamsView)
 
@@ -96,13 +111,12 @@ class FlowView(View):
     self.btn_top.grid(row=0, column=4, padx=PADX, pady=PADY, sticky=E + N)
 
     # Setup widgets layout
-    self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
-    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY, sticky=N+S+E)   
-    self.flow_tree_view.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)   
-    oper_actions.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
-    param_actions.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
-    self.params.grid(row=4, column=0, columnspan=2,padx=PADX, pady=PADY, sticky=N+S+W+E)
-    flow_actions.grid(row=5, column=0, columnspan=2, padx=PADX, pady=PADY, sticky=W + E + S + N)
+    self._flow_names_list.grid(row=0, column=0, columnspan=2, padx=PADX, sticky=W+E)
+    self._flow_steps_list.grid(row=1, column=0, columnspan=2, padx=PADX, sticky=W+E+S+N)   
+    oper_actions.grid(row=2, column=0, columnspan=2, padx=PADX, sticky=W+E)
+    param_actions.grid(row=3, column=0, columnspan=2, padx=PADX, sticky=W+E)
+    self.params.grid(row=4, column=0, columnspan=2,padx=PADX, sticky=N+S+W+E)
+    flow_actions.grid(row=5, column=0, columnspan=2, padx=PADX, sticky=W+E)
     # Set the buttons initial state
     self.activate_buttons()
     return
