@@ -16,13 +16,13 @@ class FlowLinksView(LabelFrame):
     self.rowconfigure(0, weight=1)
     
     # Setup container for links widgets
-    self._links_label = Label(parent, anchor=W, justify=LEFT)
+    self._links_label = Label(parent, anchor=W, justify=LEFT, height=4)
     self._links_label.columnconfigure(0, weight=1)
     self._links_label.rowconfigure(0, weight=1)
-    self._links_label.grid(row=0, column=0, pady=PADY_S, sticky=W+N+S+E)   
+    self._links_label.grid(row=0, column=0, pady=PADY_S, sticky=W+N+S+E)
     return
 
-  def create_links_view(self, refs: List = [], links: Dict[str, str] = {}) -> None:
+  def create_links_view(self, refs: List = [str], links: Dict[str, str] = {}, output_refs: List[str] = []) -> None:
     for child in self._links_label.winfo_children():
       child.grid_remove()
     if len(refs) > 0:
@@ -32,7 +32,7 @@ class FlowLinksView(LabelFrame):
         inref_lbl.grid(row=i, column=0, padx=PADX, pady=PADY_S, sticky=W)
         var = StringVar()
         inref_combo = Combobox(self._links_label, name=inref_name, justify=LEFT, width=45)
-        inref_combo['values'] = ['image', 'scene']
+        inref_combo['values'] = output_refs
         # Current value
         if len(links) > 0:
           link = links.get(inref_name)

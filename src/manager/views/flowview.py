@@ -92,7 +92,7 @@ class FlowView(View):
     self._links.bind_scroll_wheel(self._links)
     # create a frame within the ScrolledFrame
     self.flow_links_view_frame = self._links.display_widget(FlowLinksView)
-  
+
     # Setup operation parameters view
     self._params_view_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self._params_view_frame.columnconfigure(0, weight=1)
@@ -105,7 +105,6 @@ class FlowView(View):
     self._params.bind_scroll_wheel(self._params)
     # create a frame within the ScrolledFrame
     self.oper_params_view_frame = self._params.display_widget(OperParamsView)
-
 
     # Setup param actions view
     self._param_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
@@ -206,8 +205,8 @@ class FlowView(View):
     self.oper_params_view_frame.create_operation_params_controls(idx, name, params, params_def)
     return
 
-  def create_links_view(self, refs, links) -> None:
-    self.flow_links_view_frame.create_links_view(refs, links)
+  def create_links_view(self, refs, links, output_refs) -> None:
+    self.flow_links_view_frame.create_links_view(refs, links, output_refs)
     return
 
   def activate_edit_buttons(self, activate=False) -> None:

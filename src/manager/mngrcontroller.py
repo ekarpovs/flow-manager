@@ -92,6 +92,20 @@ class MngrController():
     self._init_flow_model(ws_name)
     return
 
+
+  def _init_flow_output_refs(self, names: List[str]) -> None:
+    self._flow_output_refs: List[List[str]] = [[]]
+    for i, name in enumerate(names):
+      operation = self._model.module.get_operation_by_name(name)
+      ref_names = [ref.get('name') for ref in operation.outrefs]
+      refs = []
+      for ref in operation.outrefs:
+        rname = ref.get('name')
+        out_ref = f'{i}-{name}-{rname}'
+        refs.append(out_ref)
+      self._flow_output_refs.append(refs)
+    return
+
   # When a worksheet item is selected
   def _init_flow_model(self, ws_name: str) -> None:
     (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
@@ -101,6 +115,7 @@ class MngrController():
     self._view.flow.set_flow_item_names(names, titles)   
     self._update_flow_by_operations_params_def(names)
     self._create_current_operation_params_controls(0, names[0])
+    self._init_flow_output_refs(names) 
     self._create_links_view(0, names[0])
     self._rebuild_runner()
     return
@@ -150,6 +165,8 @@ class MngrController():
       self._model.flow.set_item(cur_idx, new_flow_item)
       names, titles = self._model.flow.get_names()
       self._view.flow.set_flow_item_names(names, titles)   
+      self._init_flow_output_refs(names)
+      # self._create_links_view(cur_idx, name)
       self._rebuild_runner()
     return
 
@@ -159,7 +176,9 @@ class MngrController():
       return
     self._model.flow.remove_item(cur_idx)
     names, titles = self._model.flow.get_names()
-    self._view.flow.set_flow_item_names(names, titles)   
+    self._view.flow.set_flow_item_names(names, titles)
+    self._init_flow_output_refs(names)
+    # self._create_links_view(cur_idx, names[cur_idx])
     self._rebuild_runner()
     return
 
@@ -301,7 +320,13 @@ class MngrController():
     operation = self._model.module.get_operation_by_name(name)
     refs = operation.inrefs
     links = flow_item.links
-    self._view.flow.create_links_view(refs, links)
+    possible_refs = []
+    last_idx = min(len(self._flow_output_refs)-1, idx+1)
+    output_refs = self._flow_output_refs[:last_idx]
+    for item_refs in output_refs:
+      for ref in item_refs:
+        possible_refs.append(ref)
+    self._view.flow.create_links_view(refs, links, possible_refs)
     return
 
   def _key_pressed(self, event) -> None:
