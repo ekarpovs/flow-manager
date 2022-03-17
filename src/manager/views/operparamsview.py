@@ -3,7 +3,6 @@ from tkinter import *
 from tkinter.ttk import Combobox, Spinbox, Button
 from typing import Callable, Dict, List, Tuple
 
-# from ...mix.incscale import IncScale
 from ...uiconst import *
 
 class OperParamsView(Frame):
@@ -18,11 +17,11 @@ class OperParamsView(Frame):
     self.rowconfigure(0, weight=1)
 
     self._params_label = Label(self, anchor=W, justify=LEFT)
-    self._params_label.grid(row=0, column=0, pady=PADY_S, sticky=W+N+S+E)
     self._params_label.columnconfigure(0, weight=1)
     self._params_label.columnconfigure(1, weight=1)
-    self._params_label.columnconfigure(2, weight=1)
     self._params_label.rowconfigure(0, weight=1)
+    self._params_label.grid(row=0, column=0, pady=PADY_S, sticky=W+N+S+E)
+
     self.operation_param_controls = {"idx": -1, "exec": "", "param_controls": []}
     return
 
