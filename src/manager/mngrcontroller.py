@@ -101,6 +101,7 @@ class MngrController():
     self._view.flow.set_flow_item_names(names, titles)   
     self._update_flow_by_operations_params_def(names)
     self._create_current_operation_params_controls(0, names[0])
+    self._create_links_view(0, names[0])
     self._rebuild_runner()
     return
 
@@ -109,6 +110,7 @@ class MngrController():
     controls_idx = self._view.flow.get_current_opreation_params_idx()
     if controls_idx == -1 or controls_idx != idx:
       self._create_current_operation_params_controls(idx, name)
+      self._create_links_view(idx, name)
     return
 
   def _assign_oper_params(self, name: str, item: FlowItemModel) -> None:
@@ -292,6 +294,14 @@ class MngrController():
     path_in_def = [p for p in params_def if p.get('name') == 'path']
     if len(path_in_def) > 0:
       self._view.flow.btn_params_io['state'] = NORMAL
+    return
+
+  def _create_links_view(self, idx, name) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    operation = self._model.module.get_operation_by_name(name)
+    refs = operation.inrefs
+    links = flow_item.links
+    self._view.flow.create_links_view(refs, links)
     return
 
   def _key_pressed(self, event) -> None:

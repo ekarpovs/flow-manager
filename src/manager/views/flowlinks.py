@@ -1,0 +1,43 @@
+from tkinter import *
+from tkinter.ttk import Combobox
+from tkscrolledframe import widget
+from typing import Dict, List, Tuple
+
+from ...uiconst import *
+
+
+class FlowLinksView(LabelFrame):
+  def __init__(self, parent):
+    super().__init__(parent)
+    self.parent = parent 
+
+    self.grid()
+    self.columnconfigure(0, weight=1)
+    self.rowconfigure(0, weight=1)
+    
+    # Setup container for links widgets
+    self._links_label = Label(parent, anchor=W, justify=LEFT)
+    self._links_label.columnconfigure(0, weight=1)
+    self._links_label.rowconfigure(0, weight=1)
+    self._links_label.grid(row=0, column=0, pady=PADY_S, sticky=W+N+S+E)   
+    return
+
+  def create_links_view(self, refs: List = [], links: Dict[str, str] = {}) -> None:
+    for child in self._links_label.winfo_children():
+      child.grid_remove()
+    if len(refs) > 0:
+      for i, inref in enumerate(refs):
+        inref_name = inref.get('name')
+        inref_lbl = Label(self._links_label, text=inref_name)
+        inref_lbl.grid(row=i, column=0, padx=PADX, pady=PADY_S, sticky=W)
+        var = StringVar()
+        inref_combo = Combobox(self._links_label, name=inref_name, justify=LEFT, width=45)
+        inref_combo['values'] = ['image', 'scene']
+        # Current value
+        if len(links) > 0:
+          link = links.get(inref_name)
+          if link is not None:
+            inref_combo.set(link)
+            inref_combo.textvariable = var
+        inref_combo.grid(row=i, column=1, padx=PADX, pady=PADY_S, sticky=W+E)
+    return

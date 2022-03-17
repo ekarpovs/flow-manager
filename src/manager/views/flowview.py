@@ -10,6 +10,7 @@ from src.manager.models.flow.currentflowmodel import CurrentFlowModel
 from ...uiconst import *
 from .view import View
 from .operparamsview import OperParamsView
+from .flowlinks import FlowLinksView
 
 class FlowView(View):
   def __init__(self, parent):
@@ -22,8 +23,9 @@ class FlowView(View):
     self.rowconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
     self.rowconfigure(3, weight=1)
-    self.rowconfigure(4, weight=4)
-    self.rowconfigure(5, weight=1)
+    self.rowconfigure(4, weight=1)
+    self.rowconfigure(5, weight=4)
+    self.rowconfigure(6, weight=1)
     self.columnconfigure(0, weight=10)
     self.columnconfigure(1, weight=1)
 
@@ -40,14 +42,14 @@ class FlowView(View):
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+E)
     self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E)   
 
-    # Setup flow steps view
-    self._flow_steps_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
-    self._flow_steps_frame.columnconfigure(0, weight=5)
-    self._flow_steps_frame.columnconfigure(1, weight=1)
-    self._flow_steps_frame.rowconfigure(0, weight=5)
-    self._flow_steps_frame.rowconfigure(1, weight=1)
+    # Setup flow items view
+    self._flow_items_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    self._flow_items_frame.columnconfigure(0, weight=5)
+    self._flow_items_frame.columnconfigure(1, weight=1)
+    self._flow_items_frame.rowconfigure(0, weight=5)
+    self._flow_items_frame.rowconfigure(1, weight=1)
     # setup Treeview
-    self.flow_tree_view = Treeview(self._flow_steps_frame, columns=['#0','#1','#2'], selectmode="browse")
+    self.flow_tree_view = Treeview(self._flow_items_frame, columns=['#0','#1','#2'], selectmode="browse")
     # setup the treview heading
     self.flow_tree_view.heading('#0', text='Index', anchor=CENTER)
     self.flow_tree_view.heading('#1', text='Exec/Statement', anchor=W)
@@ -57,28 +59,14 @@ class FlowView(View):
     self.flow_tree_view.column('#2', minwidth=250, width=400)
     self.flow_tree_view.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY_S,sticky=W+E+S+N)   
     # setup scrollbars
-    self.tree_view_scrollbar_y = Scrollbar(self._flow_steps_frame, orient=VERTICAL, command=self.flow_tree_view.yview)
+    self.tree_view_scrollbar_y = Scrollbar(self._flow_items_frame, orient=VERTICAL, command=self.flow_tree_view.yview)
     self.tree_view_scrollbar_y.grid(row=0, column=1, sticky=N+S+E)
     self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar_y.set)   
-    self.tree_view_scrollbar_x = Scrollbar(self._flow_steps_frame, orient=HORIZONTAL, command=self.flow_tree_view.xview)
+    self.tree_view_scrollbar_x = Scrollbar(self._flow_items_frame, orient=HORIZONTAL, command=self.flow_tree_view.xview)
     self.tree_view_scrollbar_x.grid(row=1, column=0, columnspan=3, sticky=S+W+E)
     self.flow_tree_view.configure(xscrollcommand=self.tree_view_scrollbar_x.set)
 
-    # Setup operation parameters view
-    self._params_view_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
-    self._params_view_frame.columnconfigure(0, weight=1)
-    self._params_view_frame.rowconfigure(0, weight=1)
-    # Create a ScrolledFrame widget
-    self._params = ScrolledFrame(self._params_view_frame)
-    self._params.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+S+W+E)
-
-    # Bind the arrow keys and scroll wheel
-    self._params.bind_arrow_keys(self._params)
-    self._params.bind_scroll_wheel(self._params)
-    # Create a frame within the ScrolledFrame
-    self.oper_params_view_frame = self._params.display_widget(OperParamsView)
-
-    # Setup operation actions view
+    # Setup flow items actions view
     self._oper_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self.btn_add = Button(self._oper_actions_frame, text='Add', width=BTNW_S)
     self.btn_remove = Button(self._oper_actions_frame, text='Remove', width=BTNW_S)
@@ -91,6 +79,33 @@ class FlowView(View):
     self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=E + N)
     self.btn_save.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=E + N)
     self.btn_links.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
+
+    # Setup flow items links view
+    self._links_view_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    self._links_view_frame.columnconfigure(0, weight=1)
+    self._links_view_frame.rowconfigure(0, weight=1)
+    # create a ScrolledFrame widget
+    self._links = ScrolledFrame(self._links_view_frame)
+    self._links.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N+S+W+E)
+    # bind the arrow keys and scroll wheel
+    self._links.bind_arrow_keys(self._links)
+    self._links.bind_scroll_wheel(self._links)
+    # create a frame within the ScrolledFrame
+    self.flow_links_view_frame = self._links.display_widget(FlowLinksView)
+  
+    # Setup operation parameters view
+    self._params_view_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    self._params_view_frame.columnconfigure(0, weight=1)
+    self._params_view_frame.rowconfigure(0, weight=1)
+    # create a ScrolledFrame widget
+    self._params = ScrolledFrame(self._params_view_frame)
+    self._params.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N+S+W+E)
+    # bind the arrow keys and scroll wheel
+    self._params.bind_arrow_keys(self._params)
+    self._params.bind_scroll_wheel(self._params)
+    # create a frame within the ScrolledFrame
+    self.oper_params_view_frame = self._params.display_widget(OperParamsView)
+
 
     # Setup param actions view
     self._param_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
@@ -116,12 +131,13 @@ class FlowView(View):
     self.btn_top.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
 
     # Setup widgets groups layout
-    self._flow_names_frame.grid(row=0, column=0, columnspan=2, padx=PADX, sticky=W+E)
-    self._flow_steps_frame.grid(row=1, column=0, columnspan=2, padx=PADX, sticky=W+E+S+N)   
-    self._oper_actions_frame.grid(row=2, column=0, columnspan=2, padx=PADX, sticky=W+E)
-    self._param_actions_frame.grid(row=3, column=0, columnspan=2, padx=PADX, sticky=W+E)
-    self._params_view_frame.grid(row=4, column=0, columnspan=2,padx=PADX, sticky=N+S+W+E)
-    self._flow_actions_frame.grid(row=5, column=0, columnspan=2, padx=PADX, sticky=W+E)
+    self._flow_names_frame.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
+    self._flow_items_frame.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+S+N)   
+    self._oper_actions_frame.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
+    self._links_view_frame.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
+    self._param_actions_frame.grid(row=4, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
+    self._params_view_frame.grid(row=5, column=0, columnspan=2,padx=PADX, pady=PADY_S, sticky=W+E)
+    self._flow_actions_frame.grid(row=6, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
     # Set the buttons initial state
     self.activate_buttons()
     return
@@ -161,7 +177,7 @@ class FlowView(View):
       idx = 0
     cur_item = self.flow_tree_view.focus()
     item = self.flow_tree_view.item(cur_item)  
-    return (idx, item.get('text'))
+    return (idx, item.get('values')[0])
   
   # def get_current_tree_item(self) -> str:
   #   cur_item = self.flow_tree_view.focus()
@@ -188,6 +204,10 @@ class FlowView(View):
 
   def create_operation_params_controls(self, idx, name, params, params_def):
     self.oper_params_view_frame.create_operation_params_controls(idx, name, params, params_def)
+    return
+
+  def create_links_view(self, refs, links) -> None:
+    self.flow_links_view_frame.create_links_view(refs, links)
     return
 
   def activate_edit_buttons(self, activate=False) -> None:
