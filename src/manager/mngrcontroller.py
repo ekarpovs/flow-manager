@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter.ttk import Combobox, Spinbox, Button
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 import cv2
 import copy
 import os
@@ -275,6 +275,43 @@ class MngrController():
     #   self._set_top_state()
     return
 
+# Links subpanel
+  def _create_links_view(self, idx, name) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    operation = self._model.module.get_operation_by_name(name)
+    refs = operation.inrefs
+    links = flow_item.links
+    possible_refs = []
+    last_idx = min(len(self._flow_output_refs)-1, idx+1)
+    output_refs = self._flow_output_refs[:last_idx]
+    for item_refs in output_refs:
+      for ref in item_refs:
+        possible_refs.append(ref)
+    self._view.flow.create_links_view(refs, links, possible_refs)
+    self._bind_links_widgets()
+    return
+
+  def _bind_links_widgets(self) -> None:
+    links_widgets = self._view.flow.links_widgets
+    for lw in links_widgets:
+      combo = lw.get('combo')
+      name = lw.get('name')
+      getter = lw.get('getter')
+      combo.bind("<<ComboboxSelected>>", lambda e: self._assign_link(name, getter))
+    return
+
+  def _assign_link(self, name: str, getter: Callable) -> None:
+    print('link name: value', name, getter())
+    cur_idx, flow_item_name = self._view.flow.get_current_selection_tree()
+    flow_item = self._model.flow.get_item(cur_idx)
+    ext_ref = getter()
+    flow_item.links[name] = ext_ref
+    self._model.flow.replace_item(cur_idx, flow_item)
+    item_name = flow_item_name.split('.')[1]
+    state_id = f'{cur_idx}-{item_name}'
+    storage_in_ref = self._runner.storage.get_state_input_ext_ref(state_id, name)
+    storage_in_ref.ext_ref = ext_ref
+    return
 
 # Operation parameters sub panel's commands
   def _bind_param_controls(self, params_def) -> None:
@@ -313,20 +350,6 @@ class MngrController():
     path_in_def = [p for p in params_def if p.get('name') == 'path']
     if len(path_in_def) > 0:
       self._view.flow.btn_params_io['state'] = NORMAL
-    return
-
-  def _create_links_view(self, idx, name) -> None:
-    flow_item = self._model.flow.get_item(idx)
-    operation = self._model.module.get_operation_by_name(name)
-    refs = operation.inrefs
-    links = flow_item.links
-    possible_refs = []
-    last_idx = min(len(self._flow_output_refs)-1, idx+1)
-    output_refs = self._flow_output_refs[:last_idx]
-    for item_refs in output_refs:
-      for ref in item_refs:
-        possible_refs.append(ref)
-    self._view.flow.create_links_view(refs, links, possible_refs)
     return
 
   def _key_pressed(self, event) -> None:

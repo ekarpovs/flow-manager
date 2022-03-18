@@ -137,6 +137,7 @@ class FlowView(View):
     self._param_actions_frame.grid(row=4, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
     self._params_view_frame.grid(row=5, column=0, columnspan=2,padx=PADX, pady=PADY_S, sticky=W+E)
     self._flow_actions_frame.grid(row=6, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
+    
     # Set the buttons initial state
     self.activate_buttons()
     return
@@ -208,6 +209,10 @@ class FlowView(View):
   def create_links_view(self, refs, links, output_refs) -> None:
     self.flow_links_view_frame.create_links_view(refs, links, output_refs)
     return
+  
+  @property
+  def links_widgets(self) -> List[Dict[str, object]]:
+    return self.flow_links_view_frame.widgets
 
   def activate_edit_buttons(self, activate=False) -> None:
     state = DISABLED

@@ -47,6 +47,9 @@ class CurrentFlowModel():
     self.flow.remove_item(idx)
     return
 
+  def replace_item(self, idx: int, item: FlowItemModel) -> None:
+    self._flow.replace_item(idx, item)
+    return
 
   def get_params_ws(self, idx: int) -> Dict:
     params = self._flow.get_item(idx).params_ws
