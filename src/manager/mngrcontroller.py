@@ -306,7 +306,6 @@ class MngrController():
     flow_item = self._model.flow.get_item(cur_idx)
     ext_ref = getter()
     flow_item.links[name] = ext_ref
-    self._model.flow.replace_item(cur_idx, flow_item)
     item_name = flow_item_name.split('.')[1]
     state_id = f'{cur_idx}-{item_name}'
     storage_in_ref = self._runner.storage.get_state_input_ext_ref(state_id, name)
