@@ -88,8 +88,8 @@ class FlowView(View):
     self._links = ScrolledFrame(self._links_view_frame)
     self._links.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N+S+W+E)
     # bind the arrow keys and scroll wheel
-    self._links.bind_arrow_keys(self._links)
-    self._links.bind_scroll_wheel(self._links)
+    # self._links.bind_arrow_keys(self._links)
+    # self._links.bind_scroll_wheel(self._links)
     # create a frame within the ScrolledFrame
     self.flow_links_view_frame = self._links.display_widget(FlowLinksView)
 
@@ -101,8 +101,8 @@ class FlowView(View):
     self._params = ScrolledFrame(self._params_view_frame)
     self._params.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N+S+W+E)
     # bind the arrow keys and scroll wheel
-    self._params.bind_arrow_keys(self._params)
-    self._params.bind_scroll_wheel(self._params)
+    # self._params.bind_arrow_keys(self._params)
+    # self._params.bind_scroll_wheel(self._params)
     # create a frame within the ScrolledFrame
     self.oper_params_view_frame = self._params.display_widget(OperParamsView)
 
