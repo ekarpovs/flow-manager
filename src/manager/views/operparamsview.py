@@ -58,9 +58,9 @@ class OperParamsView(Frame):
 
 # Local methods
   def _clear_operation_params(self) -> None:
-    for control in self.operation_param_controls['param_controls']:
-      control['control'].grid_forget()
-      control['label'].grid_forget()   
+    for child in self._params_label.winfo_children():
+      child.grid_remove()
+
     self.operation_param_controls['idx'] = -1
     self.operation_param_controls['exec'] = ''
     self.operation_param_controls['param_controls'] = []
