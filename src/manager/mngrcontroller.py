@@ -310,6 +310,7 @@ class MngrController():
     state_id = f'{cur_idx}-{item_name}'
     storage_in_ref = self._runner.storage.get_state_input_ext_ref(state_id, name)
     storage_in_ref.ext_ref = ext_ref
+    self._apply()
     return
 
 # Operation parameters sub panel's commands
