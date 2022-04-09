@@ -10,6 +10,7 @@ src/manager/models/flow/__pycache__
 src/manager/models/module/__pycache__
 src/manager/converters/__pycache__
 src/mix
+*.bak
 config*.json
 fsm-cfg.json
 .vscode

@@ -1,6 +1,14 @@
 python > 3.7.4
 cv2 >= 3.4.2
 tk >= 8.6.8
+pillow >= 9.0.1
+pandas >= 1.2.4
+matplotlib >= 3.4.3
 # Local installation
-flow_runner >= 0.1
 operation_loader >= 0.1
+gfsm >= 0.1
+flow_model >= 0.1
+flow_converter >= 0.1
+flow_storage >= 0.1
+flow_runner >= 0.1
+
