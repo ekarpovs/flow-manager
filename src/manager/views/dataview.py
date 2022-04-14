@@ -6,7 +6,7 @@ from tkinter.ttk import Button
 from tkscrolledframe import ScrolledFrame
 from PIL import Image, ImageTk
 
-from flow_storage import *
+from flow_storage import FlowStorage, FlowDataType
 
 from ...uiconst import *
 from .view import View
@@ -101,7 +101,7 @@ class DataView(View):
     self._preview_height = DEFAULT_VIEW_SIZE
     self._preview_width = DEFAULT_VIEW_SIZE
     self.var_h.set(self._preview_height)
-    self._preview() 
+    self._preview(0) 
     return
 
   def _preview_size(self, image) -> Tuple[int,int]:
@@ -205,7 +205,7 @@ class DataView(View):
     row_idx = self._idx_map.get(idx)
     return row_idx
 
-  def _preview(self) -> None:
+  def _preview(self, idx: int) -> None:   
     if self._out is None:
       return
 
@@ -220,8 +220,8 @@ class DataView(View):
 
   def _map_idx_to_row_idx(self, idx: int) -> None:
     preview_row = len(self._idx_map)
-    (refs, data) = self._out
-    if len(refs) == 0 and len(data) == 0:
+    (out_refs, out_data) = self._out
+    if len(out_refs) == 0 and len(out_data) == 0:
       # No data for preview
       self._idx_map[f'{idx}'] = WITHOUT_PREVIEW_DATA
       return
@@ -229,12 +229,16 @@ class DataView(View):
     self._idx_map[f'{idx}'] = min(idx, preview_row)
     return
 
-  def set_preview(self, idx: int, out: Tuple[List[Tuple[str, FlowDataType]], Dict] = None) -> None:
-    self._out = out
+  def preview_result(self, idx: int, state_id: str) -> None:
+    out_data = self._storage.get_state_output_data(state_id)
+    refs = self._storage.get_state_output_refs(state_id)
+    if out_data is None or refs is None:
+      return
+    out_refs = [(ref.ext_ref, ref.int_ref, ref.data_type) for ref in refs]  
+    self._out = (out_refs, out_data)
     self._map_idx_to_row_idx(idx)
+    self._preview(idx)
 
-    self._preview()
-    
     self.content.focus_set()
     self.content.yview(SCROLL, 1, UNITS)
     return

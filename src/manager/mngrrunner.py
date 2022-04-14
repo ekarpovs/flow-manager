@@ -34,13 +34,9 @@ class MngrRunner():
   def state_idx(self) -> int:
     return self.runner.state_idx
 
-  def get_current_output(self) -> Tuple[List[Tuple[str, FlowDataType]], Dict]:
-    state_id = self.runner.output_from_state
-    data = self.storage.get_state_output_data(state_id)
-    refs = self.storage.get_state_output_refs(state_id)
-    t_refs = [(ref.ext_ref, ref.int_ref,ref.data_type) for ref in refs]  
-    return (t_refs, data)
-  
+  @property
+  def output_from_state(self) -> str:
+    return self.runner._output_from_state
 
   def build(self, model: FlowModel) -> None:
     if self._storage is not None:
