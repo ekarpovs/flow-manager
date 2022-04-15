@@ -101,7 +101,7 @@ class DataView(View):
     self._preview_height = DEFAULT_VIEW_SIZE
     self._preview_width = DEFAULT_VIEW_SIZE
     self.var_h.set(self._preview_height)
-    self._preview(0) 
+    self._preview() 
     return
 
   def _preview_size(self, image) -> Tuple[int,int]:
@@ -201,20 +201,20 @@ class DataView(View):
     self._grid_rows.insert(row_idx, preview_frame)
     return
 
-  def _get_row_idx(self, idx: str) -> int:
-    row_idx = self._idx_map.get(idx)
+  def _get_row_idx(self, state_id: str) -> int:
+    row_idx = self._idx_map.get(state_id)
     return row_idx
 
-  def _preview(self, idx: int) -> None:   
+  def _preview(self) -> None:   
     if self._out is None:
       return
 
     (out_refs, out_data) = self._out
     if len(out_refs) > 0:
       parts =out_refs[0][0].split('-')
-      idx = parts[0]
+      state_id = parts[0]
       title = '-'.join(parts[0:len(parts)-1])
-      row_idx = self._get_row_idx(idx)
+      row_idx = self._get_row_idx(state_id)
       self._create_preview(row_idx, title, out_data, out_refs)
     return
 
@@ -237,7 +237,7 @@ class DataView(View):
     out_refs = [(ref.ext_ref, ref.int_ref, ref.data_type) for ref in refs]  
     self._out = (out_refs, out_data)
     self._map_idx_to_row_idx(idx)
-    self._preview(idx)
+    self._preview()
 
     self.content.focus_set()
     self.content.yview(SCROLL, 1, UNITS)
