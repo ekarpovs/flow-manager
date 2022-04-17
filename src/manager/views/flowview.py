@@ -176,6 +176,8 @@ class FlowView(View):
     else:
       idx = 0
     cur_item = self.flow_tree_view.focus()
+    if cur_item == '':
+      return (0, '')
     item = self.flow_tree_view.item(cur_item)  
     return (idx, item.get('values')[0])
   
