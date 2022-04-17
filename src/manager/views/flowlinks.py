@@ -28,9 +28,16 @@ class FlowLinksView(LabelFrame):
   def widgets(self) -> List[Dict[str, object]]:
     return self._widgets.get('widgets')
 
-  def create_links_view(self, refs: List = [str], links: Dict[str, str] = {}, output_refs: List[str] = []) -> None:
+  def _clear_widgets(self) -> None:
+    # Clear lay out
     for child in self._links_label.winfo_children():
       child.grid_remove()
+    # Clear collection
+    self._widgets.get('widgets').clear()
+    return
+
+  def create_links_view(self, refs: List = [str], links: Dict[str, str] = {}, output_refs: List[str] = []) -> None:
+    self._clear_widgets()
     if len(refs) > 0:
       for i, inref in enumerate(refs):
         inref_name = inref.get('name')

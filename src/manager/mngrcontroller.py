@@ -116,7 +116,7 @@ class MngrController():
     self._update_flow_by_operations_params_def(names)
     self._create_current_operation_params_controls(0, names[0])
     self._init_flow_output_refs(names) 
-    self._create_links_view(0, names[0])
+    # self._create_links_view(0, names[0])
     self._rebuild_runner()
     return
 
@@ -166,7 +166,6 @@ class MngrController():
       names, titles = self._model.flow.get_names()
       self._view.flow.set_flow_item_names(names, titles)   
       self._init_flow_output_refs(names)
-      # self._create_links_view(cur_idx, name)
       self._rebuild_runner()
     return
 
@@ -178,7 +177,6 @@ class MngrController():
     names, titles = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names, titles)
     self._init_flow_output_refs(names)
-    # self._create_links_view(cur_idx, names[cur_idx])
     self._rebuild_runner()
     return
 
@@ -277,6 +275,7 @@ class MngrController():
 
 # Links subpanel
   def _create_links_view(self, idx, name) -> None:
+    self._unbind_links_widgets()
     flow_item = self._model.flow.get_item(idx)
     operation = self._model.module.get_operation_by_name(name)
     refs = operation.inrefs
@@ -289,6 +288,13 @@ class MngrController():
         possible_refs.append(ref)
     self._view.flow.create_links_view(refs, links, possible_refs)
     self._bind_links_widgets()
+    return
+
+  def _unbind_links_widgets(self) -> None:
+    links_widgets = self._view.flow.links_widgets
+    for lw in links_widgets:
+      combo = lw.get('combo')
+      combo.unbind("<<ComboboxSelected>>")
     return
 
   def _bind_links_widgets(self) -> None:
