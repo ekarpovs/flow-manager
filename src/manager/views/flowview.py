@@ -18,6 +18,27 @@ class FlowView(View):
     self.parent = parent 
     self['text'] = 'Flows'
 
+    # Setup the view
+    self._setup_view()
+    
+    # Set the buttons initial state
+    self.activate_buttons()
+    return
+
+# Setup the view
+  def _setup_view(self) -> None:
+    self._grid_config()
+    self._setup_flow_names_view()
+    self._setup_flow_items_view()
+    self._setup_flow_items_actions_view()
+    self._setup_flow_items_links_view()
+    self._setup_operation_params_actions_view()
+    self._setup_operation_params_view()
+    self._setup_flow_actions_view()
+    self._setup_views_layout()
+    return
+
+  def _grid_config(self) -> None:
     self.grid()
     self.rowconfigure(0, weight=1)
     self.rowconfigure(1, weight=1)
@@ -28,7 +49,9 @@ class FlowView(View):
     self.rowconfigure(6, weight=1)
     self.columnconfigure(0, weight=10)
     self.columnconfigure(1, weight=1)
+    return
 
+  def _setup_flow_names_view(self) -> None:
     # Setup flow names list view
     self._flow_names_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self._flow_names_frame.columnconfigure(0, weight=5)
@@ -41,7 +64,9 @@ class FlowView(View):
     self.btn_reload = Button(self._flow_names_frame, text='Reload', width=BTNW_S)
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+E)
     self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E)   
+    return
 
+  def _setup_flow_items_view(self) -> None:
     # Setup flow items view
     self._flow_items_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self._flow_items_frame.columnconfigure(0, weight=5)
@@ -65,21 +90,25 @@ class FlowView(View):
     self.tree_view_scrollbar_x = Scrollbar(self._flow_items_frame, orient=HORIZONTAL, command=self.flow_tree_view.xview)
     self.tree_view_scrollbar_x.grid(row=1, column=0, columnspan=3, sticky=S+W+E)
     self.flow_tree_view.configure(xscrollcommand=self.tree_view_scrollbar_x.set)
+    return
 
+  def _setup_flow_items_actions_view(self) -> None:
     # Setup flow items actions view
     self._oper_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self.btn_add = Button(self._oper_actions_frame, text='Add', width=BTNW_S)
     self.btn_remove = Button(self._oper_actions_frame, text='Remove', width=BTNW_S)
     self.btn_reset = Button(self._oper_actions_frame, text='Reset', width=BTNW_S)
     self.btn_save = Button(self._oper_actions_frame, text='Save', width=BTNW_S)
-    self.btn_links = Button(self._oper_actions_frame, text='Links', width=BTNW_S)
+    self.btn_links = Button(self._oper_actions_frame, text='Config', width=BTNW_S)
 
     self.btn_add.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + N)   
     self.btn_remove.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E + N)
     self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=E + N)
     self.btn_save.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=E + N)
     self.btn_links.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
+    return
 
+  def _setup_flow_items_links_view(self) -> None:
     # Setup flow items links view
     self._links_view_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self._links_view_frame.columnconfigure(0, weight=1)
@@ -92,7 +121,20 @@ class FlowView(View):
     # self._links.bind_scroll_wheel(self._links)
     # create a frame within the ScrolledFrame
     self.flow_links_view_frame = self._links.display_widget(FlowLinksView)
+    return
 
+  def _setup_operation_params_actions_view(self) -> None:
+    # Setup param actions view
+    self._param_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    self.btn_params_reset = Button(self._param_actions_frame, text='Reset', width=BTNW_S)
+    self.btn_params_default = Button(self._param_actions_frame, text='Default', width=BTNW_S)
+    self.btn_params_io = Button(self._param_actions_frame, text='I/O', width=BTNW_S)
+    self.btn_params_reset.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+N)
+    self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W+N)
+    self.btn_params_io.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W+N)
+    return
+
+  def _setup_operation_params_view(self) -> None:
     # Setup operation parameters view
     self._params_view_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self._params_view_frame.columnconfigure(0, weight=1)
@@ -105,17 +147,10 @@ class FlowView(View):
     # self._params.bind_scroll_wheel(self._params)
     # create a frame within the ScrolledFrame
     self.oper_params_view_frame = self._params.display_widget(OperParamsView)
+    return
 
-    # Setup param actions view
-    self._param_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
-    self.btn_params_reset = Button(self._param_actions_frame, text='Reset', width=BTNW_S)
-    self.btn_params_default = Button(self._param_actions_frame, text='Default', width=BTNW_S)
-    self.btn_params_io = Button(self._param_actions_frame, text='I/O', width=BTNW_S)
-    self.btn_params_reset.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+N)
-    self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W+N)
-    self.btn_params_io.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W+N)
-
-    # Setup flow actions buttons
+  def  _setup_flow_actions_view(self) -> None:
+    # Setup flow actions view
     self._flow_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self.btn_run = Button(self._flow_actions_frame, text='Run', width=BTNW_S)
     self.btn_curr = Button(self._flow_actions_frame, text='Current', width=BTNW_S)
@@ -128,7 +163,9 @@ class FlowView(View):
     self.btn_next.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W + N)
     self.btn_prev.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=E + N)
     self.btn_top.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
+    return
 
+  def _setup_views_layout(self) -> None:
     # Setup widgets groups layout
     self._flow_names_frame.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
     self._flow_items_frame.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+S+N)   
@@ -137,12 +174,9 @@ class FlowView(View):
     self._param_actions_frame.grid(row=4, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
     self._params_view_frame.grid(row=5, column=0, columnspan=2,padx=PADX, pady=PADY_S, sticky=W+E)
     self._flow_actions_frame.grid(row=6, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
-    
-    # Set the buttons initial state
-    self.activate_buttons()
     return
 
-
+# Interfaces
   def clear_flow_tree_view(self):
     items = self.flow_tree_view.get_children()
     for item in items:
