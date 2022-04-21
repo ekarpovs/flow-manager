@@ -114,7 +114,7 @@ class FlowView(View):
     self._links_view_frame.columnconfigure(0, weight=1)
     self._links_view_frame.rowconfigure(0, weight=1)
     # create a ScrolledFrame widget
-    self._links = ScrolledFrame(self._links_view_frame)
+    self._links = ScrolledFrame(self._links_view_frame, height=75)
     self._links.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N+S+W+E)
     # bind the arrow keys and scroll wheel
     # self._links.bind_arrow_keys(self._links)
