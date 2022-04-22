@@ -54,6 +54,8 @@ class FlowView(View):
   def _setup_flow_names_view(self) -> None:
     # Setup flow names list view
     self._flow_names_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    self._flow_names_frame.rowconfigure(0, weight=1)
+    self._flow_names_frame.rowconfigure(1, weight=1)
     self._flow_names_frame.columnconfigure(0, weight=5)
     self._flow_names_frame.columnconfigure(1, weight=1)
     # setup combo box
@@ -63,7 +65,10 @@ class FlowView(View):
     # setup button
     self.btn_reload = Button(self._flow_names_frame, text='Reload', width=BTNW_S)
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+E)
-    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E)   
+    self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E)
+    # setup title label
+    self._title_label = Label(self._flow_names_frame)
+    self._title_label.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W)
     return
 
   def _setup_flow_items_view(self) -> None:
@@ -228,6 +233,16 @@ class FlowView(View):
     self.names_combo_box['values'] = ws_names
     self.names_combo_box.current(0)
     return
+
+  @property
+  def ws_title(self):
+    return self._title_label.text
+
+  @ws_title.setter
+  def ws_title(self, ws_title):
+    self._title_label['text'] = ws_title
+    return
+
 
   def get_current_operation_params_def(self) -> List[Dict]: 
     return self.oper_params_view_frame.get_current_operation_params_def()

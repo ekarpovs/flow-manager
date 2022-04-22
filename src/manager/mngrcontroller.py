@@ -90,6 +90,7 @@ class MngrController():
   def _worksheet_selected(self, event) -> None:
     ws_name = self._view.flow.names_combo_box.get()
     self._init_flow_model(ws_name)
+    self._view.ws_title = self._model.flow.flow.info
     return
 
 
@@ -146,10 +147,12 @@ class MngrController():
     names = self._model.flow.worksheetnames
     names.insert(0, 'new <>')
     self._view.ws_names = names
+    self._view.ws_title = self._model.flow.flow.info
     if event is not None:
       # don't clear after store ws
       self._view.flow.clear_flow_tree_view()
       self._view.data.clear_view()
+      self._view.ws_title = ''
     return
 
   def _add_operation_to_flow_model(self) -> None:
@@ -202,6 +205,7 @@ class MngrController():
   def _update_flow(self) -> None:
     names, titles = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names, titles)   
+    self._view.ws_title = self._model.flow.flow.info
     self._rebuild_runner()
     return 
 
