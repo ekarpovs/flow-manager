@@ -155,9 +155,10 @@ class DataView(View):
     if len(self._grid_rows) > 0:
       self._out = None
       # map idx to preview idx
-      row_idx = max(len(self._idx_map)-1, self._get_row_idx(f'{idx}'))
+      row_idx = self._get_row_idx(f'{idx}')
       if row_idx == WITHOUT_PREVIEW_DATA:
         return
+      row_idx = max(len(self._idx_map)-1, self._get_row_idx(f'{idx}'))
       try:
         # remove idx mapping for the idx
         self._idx_map.pop(f'{row_idx}')
@@ -199,10 +200,20 @@ class DataView(View):
       pass
     # set new one
     self._grid_rows.insert(row_idx, preview_frame)
+
+    geom = preview_frame.winfo_geometry()
+    h = preview_frame.winfo_height()
+    w = preview_frame.winfo_width()
+    y = preview_frame.winfo_y()
+    geom_cont = self.content.winfo_geometry()
+    # self._move(preview_frame)
+
+    self.content.focus_set()
+    self.content.yview(SCROLL, h, UNITS)
     return
 
   def _get_row_idx(self, state_id: str) -> int:
-    row_idx = self._idx_map.get(state_id)
+    row_idx = self._idx_map.get(state_id, WITHOUT_PREVIEW_DATA)
     return row_idx
 
   def _preview(self) -> None:   
@@ -238,9 +249,6 @@ class DataView(View):
     self._out = (out_refs, out_data)
     self._map_idx_to_row_idx(idx)
     self._preview()
-
-    self.content.focus_set()
-    self.content.yview(SCROLL, 1, UNITS)
     return
     
   def _on_click(self, event) -> None:
@@ -275,4 +283,38 @@ class DataView(View):
 
   def _save(self) -> None:
     print('save')
+    return
+
+  # TODO:
+  # https://stackoverflow.com/questions/28005591/how-to-create-a-scrollable-canvas-that-scrolls-without-a-scroll-bar-in-python
+  def _move(self, preview_frame):
+    deltay = self._preview_height
+    deltax = self._preview_width
+    # make sure we don't move beyond our scrollable region
+    (x0,y0,x1,y1) = self.content._canvas.coords()
+    deltay = 0 if (deltay > 0 and y1 >= 400) else deltay
+    deltay = 0 if (deltay < 0 and y0 <= -400) else deltay
+    deltax = 0 if (deltax > 0 and x1 >= 400) else deltax
+    deltax = 0 if (deltax < 0 and x0 <= -400) else deltax
+
+    # move the item, then scroll it into view
+    self.content._canvas.move(preview_frame, deltax, deltay)
+    self._make_visible(preview_frame)    
+
+  def _make_visible(self, preview_frame) -> None:
+    # determine the bounding box of the visible area of the screen
+    (cx0,cy0) = (self.content._canvas.canvasx(0), self.content._canvas.canvasy(0))
+    (cx1,cy1) = (self.content._canvas.canvasx(self.content._canvas.cget("width")), 
+                  self.content._canvas.canvasy(self.content._canvas.cget("height")))
+
+    # determine the bounding box of the thing to be made visible
+    (x0,y0,x1,y1) = self.content._canvas.coords(preview_frame)
+
+    # determine how far off the screen the object is
+    deltax = x0-cx0 if x0 <= cx0 else x1-cx1 if x1 >= cx1 else 0
+    deltay = y0-cy0 if y0 <= cy0 else y1-cy1 if y1 >= cy1 else 0
+
+    # scroll the canvas to make the item visible
+    self.canvas.xview("scroll", int(deltax), "units")
+    self.canvas.yview("scroll", int(deltay), "units")
     return
