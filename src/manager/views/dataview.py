@@ -201,13 +201,9 @@ class DataView(View):
     # set new one
     self._grid_rows.insert(row_idx, preview_frame)
 
-    geom = preview_frame.winfo_geometry()
+    # Scroll view if need
+    self.update_idletasks()
     h = preview_frame.winfo_height()
-    w = preview_frame.winfo_width()
-    y = preview_frame.winfo_y()
-    geom_cont = self.content.winfo_geometry()
-    # self._move(preview_frame)
-
     self.content.focus_set()
     self.content.yview(SCROLL, h, UNITS)
     return
