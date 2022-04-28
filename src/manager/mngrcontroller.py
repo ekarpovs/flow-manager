@@ -374,6 +374,8 @@ class MngrController():
     for k in params_new.keys():
       flow_item.params[k] = params_new.get(k)
     self._run_current(idx)
+    # Special treatment - activated via parameters view
+    self._view.flow.btn_params_io['state'] = DISABLED
     return
 
   def _reset(self) -> None:
