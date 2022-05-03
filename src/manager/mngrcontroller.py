@@ -124,7 +124,7 @@ class MngrController():
   def _tree_selection_changed(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     controls_idx = self._view.flow.get_current_opreation_params_idx()
-    if controls_idx == -1 or controls_idx != idx:
+    if self._model.flow.flow is not None and (controls_idx == -1 or controls_idx != idx):
       self._create_current_operation_params_controls(idx, name)
       self._create_links_view(idx, name)
     return
@@ -147,12 +147,13 @@ class MngrController():
     names = self._model.flow.worksheetnames
     names.insert(0, 'new <>')
     self._view.ws_names = names
-    self._view.ws_title = self._model.flow.flow.info
+    # self._view.ws_title = self._model.flow.flow.info
     if event is not None:
       # don't clear after store ws
       self._view.flow.clear_flow_tree_view()
       self._view.data.clear_view()
       self._view.ws_title = ''
+      self._view.params.clear()
     return
 
   def _add_operation_to_flow_model(self) -> None:
@@ -410,6 +411,8 @@ class MngrController():
 
   def _rebuild_runner(self) -> None:
     if self._model.flow:
+      self._view.params.clear()
+      self._view.params.build(self._model.flow.flow)
       self._runner.build(self._model.flow.flow)
       # for plotting
       self._view.data.storage = self._runner.storage

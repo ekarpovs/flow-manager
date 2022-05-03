@@ -5,6 +5,7 @@ from typing import Callable, Dict, List, Tuple
 
 # from ...mix.incscale import IncScale
 from ...uiconst import *
+from .paramsview import paramsutils as put
 
 class OperParamsView(Frame):
   def __init__(self, parent) -> None:
@@ -24,7 +25,7 @@ class OperParamsView(Frame):
 # API
   def create_operation_params_controls(self, idx: int, item_name: str, params: Dict, params_def: List[Dict]) -> None:
     self._clear_operation_params()
-    params_list = self._convert_to_list_of_dict(params, params_def)
+    params_list = put._convert_to_list_of_dict(params, params_def)
     self._create_controls(idx, item_name, params_list)
     return
 
@@ -168,9 +169,9 @@ class OperParamsView(Frame):
         param_control.set(value)
 
       param_possible_values = param.get('p_values')
-      param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
+      param_values_tuple = put.parse_possible_values_list_or_range(param_possible_values)
       param_control['values'] = param_values_tuple
-      var = self.get_var_by_type(p_types)  
+      var = put.get_var_by_type(p_types)  
       param_default_value = param.get('default')    
       param_control.set(param_default_value)
       param_control.textvariable = var
@@ -198,9 +199,9 @@ class OperParamsView(Frame):
 
       p_types = param.get('p_types')
       param_possible_values = param.get('p_values')     
-      param_keys_tuple = self.possible_values_pairs_to_tuple(param_possible_values)
+      param_keys_tuple = put.possible_values_pairs_to_tuple(param_possible_values)
       param_control['values'] = param_keys_tuple
-      param_dict = self.possible_values_pairs_to_dict(param_possible_values)
+      param_dict = put.possible_values_pairs_to_dict(param_possible_values)
       param_default_value = param.get('default')
       if (type(param_default_value) is int) or (type(param_default_value) is float):
         param_default_value = get_key(param_default_value)
@@ -213,12 +214,12 @@ class OperParamsView(Frame):
 
     def _prange(param: Dict) -> Tuple[Callable, Callable, Spinbox]:
       param_possible_values = param.get('p_values')
-      param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
+      param_values_tuple = put.parse_possible_values_list_or_range(param_possible_values)
       from_ = param_values_tuple[0]
       to = param_values_tuple[1]
       resolution = param_values_tuple[2]
       p_types = param.get('p_types')
-      var = self.get_var_by_type(p_types)  
+      var = put.get_var_by_type(p_types)  
 
       def get():
         value = var.get()
@@ -242,7 +243,7 @@ class OperParamsView(Frame):
 
     def _pscale(param: Dict) -> Tuple[Callable, Callable, Scale]:
       param_possible_values = param.get('p_values')
-      param_values_tuple = self.parse_possible_values_list_or_range(param_possible_values)
+      param_values_tuple = put.parse_possible_values_list_or_range(param_possible_values)
       p_types = param.get('p_types')
       if p_types == 'float':
         from_ = float(param_values_tuple[0])
@@ -256,7 +257,7 @@ class OperParamsView(Frame):
         increment = float(param_values_tuple[3])
       else:
         pass      
-      var = self.get_var_by_type(p_types)  
+      var = put.get_var_by_type(p_types)  
 
       def get():
         # x, y = param_control.coords()
@@ -312,59 +313,3 @@ class OperParamsView(Frame):
 
     control_builder = type_switcher.get(param_type, 'Invalid type')
     return control_builder(param)
-
-# Class utilities, converters
-  @staticmethod
-  def get_var_by_type(type: str) -> Variable:
-    var = tk.StringVar()
-    if type == 'float':
-      var = tk.DoubleVar()
-    elif type == 'int':
-      var = tk.IntVar()
-    return var
-
-  @staticmethod
-  def _convert_to_list_of_dict(params: Dict, params_def: List[Dict]) -> List[Dict]:
-    for param_def in params_def:
-      name = param_def.get('name')
-      pvalue = params.get(name, None)
-      if pvalue is not None:
-        param_def['default'] = pvalue
-    return params_def
-
-  @staticmethod
-  def split_possible_values_string(param_possible_values: str) -> List[str]:
-    end_idx = len(param_possible_values)
-    param_possible_values = param_possible_values[0:end_idx]
-    return param_possible_values.split(',')
-
-  @staticmethod
-  def parse_possible_values_dict_def(param_possible_values: str) -> List[str]:   
-    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
-    return [item for  item in param_possible_values_list]
-
-  @staticmethod
-  def possible_values_pairs_to_tuple(param_possible_values: List[str]) -> Tuple:   
-    pairs_list = OperParamsView.parse_possible_values_dict_def(param_possible_values)
-    param_key_list = [item.split(':')[0] for  item in pairs_list]
-    param_keys_tuple = tuple(param_key_list)
-    return param_keys_tuple
-
-  @staticmethod
-  def possible_values_pairs_to_dict(param_possible_values: str) -> Dict:   
-    pairs_list = OperParamsView.parse_possible_values_dict_def(param_possible_values)
-    param_dict = {}
-    for pair_str in pairs_list:
-      kv = pair_str.split(':')
-      k = kv[0]
-      # v = kv[1]
-      v = int(kv[1])
-      param_dict[k] = v
-    return param_dict
-
-  @staticmethod
-  def parse_possible_values_list_or_range(param_possible_values: str) -> Tuple:
-    param_possible_values_list = OperParamsView.split_possible_values_string(param_possible_values)
-    param_key_list = [item for  item in param_possible_values_list]   
-    param_values_tuple = tuple(param_key_list)
-    return param_values_tuple

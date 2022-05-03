@@ -16,23 +16,30 @@ class MngrView(LabelFrame):
     self.rowconfigure(0, weight=1)
     self.columnconfigure(0, weight=1)
     self.columnconfigure(1, weight=1)
-    self.columnconfigure(2, weight=2)
+    self.columnconfigure(2, weight=1)
+    self.columnconfigure(3, weight=2)
 
 
     self._module = ModuleView(self)
     self._flow = FlowView(self)
+    self._params = ParamsView(self)
     self._data = DataView(self)
 
     self._divide_view()
 
     self._module.grid(row=0, column=0)
     self._flow.grid(row=0, column=1)
-    self._data.grid(row=0, column=2)
+    self._params.grid(row=0, column=2)
+    self._data.grid(row=0, column=3)
 
 
   @property
   def module(self) -> ModuleView:
     return self._module
+
+  @property
+  def params(self) -> ParamsView:
+    return self._params
 
   @property
   def flow(self) -> FlowView:
@@ -85,11 +92,14 @@ class MngrView(LabelFrame):
     self['width'] = w -5
     view_height = h - PADY*2
     self._module['height'] = view_height
-    self._module['width'] = int((w/3.5)*0.9)
+    self._module['width'] = w//5
     self._flow['height'] = view_height
-    self._flow['width'] = int((w/3.5)*1.02)
+    self._flow['width'] = int((w/4)*0.95)
+    self._params['height'] = view_height
+    self._params['width'] = int((w/5) * 1.1)
     self._data['height'] = view_height
-    self._data['width'] = w - self._module['width'] - self._flow['width']
+    self._data['width'] = w - self._module['width'] - self._params['width'] - self._flow['width']-PADX
     self._module.grid_propagate(0)
     self._flow.grid_propagate(0)
+    self._params.grid_propagate(0)
     self._data.grid_propagate(0)
