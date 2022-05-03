@@ -34,6 +34,7 @@ class CurrentFlowModel():
 
   def reload(self) -> None:
     self._ws_model = WorksheetModel(self._cfg.worksheets_paths)
+    self.flow = None
     return
 
   def get_item(self, idx: int) -> FlowItemModel:
