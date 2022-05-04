@@ -121,12 +121,55 @@ class MngrController():
     self._rebuild_runner()
     return
 
+  def _unbind_params_widgets(self) -> None:
+    children = self._view.params.get_active_wd_children()
+    for child in children:
+      t = type(child) 
+      if t == Scale: 
+        child.unbind("<ButtonRelease-1>")
+      elif t == Spinbox:
+        child.unbind("<ButtonRelease-1>")
+      elif t == Checkbutton:
+        child.configure(command=None)
+      elif t == Combobox:
+        child.unbind("<<ComboboxSelected>>")
+      elif t == Entry:
+        child.unbind("<Key>")
+      else:
+        pass
+    return
+
+  def _bind_params_widgets(self) -> None:
+    children = self._view.params.get_active_wd_children()
+    for child in children:
+      t = type(child) 
+      if t == Scale: 
+        child.bind("<ButtonRelease-1>", self._apply)
+      elif t == Spinbox:
+        child.bind("<ButtonRelease-1>", self._apply)
+      elif t == Checkbutton:
+        child.configure(command=self._apply)
+      elif t == Combobox:
+        child.bind("<<ComboboxSelected>>", self._apply)
+      elif t == Entry:
+        child.bind("<Key>", self._key_pressed)
+      else:
+        pass
+    return
+
+  def _activate_params(self, idx: int = 0) -> None:
+    self._unbind_params_widgets()
+    self._view.params.set_active_wd(idx)
+    self._bind_params_widgets()
+    return
+
   def _tree_selection_changed(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     controls_idx = self._view.flow.get_current_opreation_params_idx()
     if self._model.flow.flow is not None and (controls_idx == -1 or controls_idx != idx):
       self._create_current_operation_params_controls(idx, name)
       self._create_links_view(idx, name)
+      self._activate_params(idx)
     return
 
   def _assign_oper_params(self, name: str, item: FlowItemModel) -> None:
@@ -312,7 +355,6 @@ class MngrController():
     return
 
   def _assign_link(self, name: str, getter: Callable) -> None:
-    print('link name: value', name, getter())
     cur_idx, flow_item_name = self._view.flow.get_current_selection_tree()
     flow_item = self._model.flow.get_item(cur_idx)
     ext_ref = getter()
@@ -413,6 +455,7 @@ class MngrController():
     if self._model.flow:
       self._view.params.clear()
       self._view.params.build(self._model.flow.flow)
+      self._activate_params()
       self._runner.build(self._model.flow.flow)
       # for plotting
       self._view.data.storage = self._runner.storage

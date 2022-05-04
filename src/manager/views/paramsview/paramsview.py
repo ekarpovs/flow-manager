@@ -28,15 +28,26 @@ class ParamsView(View):
     self._content.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E)
     # Create the params frame within the ScrolledFrame
     self._params_view = self._content.display_widget(Frame)
-    # self._params_view['bg'] = 'green'
     self._grid_rows: List[Widget] = []
+    self._active_wd_idx = -1
     return
+
+  def get_active_wd_children(self) -> List[Widget]:
+    if self._active_wd_idx < 0:
+      return None
+    children = []
+    active_wd = self._grid_rows[self._active_wd_idx]
+    for child in active_wd.winfo_children():
+      if child.widgetName != 'label':
+        children.append(child)
+    return children
 
   def clear(self) -> None:
     for row in self._grid_rows:
       row.grid_remove()  
     self._grid_rows.clear()
     self._content.scroll_to_top()   
+    self._active_wd_idx = -1
     return
 
   def build(self, flow: FlowModel) -> None:
@@ -46,6 +57,8 @@ class ParamsView(View):
       self._factory.container = item_params_frame
       self._create_item_params_widgets(item)
       self._grid_rows.append(item_params_frame)
+    self._active_wd_idx = 0
+    self._hightlighte_active_wd(True)
     return  
 
   def _create_item_params_container(self, idx: int, item: FlowItemModel) -> Widget:
@@ -79,3 +92,20 @@ class ParamsView(View):
       param_descr = Label(self._factory.container, text=f'{comment}')
       param_descr.grid(row=i, column=2, padx=PADX_S, pady=PADY_S, sticky=W)
     return 
+
+
+  def set_active_wd(self, idx: int) -> None:
+    self._hightlighte_active_wd()
+    self._active_wd_idx = idx
+    self._hightlighte_active_wd(True)
+    return
+
+  def _hightlighte_active_wd(self, active: bool = False) -> None:
+    color = 'SystemButtonFace'
+    if active:
+      color = 'azure'
+    prev_wd = self._grid_rows[self._active_wd_idx]
+    children = prev_wd.winfo_children()
+    if len(children) > 0: 
+      children[0]['bg'] = color
+    return

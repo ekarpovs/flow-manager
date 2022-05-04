@@ -4,8 +4,6 @@ from tkinter.ttk import Combobox, Spinbox, Button
 from typing import Callable, Dict, List, Tuple
 
 from .paramsutils import *
-
-
 from ....uiconst import *
 
 
