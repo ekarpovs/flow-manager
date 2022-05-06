@@ -230,6 +230,7 @@ class MngrController():
   def _reset_flow_model(self) -> None:
     ws_name = self._view.flow.names_combo_box.get()
     self._init_flow_model(ws_name)
+    self._current()
     return
 
   def _store_flow_model_as_ws(self) -> None:
@@ -253,6 +254,12 @@ class MngrController():
     self._rebuild_runner()
     return 
 
+  def _update_flow_item_params(self, idx: int) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    params_new = self._view.params.get_active_params()
+    for k in params_new.keys():
+      flow_item.params[k] = params_new.get(k)
+    return
 
 # Execution commands
   def _preview_step_result(self, idx: int) -> None:
@@ -275,6 +282,7 @@ class MngrController():
   def _step(self, event_name: str) -> None:
     if self._ready():
       idx, _ = self._view.flow.get_current_selection_tree()
+      self._update_flow_item_params(idx)
       self._runner.run_one(event_name, idx, self._model.flow.flow)
       new_idx = self._runner.state_idx
       self._view.flow.set_selection_tree(new_idx)
@@ -412,13 +420,6 @@ class MngrController():
 
   def _apply(self, event=None) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
-    flow_item = self._model.flow.get_item(idx)
-    # instead of:
-    # params_new = self._view.flow.get_current_operation_params_def()
-    # get from params view:
-    params_new = self._view.params.get_active_params()
-    for k in params_new.keys():
-      flow_item.params[k] = params_new.get(k)
     self._run_current(idx)
     # Special treatment - activated via parameters view
     self._view.flow.btn_params_io['state'] = DISABLED

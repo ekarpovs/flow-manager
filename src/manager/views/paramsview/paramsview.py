@@ -1,6 +1,6 @@
 from typing import List, Dict, Tuple, Callable
 from tkinter import *
-from tkinter.ttk import Combobox, LabelFrame, Style
+from tkinter.ttk import LabelFrame
 from tkscrolledframe import ScrolledFrame
 import copy
 
@@ -60,20 +60,18 @@ class ParamsView(View):
     for descr in descriptors:
       widget = descr.get('wd')
       name = widget.winfo_name()
+      if name == 'item_name':
+        continue
       getter = descr.get('getter')
       value = getter()
       params[name] =  value 
     return params
 
-  def clear(self) -> None:
-    if self._active_wd_idx < 0:
-      return
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
-    for descr in descriptors:
-      widget = descr.get('wd')
-      widget.grid_remove()
+  def clear(self) -> None:     
+    for child in self._params_view.winfo_children():
+      child.grid_remove()
     self._grid_rows_descr.clear()
-    self._content.scroll_to_top()   
+    self._content.scroll_to_top()
     self._active_wd_idx = -1
     return
 
@@ -83,21 +81,17 @@ class ParamsView(View):
       item_params_frame = self._create_item_params_container(i, item)
       item_params_frame.grid(row=i, column=0, padx=PADX, sticky=W + E)
       self._factory.container = item_params_frame
-      item_params_descr = self._create_item_params_widgets(item)
+      item_params_descr = self._create_item_params_widgets(i, item)
       self._grid_rows_descr.append(item_params_descr)
     self._active_wd_idx = 0
     self._hightlighte_active_wd(True)
     return  
 
   def _create_item_params_container(self, idx: int, item: FlowItemModel) -> Widget:
-    # style = Style()
-    # style.configure("BG.TLabel", background="green")
-    # item_params_frame = LabelFrame(self._params_view, name=f'--{i}--', text=item.name, style="BG.TLabel")
-    title = f'{idx}-{item.name}'
-    item_params_frame = LabelFrame(self._params_view, name=f'--{idx}--', text=title)
+    item_params_frame = LabelFrame(self._params_view, name=f'--{idx}--')
     return item_params_frame
 
-  def _create_item_params_widgets(self, item: FlowItemModel) -> Dict:
+  def _create_item_params_widgets(self, idx: int, item: FlowItemModel) -> Dict:
     # merge curent params with params_ws
     params = item.params # Dict
     params_ws = item.params_ws # Dict
@@ -108,6 +102,10 @@ class ParamsView(View):
       params[k] = params_ws.ket(k)
     # merge create widget, label
     item_params_descr = []
+    title = f'{idx}-{item.name}'
+    item_label = Label(self._factory.container, name='item_name', text=title)
+    item_label.grid(row=0, column=0, columnspan=3, padx=PADX_S, pady=PADY_S, sticky=W)
+    item_params_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
     for i, param_def in enumerate(params_def):
       name = param_def.get('name')
       comment = param_def.get('comment')
@@ -115,11 +113,11 @@ class ParamsView(View):
       if pvalue is not None:
         param_def['default'] = pvalue
       getter, setter, param_widget = self._factory.create(param_def)
-      param_widget.grid(row=i, column=1, padx=PADX_S, pady=PADY_S, sticky=W)
+      param_widget.grid(row=i+1, column=1, padx=PADX_S, pady=PADY_S, sticky=W)
       param_label = Label(self._factory.container, text=f'{name}')
-      param_label.grid(row=i, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
+      param_label.grid(row=i+1, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
       param_descr = Label(self._factory.container, text=f'{comment}')
-      param_descr.grid(row=i, column=2, padx=PADX_S, pady=PADY_S, sticky=W)
+      param_descr.grid(row=i+1, column=2, padx=PADX_S, pady=PADY_S, sticky=W)
       item_params_descr.append({'name': param_widget.winfo_name(), 'getter': getter, 'setter': setter, 'wd': param_widget})
     return item_params_descr
 
@@ -134,9 +132,11 @@ class ParamsView(View):
     color = 'SystemButtonFace'
     if active:
       color = 'azure'
-    # prev_wd = self._grid_rows[self._active_wd_idx]
-    prev_wd_descr = self._grid_rows_descr[self._active_wd_idx]
-    # children = prev_wd.winfo_children()
-    # if len(children) > 0: 
-    #   children[0]['bg'] = color
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    for descr in descriptors:
+      widget = descr.get('wd')
+      name = widget.winfo_name()
+      if name == 'item_name':
+        widget['bg'] = color
+        break   
     return
