@@ -39,13 +39,21 @@ class ParamWidgetFactory():
 
   def _create_entry(self, param_def: Dict) -> Tuple[Callable, Callable, Entry]:
     def get():
-      return wd.get()
+      value = wd.get()
+      if p_type == 'float':
+        value = float(value)
+      elif p_type == 'int':
+        value = int(value)
+      else:
+        pass
+      return value
 
     def set(value):
       wd.set(value)
       return
     width=10
     p_type = param_def.get('type')
+    p_name = param_def.get('name')
     p_value = param_def.get('default')
     var = None
     if p_type == 'int':
@@ -57,7 +65,7 @@ class ParamWidgetFactory():
       width=50
 
     var.set(p_value)
-    wd = Entry(self._container, textvariable=var, width=width)
+    wd = Entry(self._container, name=p_name,textvariable=var, width=width)
     return get, set, wd
 
   def _create_check(self, param_def) -> Tuple[Callable, Callable, Checkbutton]:
@@ -67,17 +75,17 @@ class ParamWidgetFactory():
     def set(value: bool):
       wd.set = value
       return
-
+    p_name = param_def.get('name')
     p_value = param_def.get('default')
     var = tk.BooleanVar()
     var.set(p_value)
-    wd = Checkbutton(self._container, variable=var, onvalue=True, offvalue=False, command=get)
+    wd = Checkbutton(self._container, name=p_name, variable=var, onvalue=True, offvalue=False, command=get)
     return get, set, wd
 
   def _create_combo(self, param_def) -> Tuple[Callable, Callable, Combobox]:
     def get_d():
       key = wd.get()
-      value = wd.get(key, 0)
+      value = p_dict.get(key, 0)
       return value
 
     def get_l():
@@ -101,6 +109,7 @@ class ParamWidgetFactory():
       return "key doesn't exist"
 
     p_type = param_def.get('type')
+    p_name = param_def.get('name')   
     p_types = param_def.get('p_types')
     p_possible_values = param_def.get('p_values')
     p_default_value = param_def.get('default')
@@ -115,7 +124,7 @@ class ParamWidgetFactory():
       var = get_var_by_type(p_types)  
       getter = get_l
     
-    wd = Combobox(self._container, width=10)
+    wd = Combobox(self._container, name=p_name, width=10)
     wd['values'] = p_values_tuple
     wd.set(p_default_value)
     wd.textvariable = var
@@ -138,6 +147,7 @@ class ParamWidgetFactory():
       return
 
     p_type = param_def.get('type')
+    p_name = param_def.get('name')
     p_types = param_def.get('p_types')
     p_possible_values = param_def.get('p_values')
     p_default_value = param_def.get('default')
@@ -147,7 +157,7 @@ class ParamWidgetFactory():
     resolution = p_values_tuple[2]
     var = get_var_by_type(p_types)  
     var.set(p_default_value)
-    wd = Spinbox(self, from_=from_, to=to, textvariable=var, wrap=True, command=get)
+    wd = Spinbox(self, name=p_name, from_=from_, to=to, textvariable=var, wrap=True, command=get)
     return get, set, wd
 
   def _create_scale(self, param_def) -> Tuple[Callable, Callable, Scale]:
@@ -168,6 +178,7 @@ class ParamWidgetFactory():
       return
 
     p_type = param_def.get('type')
+    p_name = param_def.get('name')
     p_types = param_def.get('p_types')
     p_possible_values = param_def.get('p_values')
     p_default_value = param_def.get('default')
@@ -186,6 +197,6 @@ class ParamWidgetFactory():
       pass      
     var = get_var_by_type(p_types)  
     var.set(p_default_value)
-    wd = Scale(self._container, from_=from_, to=to, resolution=resolution, variable=var, length=250, orient=HORIZONTAL)
+    wd = Scale(self._container, name=p_name,from_=from_, to=to, resolution=resolution, variable=var, length=250, orient=HORIZONTAL)
     return get, set, wd
 

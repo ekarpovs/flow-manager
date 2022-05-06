@@ -1,8 +1,8 @@
-import numpy as np 
 from typing import List, Dict, Tuple, Callable
 from tkinter import *
-from tkinter.ttk import LabelFrame, Style
+from tkinter.ttk import Combobox, LabelFrame, Style
 from tkscrolledframe import ScrolledFrame
+import copy
 
 from flow_model import FlowModel, FlowItemModel
 
@@ -23,40 +23,68 @@ class ParamsView(View):
     self.update_idletasks()
     h = self.parent.winfo_reqheight()
 
+    self._grid_rows_descr: List[Dict] = []
+    self._active_wd_idx = -1
+
     # Content will be scrolable
     self._content = ScrolledFrame(self, use_ttk=True, height=int(h/1.4))
     self._content.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E)
     # Create the params frame within the ScrolledFrame
     self._params_view = self._content.display_widget(Frame)
-    self._grid_rows: List[Widget] = []
-    self._active_wd_idx = -1
+
+    # Setup param actions view
+    # self._params_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    # self.btn_params_reset = Button(self._param_actions_frame, text='Reset', width=BTNW_S)
+    # self.btn_params_default = Button(self._param_actions_frame, text='Default', width=BTNW_S)
+    # self.btn_params_io = Button(self._param_actions_frame, text='I/O', width=BTNW_S)
+    # self.btn_params_reset.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+N)
+    # self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W+N)
+    # self.btn_params_io.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W+N)
     return
 
-  def get_active_wd_children(self) -> List[Widget]:
+  def get_active_param_widgets(self) -> List[Widget]:
     if self._active_wd_idx < 0:
       return None
-    children = []
-    active_wd = self._grid_rows[self._active_wd_idx]
-    for child in active_wd.winfo_children():
-      if child.widgetName != 'label':
-        children.append(child)
-    return children
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    widgets = []
+    for descr in descriptors:
+      widget = descr.get('wd')
+      widgets.append(widget)
+    return widgets
+
+  def get_active_params(self) -> Dict:
+    if self._active_wd_idx < 0:
+      return None
+    params = {}
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    for descr in descriptors:
+      widget = descr.get('wd')
+      name = widget.winfo_name()
+      getter = descr.get('getter')
+      value = getter()
+      params[name] =  value 
+    return params
 
   def clear(self) -> None:
-    for row in self._grid_rows:
-      row.grid_remove()  
-    self._grid_rows.clear()
+    if self._active_wd_idx < 0:
+      return
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    for descr in descriptors:
+      widget = descr.get('wd')
+      widget.grid_remove()
+    self._grid_rows_descr.clear()
     self._content.scroll_to_top()   
     self._active_wd_idx = -1
     return
 
   def build(self, flow: FlowModel) -> None:
-    for i,item in enumerate(flow.items):
+    items = copy.deepcopy(flow.items)
+    for i,item in enumerate(items):
       item_params_frame = self._create_item_params_container(i, item)
       item_params_frame.grid(row=i, column=0, padx=PADX, sticky=W + E)
       self._factory.container = item_params_frame
-      self._create_item_params_widgets(item)
-      self._grid_rows.append(item_params_frame)
+      item_params_descr = self._create_item_params_widgets(item)
+      self._grid_rows_descr.append(item_params_descr)
     self._active_wd_idx = 0
     self._hightlighte_active_wd(True)
     return  
@@ -69,7 +97,7 @@ class ParamsView(View):
     item_params_frame = LabelFrame(self._params_view, name=f'--{idx}--', text=title)
     return item_params_frame
 
-  def _create_item_params_widgets(self, item: FlowItemModel) -> None:
+  def _create_item_params_widgets(self, item: FlowItemModel) -> Dict:
     # merge curent params with params_ws
     params = item.params # Dict
     params_ws = item.params_ws # Dict
@@ -79,6 +107,7 @@ class ParamsView(View):
         continue
       params[k] = params_ws.ket(k)
     # merge create widget, label
+    item_params_descr = []
     for i, param_def in enumerate(params_def):
       name = param_def.get('name')
       comment = param_def.get('comment')
@@ -91,7 +120,8 @@ class ParamsView(View):
       param_label.grid(row=i, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
       param_descr = Label(self._factory.container, text=f'{comment}')
       param_descr.grid(row=i, column=2, padx=PADX_S, pady=PADY_S, sticky=W)
-    return 
+      item_params_descr.append({'name': param_widget.winfo_name(), 'getter': getter, 'setter': setter, 'wd': param_widget})
+    return item_params_descr
 
 
   def set_active_wd(self, idx: int) -> None:
@@ -104,8 +134,9 @@ class ParamsView(View):
     color = 'SystemButtonFace'
     if active:
       color = 'azure'
-    prev_wd = self._grid_rows[self._active_wd_idx]
-    children = prev_wd.winfo_children()
-    if len(children) > 0: 
-      children[0]['bg'] = color
+    # prev_wd = self._grid_rows[self._active_wd_idx]
+    prev_wd_descr = self._grid_rows_descr[self._active_wd_idx]
+    # children = prev_wd.winfo_children()
+    # if len(children) > 0: 
+    #   children[0]['bg'] = color
     return
