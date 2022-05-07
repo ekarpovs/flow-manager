@@ -25,13 +25,12 @@ class MngrView(LabelFrame):
     self._params = ParamsView(self)
     self._data = DataView(self)
 
-    self._divide_view()
-
     self._module.grid(row=0, column=0)
     self._flow.grid(row=0, column=1)
     self._params.grid(row=0, column=2)
     self._data.grid(row=0, column=3)
-
+    self._divide_view()
+    return
 
   @property
   def module(self) -> ModuleView:
@@ -48,7 +47,6 @@ class MngrView(LabelFrame):
   @property
   def data(self) -> DataView:
     return self._data
-
 
   @property
   def ws_names(self):
@@ -68,7 +66,6 @@ class MngrView(LabelFrame):
     self._flow.ws_title = ws_title
     return
 
-
   def set(self, flow_module_name):
     self._flow.set_flow_module_name(flow_module_name)
     return
@@ -82,14 +79,14 @@ class MngrView(LabelFrame):
     self._module.module_defs = modules_defs
     return
 
-
 # View layout
 ################### Local methods ###########################
   def _divide_view(self):
-    self.parent.update()
+    # self.parent.update()
+    self.update_idletasks()
     h = self.parent.winfo_reqheight()
     w = self.parent.winfo_reqwidth()
-    self['width'] = w -5
+    self['width'] = w - PADX_S
     view_height = h - PADY*2
     self._module['height'] = view_height
     self._module['width'] = w//5
@@ -103,3 +100,4 @@ class MngrView(LabelFrame):
     self._flow.grid_propagate(0)
     self._params.grid_propagate(0)
     self._data.grid_propagate(0)
+    return

@@ -42,9 +42,9 @@ class FlowView(View):
   def _grid_config(self) -> None:
     self.grid()
     self.rowconfigure(0, weight=1)
-    self.rowconfigure(1, weight=2)
+    self.rowconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
-    self.rowconfigure(3, weight=2)
+    self.rowconfigure(3, weight=1)
     self.rowconfigure(4, weight=1)
     self.columnconfigure(0, weight=10)
     self.columnconfigure(1, weight=1)
@@ -118,7 +118,7 @@ class FlowView(View):
     self._links_view_frame.columnconfigure(0, weight=1)
     self._links_view_frame.rowconfigure(0, weight=1)
     # create a ScrolledFrame widget
-    self._links = ScrolledFrame(self._links_view_frame)
+    self._links = ScrolledFrame(self._links_view_frame, height=int(self._h*1.3))
     self._links.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N+S+W+E)
     # create a frame within the ScrolledFrame
     self.flow_links_view_frame = self._links.display_widget(FlowLinksView)

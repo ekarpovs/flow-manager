@@ -33,7 +33,8 @@ class ParamsView(View):
     self.rowconfigure(1, weight=1)
 
     # Content will be scrolable
-    self._content = ScrolledFrame(self, use_ttk=True, height=int(h/1.33))
+    # self._content = ScrolledFrame(self, use_ttk=True, height=int(h/1.33))
+    self._content = ScrolledFrame(self, use_ttk=True, height=int(h/1.5))
     self._content.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E)
     # Create the params frame within the ScrolledFrame
     self._params_view = self._content.display_widget(Frame)
