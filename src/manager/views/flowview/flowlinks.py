@@ -3,7 +3,7 @@ from tkinter.ttk import Combobox
 from tkscrolledframe import widget
 from typing import Callable, Dict, List, Tuple
 
-from ...uiconst import *
+from ....uiconst import *
 
 
 class FlowLinksView(Frame):
