@@ -2,8 +2,8 @@ from tkinter import *
 from tkinter import ttk
 from typing import List
 
-from ...uiconst import *
-from .view import View
+from ....uiconst import *
+from ..view import View
 
 '''
 Path item

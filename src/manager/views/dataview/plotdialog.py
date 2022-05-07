@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-from ...uiconst import *
+from ....uiconst import *
 
 class PlotDialog(Toplevel):
   def __init__(self, parent, name: str, data):

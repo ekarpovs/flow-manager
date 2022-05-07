@@ -7,10 +7,9 @@ from tkscrolledframe import ScrolledFrame
 from src.manager.linksdialog.linksdialog import LinksDialog
 from src.manager.models.flow.currentflowmodel import CurrentFlowModel
 
-from ...uiconst import *
-from .view import View
-from .operparamsview import OperParamsView
-from .flowlinks import FlowLinksView
+from ....uiconst import *
+from ..view import View
+from ..flowlinks import FlowLinksView
 
 class FlowView(View):
   def __init__(self, parent):

@@ -8,8 +8,8 @@ from PIL import Image, ImageTk
 
 from flow_storage import FlowStorage, FlowDataType
 
-from ...uiconst import *
-from .view import View
+from ....uiconst import *
+from ..view import View
 from .plotdialog import PlotDialog 
 
 DEFAULT_VIEW_SIZE = 50
