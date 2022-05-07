@@ -49,7 +49,7 @@ class ParamWidgetFactory():
       return value
 
     def set(value):
-      wd.set(value)
+      var.set(value)
       return
     width=10
     p_type = param_def.get('type')
@@ -99,7 +99,10 @@ class ParamWidgetFactory():
       return value
 
     def set(value):
-      wd.set(value)
+      if p_type == 'Dict':
+        wd.set(get_key(value))
+      else:
+        wd.set()
       return
 
     def get_key(val):

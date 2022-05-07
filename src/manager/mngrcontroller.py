@@ -44,9 +44,9 @@ class MngrController():
 
     self._view.flow.flow_tree_view.bind('<<TreeviewSelect>>', self._tree_selection_changed)
 
-    self._view.flow.btn_params_reset.configure(command=self._reset)
-    self._view.flow.btn_params_default.configure(command=self._default) 
-    self._view.flow.btn_params_io.configure(command=self._get_io_object) 
+    self._view.params.btn_params_reset.configure(command=self._reset)
+    self._view.params.btn_params_default.configure(command=self._default) 
+    self._view.params.btn_params_io.configure(command=self._get_io_object) 
 
     self._start()
     return
@@ -92,7 +92,6 @@ class MngrController():
     self._init_flow_model(ws_name)
     self._view.ws_title = self._model.flow.flow.info
     return
-
 
   def _init_flow_output_refs(self, names: List[str]) -> None:
     self._flow_output_refs: List[List[str]] = [[]]
@@ -165,9 +164,7 @@ class MngrController():
 
   def _tree_selection_changed(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
-    controls_idx = self._view.flow.get_current_opreation_params_idx()
-    if self._model.flow.flow is not None and (controls_idx == -1 or controls_idx != idx):
-      # self._create_current_operation_params_controls(idx, name)
+    if self._model.flow.flow is not None:
       self._create_links_view(idx, name)
       self._activate_params(idx)
     return
@@ -254,11 +251,20 @@ class MngrController():
     self._rebuild_runner()
     return 
 
-  def _update_flow_item_params(self, idx: int) -> None:
-    flow_item = self._model.flow.get_item(idx)
-    params_new = self._view.params.get_active_params()
-    for k in params_new.keys():
-      flow_item.params[k] = params_new.get(k)
+  def _apply_step_params(self, idx: int) -> None:
+    self._view.params.apply_active_params(idx)
+    return
+
+  def _reset_active_params(self, idx: int) -> None:
+    self._view.params.reset_active_params(idx)
+    return
+
+  def _default_active_params(self, idx: int) -> None:
+    self._view.params.default_active_params(idx)
+    return
+
+  def _update_active_params(self, idx: int) -> None:
+    self._view.params.update_active_params(idx)
     return
 
 # Execution commands
@@ -282,7 +288,7 @@ class MngrController():
   def _step(self, event_name: str) -> None:
     if self._ready():
       idx, _ = self._view.flow.get_current_selection_tree()
-      self._update_flow_item_params(idx)
+      self._apply_step_params(idx)
       self._runner.run_one(event_name, idx, self._model.flow.flow)
       new_idx = self._runner.state_idx
       self._view.flow.set_selection_tree(new_idx)
@@ -325,8 +331,6 @@ class MngrController():
   def _run_current(self, idx: int) -> None:
     if self._ready() and self._runner.state_idx == idx:
       self._current()
-    # else:
-    #   self._set_top_state()
     return
 
 # Links subpanel
@@ -374,45 +378,6 @@ class MngrController():
     self._apply()
     return
 
-# Operation parameters sub panel's commands
-  def _bind_param_controls(self, params_def) -> None:
-    for param_def in params_def:
-      cname = param_def.get('name')
-      ctype = param_def.get('type')
-      param_control = self._view.flow.get_current_operation_param_control(cname)
-      t = type(param_control) 
-      if t == Scale: 
-        param_control.bind("<ButtonRelease-1>", self._apply)
-      elif t == Spinbox:
-        param_control.bind("<ButtonRelease-1>", self._apply)
-      elif t == Checkbutton:
-        param_control.configure(command=self._apply)
-      elif t == Combobox:
-        param_control.bind("<<ComboboxSelected>>", self._apply)
-      elif t == Entry:
-        param_control.bind("<Key>", self._key_pressed)
-      else:
-        pass
-    return
-
-  # def _create_current_operation_params_controls(self, idx, name) -> None:
-  #   flow_item = self._model.flow.get_item(idx)
-  #   params_def = flow_item.params_def
-  #   # merge curent params and params_ws
-  #   params = flow_item.params
-  #   params_ws = flow_item.params_ws
-  #   for k in params_ws.keys():
-  #     if k in params:
-  #       continue
-  #     params[k] = params_ws.ket(k)
-  #   self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
-  #   self._bind_param_controls(params_def)
-  #   self._view.flow.btn_params_io['state'] = DISABLED
-  #   path_in_def = [p for p in params_def if p.get('name') == 'path']
-  #   if len(path_in_def) > 0:
-  #     self._view.flow.btn_params_io['state'] = NORMAL
-  #   return
-
   def _key_pressed(self, event) -> None:
     if event.keycode == 13:
       self._apply()
@@ -421,31 +386,17 @@ class MngrController():
   def _apply(self, event=None) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     self._run_current(idx)
-    # Special treatment - activated via parameters view
-    self._view.flow.btn_params_io['state'] = DISABLED
     return
 
   def _reset(self) -> None:
-    idx, name = self._view.flow.get_current_selection_tree()
-    flow_item = self._model.flow.get_item(idx)
-    params_def = flow_item.params_def   
-    params = copy.deepcopy(flow_item.params_ws)
-    flow_item.params = params
-    # self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
-    # self._bind_param_controls(params_def)
-
+    idx, _ = self._view.flow.get_current_selection_tree()
+    self._reset_active_params(idx)
     self._run_current(idx)
     return
 
   def _default(self) -> None:
-    idx, name = self._view.flow.get_current_selection_tree()
-    flow_item = self._model.flow.get_item(idx)
-    params_def = flow_item.params_def   
-    params = self._converter.flow.convert_params_def_to_dict(flow_item.params_def)
-    flow_item.params = params
-    # self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
-    # self._bind_param_controls(params_def)
-
+    idx, _ = self._view.flow.get_current_selection_tree()
+    self._default_active_params(idx)
     self._run_current(idx)
     return
 
@@ -490,8 +441,7 @@ class MngrController():
     p = [p for p in params_def if p.get('name') == 'path' or p.get('name') == 'src' or p.get('name') == 'dest']
     if p is not None:
       self._set_image_location_to_params(io_obj, params, key)
-    # self._view.flow.create_operation_params_controls(idx, name, params, copy.deepcopy(params_def))
-    # self._bind_param_controls(params_def)
+    self._update_active_params(idx)
     self._apply(None)
     return
   

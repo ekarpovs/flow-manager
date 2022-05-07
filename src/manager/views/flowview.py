@@ -18,6 +18,9 @@ class FlowView(View):
     self.parent = parent 
     self['text'] = 'Flows'
 
+    self.update_idletasks()
+    self._h = self.parent.winfo_reqheight()
+
     # Setup the view
     self._setup_view()
     
@@ -32,8 +35,6 @@ class FlowView(View):
     self._setup_flow_items_view()
     self._setup_flow_items_actions_view()
     self._setup_flow_items_links_view()
-    self._setup_operation_params_actions_view()
-    self._setup_operation_params_view()
     self._setup_flow_actions_view()
     self._setup_views_layout()
     return
@@ -41,12 +42,10 @@ class FlowView(View):
   def _grid_config(self) -> None:
     self.grid()
     self.rowconfigure(0, weight=1)
-    self.rowconfigure(1, weight=1)
+    self.rowconfigure(1, weight=2)
     self.rowconfigure(2, weight=1)
-    self.rowconfigure(3, weight=1)
+    self.rowconfigure(3, weight=2)
     self.rowconfigure(4, weight=1)
-    self.rowconfigure(5, weight=4)
-    self.rowconfigure(6, weight=1)
     self.columnconfigure(0, weight=10)
     self.columnconfigure(1, weight=1)
     return
@@ -114,44 +113,15 @@ class FlowView(View):
     return
 
   def _setup_flow_items_links_view(self) -> None:
-    # Setup flow items links view
+     # Setup flow items links view
     self._links_view_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self._links_view_frame.columnconfigure(0, weight=1)
     self._links_view_frame.rowconfigure(0, weight=1)
     # create a ScrolledFrame widget
-    self._links = ScrolledFrame(self._links_view_frame, height=75)
+    self._links = ScrolledFrame(self._links_view_frame)
     self._links.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N+S+W+E)
-    # bind the arrow keys and scroll wheel
-    # self._links.bind_arrow_keys(self._links)
-    # self._links.bind_scroll_wheel(self._links)
     # create a frame within the ScrolledFrame
     self.flow_links_view_frame = self._links.display_widget(FlowLinksView)
-    return
-
-  def _setup_operation_params_actions_view(self) -> None:
-    # Setup param actions view
-    self._param_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
-    self.btn_params_reset = Button(self._param_actions_frame, text='Reset', width=BTNW_S)
-    self.btn_params_default = Button(self._param_actions_frame, text='Default', width=BTNW_S)
-    self.btn_params_io = Button(self._param_actions_frame, text='I/O', width=BTNW_S)
-    self.btn_params_reset.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+N)
-    self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W+N)
-    self.btn_params_io.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W+N)
-    return
-
-  def _setup_operation_params_view(self) -> None:
-    # Setup operation parameters view
-    self._params_view_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
-    self._params_view_frame.columnconfigure(0, weight=1)
-    self._params_view_frame.rowconfigure(0, weight=1)
-    # create a ScrolledFrame widget
-    self._params = ScrolledFrame(self._params_view_frame)
-    self._params.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N+S+W+E)
-    # bind the arrow keys and scroll wheel
-    # self._params.bind_arrow_keys(self._params)
-    # self._params.bind_scroll_wheel(self._params)
-    # create a frame within the ScrolledFrame
-    self.oper_params_view_frame = self._params.display_widget(OperParamsView)
     return
 
   def  _setup_flow_actions_view(self) -> None:
@@ -176,9 +146,7 @@ class FlowView(View):
     self._flow_items_frame.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+S+N)   
     self._oper_actions_frame.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
     self._links_view_frame.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
-    self._param_actions_frame.grid(row=4, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
-    self._params_view_frame.grid(row=5, column=0, columnspan=2,padx=PADX, pady=PADY_S, sticky=W+E)
-    self._flow_actions_frame.grid(row=6, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
+    self._flow_actions_frame.grid(row=4, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
     return
 
 # Interfaces
@@ -220,10 +188,6 @@ class FlowView(View):
     item = self.flow_tree_view.item(cur_item)  
     return (idx, item.get('values')[0])
   
-  # def get_current_tree_item(self) -> str:
-  #   cur_item = self.flow_tree_view.focus()
-  #   return self.flow_tree_view.item(cur_item)  
-
   @property
   def ws_names(self) -> List[str]:
     return self.names_combo_box.get('values')
@@ -241,20 +205,6 @@ class FlowView(View):
   @ws_title.setter
   def ws_title(self, ws_title):
     self._title_label['text'] = ws_title
-    return
-
-
-  def get_current_operation_params_def(self) -> List[Dict]: 
-    return self.oper_params_view_frame.get_current_operation_params_def()
-
-  def get_current_opreation_params_idx(self) -> int:
-    return self.oper_params_view_frame.get_current_opreation_params_idx()
-
-  def get_current_operation_param_control(self, cname) -> Widget:
-    return self.oper_params_view_frame.get_current_operation_param_control(cname)
-
-  def create_operation_params_controls(self, idx, name, params, params_def):
-    self.oper_params_view_frame.create_operation_params_controls(idx, name, params, params_def)
     return
 
   def create_links_view(self, refs, links, output_refs) -> None:
@@ -276,15 +226,6 @@ class FlowView(View):
     self.btn_links['state']=state
     return
 
-  def activate_params_buttons(self, activate=False) -> None:
-    state = DISABLED
-    if activate:
-      state = NORMAL
-    self.btn_params_reset['state']=state
-    self.btn_params_default['state']=state
-    self.btn_params_io['state']=state
-    return
-
   def activate_runtime_buttons(self, activate=False) -> None:
     state = DISABLED
     if activate:
@@ -298,7 +239,6 @@ class FlowView(View):
 
   def activate_buttons(self, activate=False) -> None:
     self.activate_edit_buttons(activate)
-    self.activate_params_buttons(activate)
     self.activate_runtime_buttons(activate)
     return
 
