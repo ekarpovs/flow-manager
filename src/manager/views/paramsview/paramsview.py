@@ -18,7 +18,6 @@ class ParamsView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self['text'] = 'Parameters'
-
     self._factory = ParamWidgetFactory()
 
     self.update_idletasks()
@@ -33,9 +32,8 @@ class ParamsView(View):
     self.rowconfigure(1, weight=1)
 
     # Content will be scrolable
-    # self._content = ScrolledFrame(self, use_ttk=True, height=int(h/1.33))
-    self._content = ScrolledFrame(self, use_ttk=True, height=int(h/1.5))
-    self._content.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E)
+    self._content = ScrolledFrame(self, use_ttk=True, height=int(h*0.65))
+    self._content.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N + S + W + E)
     # Create the params frame within the ScrolledFrame
     self._params_view = self._content.display_widget(Frame)
 
@@ -47,7 +45,7 @@ class ParamsView(View):
     self.btn_params_reset.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+N)
     self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W+N)
     self.btn_params_io.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W+N)
-    self._params_actions_frame.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E)
+    self._params_actions_frame.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E + S)
 
     self._activate_params_buttons()
     return

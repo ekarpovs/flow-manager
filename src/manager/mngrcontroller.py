@@ -34,7 +34,7 @@ class MngrController():
     self._view.flow.btn_remove.configure(command=self._remove_operation_from_flow_model)
     self._view.flow.btn_reset.configure(command=self._reset_flow_model)
     self._view.flow.btn_save.configure(command=self._store_flow_model_as_ws)
-    self._view.flow.btn_links.configure(command=self._edit_flow_links)
+    # self._view.flow.btn_links.configure(command=self._edit_flow_links)
     
     self._view.flow.btn_run.configure(command=self._run)   
     self._view.flow.btn_curr.configure(command=self._apply)   
@@ -93,18 +93,18 @@ class MngrController():
     self._view.ws_title = self._model.flow.flow.info
     return
 
-  def _init_flow_output_refs(self, names: List[str]) -> None:
-    self._flow_output_refs: List[List[str]] = [[]]
-    for i, name in enumerate(names):
-      operation = self._model.module.get_operation_by_name(name)
-      ref_names = [ref.get('name') for ref in operation.outrefs]
-      refs = []
-      for ref in operation.outrefs:
-        rname = ref.get('name')
-        out_ref = f'{i}-{name}-{rname}'
-        refs.append(out_ref)
-      self._flow_output_refs.append(refs)
-    return
+  # def _init_flow_output_refs(self, names: List[str]) -> None:
+  #   self._flow_output_refs: List[List[str]] = [[]]
+  #   for i, name in enumerate(names):
+  #     operation = self._model.module.get_operation_by_name(name)
+  #     ref_names = [ref.get('name') for ref in operation.outrefs]
+  #     refs = []
+  #     for ref in operation.outrefs:
+  #       rname = ref.get('name')
+  #       out_ref = f'{i}-{name}-{rname}'
+  #       refs.append(out_ref)
+  #     self._flow_output_refs.append(refs)
+  #   return
 
   # When a worksheet item is selected
   def _init_flow_model(self, ws_name: str) -> None:
@@ -113,10 +113,8 @@ class MngrController():
     self._model.init_flow_model(ws_path, ws_name)
     names, titles = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names, titles)   
-    self._update_flow_by_operations_params_def(names)
-    # self._create_current_operation_params_controls(0, names[0])
-    self._init_flow_output_refs(names) 
-    # self._create_links_view(0, names[0])
+    self._update_flow_by_operations_definitions(names)
+    # self._init_flow_output_refs(names) 
     self._rebuild_runner()
     return
 
@@ -162,22 +160,29 @@ class MngrController():
     self._bind_params_widgets()
     return
 
+  def _activate_links(self, idx: int = 0) -> None:
+    self._view.links.set_active_wd(idx)
+    return
+
   def _tree_selection_changed(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     if self._model.flow.flow is not None:
-      self._create_links_view(idx, name)
+      # self._create_links_view(idx, name)
       self._activate_params(idx)
+      self._activate_links(idx)
     return
 
-  def _assign_oper_params(self, name: str, item: FlowItemModel) -> None:
+  def _assign_operation_definitions(self, name: str, item: FlowItemModel) -> None:
     operation = self._model.module.get_operation_by_name(name)
     item.params_def = operation.params
+    item.inrefs_def = operation.inrefs
+    item.outrefs_def = operation.outrefs
     return
 
-  def _update_flow_by_operations_params_def(self, names: List[str]) -> None:
+  def _update_flow_by_operations_definitions(self, names: List[str]) -> None:
     for idx, name in enumerate(names):
       item = self._model.flow.get_item(idx)
-      self._assign_oper_params(name, item)
+      self._assign_operation_definitions(name, item)
     return 
 
 
@@ -194,6 +199,7 @@ class MngrController():
       self._view.data.clear_view()
       self._view.ws_title = ''
       self._view.params.clear()
+      self._view.links.clear()
     return
 
   def _add_operation_to_flow_model(self) -> None:
@@ -205,11 +211,11 @@ class MngrController():
     # Perform if operation only selected
     if name is not None:     
       new_flow_item = FlowItemModel(FlowItemType.EXEC, name)
-      self._assign_oper_params(name, new_flow_item)
+      self._assign_operation_definitions(name, new_flow_item)
       self._model.flow.set_item(cur_idx, new_flow_item)
       names, titles = self._model.flow.get_names()
       self._view.flow.set_flow_item_names(names, titles)   
-      self._init_flow_output_refs(names)
+      # self._init_flow_output_refs(names)
       self._rebuild_runner()
     return
 
@@ -220,7 +226,7 @@ class MngrController():
     self._model.flow.remove_item(cur_idx)
     names, titles = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names, titles)
-    self._init_flow_output_refs(names)
+    # self._init_flow_output_refs(names)
     self._rebuild_runner()
     return
 
@@ -240,9 +246,9 @@ class MngrController():
     self._view.flow.names_combo_box.set(ws_name)
     return
 
-  def _edit_flow_links(self) -> None:
-    self._view.flow.edit_flow_links(self._model.flow, self._update_flow)
-    return
+  # def _edit_flow_links(self) -> None:
+  #   self._view.flow.edit_flow_links(self._model.flow, self._update_flow)
+  #   return
 
   def _update_flow(self) -> None:
     names, titles = self._model.flow.get_names()
@@ -334,21 +340,21 @@ class MngrController():
     return
 
 # Links subpanel
-  def _create_links_view(self, idx, name) -> None:
-    self._unbind_links_widgets()
-    flow_item = self._model.flow.get_item(idx)
-    operation = self._model.module.get_operation_by_name(name)
-    refs = operation.inrefs
-    links = flow_item.links
-    possible_refs = []
-    last_idx = min(len(self._flow_output_refs)-1, idx+1)
-    output_refs = self._flow_output_refs[:last_idx]
-    for item_refs in output_refs:
-      for ref in item_refs:
-        possible_refs.append(ref)
-    self._view.flow.create_links_view(refs, links, possible_refs)
-    self._bind_links_widgets()
-    return
+  # def _create_links_view(self, idx, name) -> None:
+  #   self._unbind_links_widgets()
+  #   flow_item = self._model.flow.get_item(idx)
+  #   operation = self._model.module.get_operation_by_name(name)
+  #   refs = operation.inrefs
+  #   links = flow_item.links
+  #   possible_refs = []
+  #   last_idx = min(len(self._flow_output_refs)-1, idx+1)
+  #   output_refs = self._flow_output_refs[:last_idx]
+  #   for item_refs in output_refs:
+  #     for ref in item_refs:
+  #       possible_refs.append(ref)
+  #   self._view.flow.create_links_view(refs, links, possible_refs)
+  #   self._bind_links_widgets()
+  #   return
 
   def _unbind_links_widgets(self) -> None:
     links_widgets = self._view.flow.links_widgets
@@ -411,6 +417,9 @@ class MngrController():
       self._view.params.clear()
       self._view.params.build(self._model.flow.flow)
       self._activate_params()
+      self._view.links.clear()
+      self._view.links.build(self._model.flow.flow)
+      self._activate_links()      
       self._runner.build(self._model.flow.flow)
       # for plotting
       self._view.data.storage = self._runner.storage

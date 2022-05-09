@@ -18,7 +18,7 @@ class FlowView(View):
     self['text'] = 'Flows'
 
     self.update_idletasks()
-    self._h = self.parent.winfo_reqheight()
+    self._h = self.parent.winfo_height()
 
     # Setup the view
     self._setup_view()
@@ -33,7 +33,7 @@ class FlowView(View):
     self._setup_flow_names_view()
     self._setup_flow_items_view()
     self._setup_flow_items_actions_view()
-    self._setup_flow_items_links_view()
+    # self._setup_flow_items_links_view()
     self._setup_flow_actions_view()
     self._setup_views_layout()
     return
@@ -44,7 +44,6 @@ class FlowView(View):
     self.rowconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
     self.rowconfigure(3, weight=1)
-    self.rowconfigure(4, weight=1)
     self.columnconfigure(0, weight=10)
     self.columnconfigure(1, weight=1)
     return
@@ -53,7 +52,6 @@ class FlowView(View):
     # Setup flow names list view
     self._flow_names_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self._flow_names_frame.rowconfigure(0, weight=1)
-    self._flow_names_frame.rowconfigure(1, weight=1)
     self._flow_names_frame.columnconfigure(0, weight=5)
     self._flow_names_frame.columnconfigure(1, weight=1)
     # setup combo box
@@ -64,9 +62,9 @@ class FlowView(View):
     self.btn_reload = Button(self._flow_names_frame, text='Reload', width=BTNW_S)
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+E)
     self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E)
-    # setup title label
-    self._title_label = Label(self._flow_names_frame)
-    self._title_label.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W)
+    # # setup title label
+    # self._title_label = Label(self._flow_names_frame)
+    # self._title_label.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W)
     return
 
   def _setup_flow_items_view(self) -> None:
@@ -77,7 +75,7 @@ class FlowView(View):
     self._flow_items_frame.rowconfigure(0, weight=5)
     self._flow_items_frame.rowconfigure(1, weight=1)
     # setup Treeview
-    self.flow_tree_view = Treeview(self._flow_items_frame, columns=['#0','#1','#2'], selectmode="browse")
+    self.flow_tree_view = Treeview(self._flow_items_frame, columns=['#0','#1','#2'], selectmode="browse", height=int(self._h*0.07))
     # setup the treview heading
     self.flow_tree_view.heading('#0', text='Index', anchor=CENTER)
     self.flow_tree_view.heading('#1', text='Exec/Statement', anchor=W)
@@ -102,25 +100,13 @@ class FlowView(View):
     self.btn_remove = Button(self._oper_actions_frame, text='Remove', width=BTNW_S)
     self.btn_reset = Button(self._oper_actions_frame, text='Reset', width=BTNW_S)
     self.btn_save = Button(self._oper_actions_frame, text='Save', width=BTNW_S)
-    self.btn_links = Button(self._oper_actions_frame, text='Config', width=BTNW_S)
+    # self.btn_links = Button(self._oper_actions_frame, text='Config', width=BTNW_S)
 
     self.btn_add.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + N)   
     self.btn_remove.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E + N)
     self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=E + N)
     self.btn_save.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=E + N)
-    self.btn_links.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
-    return
-
-  def _setup_flow_items_links_view(self) -> None:
-     # Setup flow items links view
-    self._links_view_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
-    self._links_view_frame.columnconfigure(0, weight=1)
-    self._links_view_frame.rowconfigure(0, weight=1)
-    # create a ScrolledFrame widget
-    self._links = ScrolledFrame(self._links_view_frame, height=int(self._h*1.3))
-    self._links.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N+S+W+E)
-    # create a frame within the ScrolledFrame
-    self.flow_links_view_frame = self._links.display_widget(FlowLinksView)
+    # self.btn_links.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
     return
 
   def  _setup_flow_actions_view(self) -> None:
@@ -141,11 +127,10 @@ class FlowView(View):
 
   def _setup_views_layout(self) -> None:
     # Setup widgets groups layout
-    self._flow_names_frame.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
-    self._flow_items_frame.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+S+N)   
-    self._oper_actions_frame.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
-    self._links_view_frame.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
-    self._flow_actions_frame.grid(row=4, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E)
+    self._flow_names_frame.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N)
+    self._flow_items_frame.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N)   
+    self._oper_actions_frame.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N)
+    self._flow_actions_frame.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N)
     return
 
 # Interfaces
@@ -197,22 +182,22 @@ class FlowView(View):
     self.names_combo_box.current(0)
     return
 
-  @property
-  def ws_title(self):
-    return self._title_label.text
+  # @property
+  # def ws_title(self):
+  #   return self._title_label.text
 
-  @ws_title.setter
-  def ws_title(self, ws_title):
-    self._title_label['text'] = ws_title
-    return
+  # @ws_title.setter
+  # def ws_title(self, ws_title):
+  #   self._title_label['text'] = ws_title
+  #   return
 
-  def create_links_view(self, refs, links, output_refs) -> None:
-    self.flow_links_view_frame.create_links_view(refs, links, output_refs)
-    return
+  # def create_links_view(self, refs, links, output_refs) -> None:
+  #   self.flow_links_view_frame.create_links_view(refs, links, output_refs)
+  #   return
   
-  @property
-  def links_widgets(self) -> List[Dict[str, object]]:
-    return self.flow_links_view_frame.widgets
+  # @property
+  # def links_widgets(self) -> List[Dict[str, object]]:
+  #   return self.flow_links_view_frame.widgets
 
   def activate_edit_buttons(self, activate=False) -> None:
     state = DISABLED
@@ -222,7 +207,7 @@ class FlowView(View):
     self.btn_remove['state']=state
     self.btn_reset['state']=state
     self.btn_save['state']=state
-    self.btn_links['state']=state
+    # self.btn_links['state']=state
     return
 
   def activate_runtime_buttons(self, activate=False) -> None:
@@ -233,7 +218,7 @@ class FlowView(View):
     self.btn_curr['state']=state
     self.btn_next['state']=state
     self.btn_prev['state']=state
-    self.btn_top['state']=state
+    # self.btn_top['state']=state
     return
 
   def activate_buttons(self, activate=False) -> None:
@@ -241,6 +226,6 @@ class FlowView(View):
     self.activate_runtime_buttons(activate)
     return
 
-  def edit_flow_links(self, flow: CurrentFlowModel, callback: Callable) -> None:
-    lnk_dlg = LinksDialog(self.parent, flow, callback)
-    return
+  # def edit_flow_links(self, flow: CurrentFlowModel, callback: Callable) -> None:
+  #   lnk_dlg = LinksDialog(self.parent, flow, callback)
+  #   return

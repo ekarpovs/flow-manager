@@ -5,6 +5,7 @@ src/manager/linksdialog/__pycache__
 src/manager/views/__pycache__
 src/manager/views/moduleview/__pycache__
 src/manager/views/flowview/__pycache__
+src/manager/views/linksview/__pycache__
 src/manager/views/paramsview/__pycache__
 src/manager/views/dataview/__pycache__
 src/manager/models/__pycache__
