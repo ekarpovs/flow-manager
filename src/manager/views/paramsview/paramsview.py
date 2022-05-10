@@ -50,18 +50,18 @@ class ParamsView(View):
     self._activate_params_buttons()
     return
 
-  def apply_active_params(self, idx: int) -> None:
+  def apply_active_item_params(self, idx: int) -> None:
     '''
     From active widget to flow item 
     '''
     
     flow_item = self._flow.get_item(idx)
-    params_wd = self._get_active_params()
+    params_wd = self._get_active_item_params()
     for k in params_wd.keys():
       flow_item.params[k] = params_wd.get(k)
     return
 
-  def reset_active_params(self, idx: int) -> None:
+  def reset_active_item_params(self, idx: int) -> None:
     '''
     From ws definition to active widget and flow item 
     '''
@@ -78,10 +78,10 @@ class ParamsView(View):
         param_new_val = param_def.get('default')
       flow_item.params[k] = param_new_val
       params_new[k] = param_new_val
-    self._set_active_params(params_new)
+    self._set_active_item_params(params_new)
     return
 
-  def default_active_params(self, idx: int) -> None:
+  def default_active_item_params(self, idx: int) -> None:
     '''
     From operation params definition to active widget and flow item 
     '''
@@ -90,16 +90,16 @@ class ParamsView(View):
     params_def = copy.deepcopy(flow_item.params_def)
     params = convert_params_def_to_dict(params_def)    
     flow_item.params = params
-    self._set_active_params(params)
+    self._set_active_item_params(params)
     return
 
-  def update_active_params(self, idx: int) -> None:
+  def update_active_item_params(self, idx: int) -> None:
     flow_item = self._flow.get_item(idx)
     params = copy.deepcopy(flow_item.params)
-    self._set_active_params(params)
+    self._set_active_item_params(params)
     return
 
-  def get_active_param_widgets(self) -> List[Widget]:
+  def get_active_item_params_widgets(self) -> List[Widget]:
     if self._active_wd_idx < 0:
       return None
     descriptors = self._grid_rows_descr[self._active_wd_idx]
@@ -109,7 +109,7 @@ class ParamsView(View):
       widgets.append(widget)
     return widgets
 
-  def _get_active_params(self) -> Dict:
+  def _get_active_item_params(self) -> Dict:
     if self._active_wd_idx < 0:
       return None
     params = {}
@@ -124,7 +124,7 @@ class ParamsView(View):
       params[name] =  value 
     return params
 
-  def _set_active_params(self, params) -> None:
+  def _set_active_item_params(self, params) -> None:
     if self._active_wd_idx < 0:
       return None
     descriptors = self._grid_rows_descr[self._active_wd_idx]
