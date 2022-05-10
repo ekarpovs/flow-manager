@@ -231,7 +231,7 @@ class MngrController():
     (new_path, stored_as) = self._model.flow.store_flow_model_as_ws(path, name)
     # TODO: implement change flow name and reload? 
     ws_name = f'{stored_as} <{new_path}>'
-    self._reload_ws_list(None)
+    # self._reload_ws_list(None)
     self._view.flow.names_combo_box.set(ws_name)
     return
 
