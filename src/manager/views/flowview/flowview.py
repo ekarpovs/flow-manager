@@ -96,17 +96,23 @@ class FlowView(View):
   def _setup_flow_items_actions_view(self) -> None:
     # Setup flow items actions view
     self._oper_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    self._oper_actions_frame.columnconfigure(0, weight=1)
+    self._oper_actions_frame.columnconfigure(1, weight=1)
+    self._oper_actions_frame.columnconfigure(2, weight=1)
+    self._oper_actions_frame.columnconfigure(3, weight=1)
+    self._oper_actions_frame.columnconfigure(4, weight=1)
+    
     self.btn_add = Button(self._oper_actions_frame, text='Add', width=BTNW_S)
     self.btn_remove = Button(self._oper_actions_frame, text='Remove', width=BTNW_S)
     self.btn_reset = Button(self._oper_actions_frame, text='Reset', width=BTNW_S)
     self.btn_save = Button(self._oper_actions_frame, text='Save', width=BTNW_S)
-    # self.btn_links = Button(self._oper_actions_frame, text='Config', width=BTNW_S)
+    self.btn_empty = Label(self._oper_actions_frame, width=BTNW_S)
 
-    self.btn_add.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + N)   
-    self.btn_remove.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E + N)
-    self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=E + N)
-    self.btn_save.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=E + N)
-    # self.btn_links.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
+    self.btn_add.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W)   
+    self.btn_remove.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W)
+    self.btn_reset.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W)
+    self.btn_empty.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=W)
+    self.btn_save.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E)
     return
 
   def  _setup_flow_actions_view(self) -> None:
@@ -182,23 +188,6 @@ class FlowView(View):
     self.names_combo_box.current(0)
     return
 
-  # @property
-  # def ws_title(self):
-  #   return self._title_label.text
-
-  # @ws_title.setter
-  # def ws_title(self, ws_title):
-  #   self._title_label['text'] = ws_title
-  #   return
-
-  # def create_links_view(self, refs, links, output_refs) -> None:
-  #   self.flow_links_view_frame.create_links_view(refs, links, output_refs)
-  #   return
-  
-  # @property
-  # def links_widgets(self) -> List[Dict[str, object]]:
-  #   return self.flow_links_view_frame.widgets
-
   def activate_edit_buttons(self, activate=False) -> None:
     state = DISABLED
     if activate:
@@ -207,7 +196,6 @@ class FlowView(View):
     self.btn_remove['state']=state
     self.btn_reset['state']=state
     self.btn_save['state']=state
-    # self.btn_links['state']=state
     return
 
   def activate_runtime_buttons(self, activate=False) -> None:
@@ -218,14 +206,9 @@ class FlowView(View):
     self.btn_curr['state']=state
     self.btn_next['state']=state
     self.btn_prev['state']=state
-    # self.btn_top['state']=state
     return
 
   def activate_buttons(self, activate=False) -> None:
     self.activate_edit_buttons(activate)
     self.activate_runtime_buttons(activate)
     return
-
-  # def edit_flow_links(self, flow: CurrentFlowModel, callback: Callable) -> None:
-  #   lnk_dlg = LinksDialog(self.parent, flow, callback)
-  #   return
