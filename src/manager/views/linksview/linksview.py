@@ -78,8 +78,10 @@ class LinksView(View):
       item_links_frame.columnconfigure(1, weight=1)
       item_links_descr = self._create_item_links_widgets(item_links_frame, i, item)
       self._grid_rows_descr.append(item_links_descr)
+    self._disable_all()
     self._active_wd_idx = 0
     self._hightlighte_active_wd(True)
+    self._set_active_wd_state(True)
     return  
 
   def _create_item_links_container(self, idx: int) -> Widget:
@@ -134,8 +136,31 @@ class LinksView(View):
 
   def set_active_wd(self, idx: int) -> None:
     self._hightlighte_active_wd()
+    self._set_active_wd_state()
     self._active_wd_idx = idx
     self._hightlighte_active_wd(True)
+    self._set_active_wd_state(True)
+    return
+  
+  def _set_active_wd_state(self, active: bool = False) -> None:
+    state = DISABLED
+    if active:
+      state = NORMAL
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    for descr in descriptors:
+      widget = descr.get('wd')
+      t = type(widget)
+      if t == Combobox:
+        widget['state'] = state
+    return
+
+  def _disable_all(self) -> None:
+    for descriptors in self._grid_rows_descr:
+      for descr in descriptors:
+        widget = descr.get('wd')
+        t = type(widget)
+        if t == Combobox:
+          widget['state'] = DISABLED
     return
 
   # UI methods

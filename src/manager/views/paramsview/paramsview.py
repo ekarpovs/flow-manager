@@ -155,9 +155,11 @@ class ParamsView(View):
       self._factory.container = item_params_frame
       item_params_descr = self._create_item_params_widgets(i, item)
       self._grid_rows_descr.append(item_params_descr)
+    self._disable_all()
     self._active_wd_idx = 0
-    self._activate_params_buttons(True)   
     self._hightlighte_active_wd(True)
+    self._set_active_wd_state(True)
+    self._activate_params_buttons(True)   
     return  
 
   def _create_item_params_container(self, idx: int, item: FlowItemModel) -> Widget:
@@ -197,10 +199,30 @@ class ParamsView(View):
 
   def set_active_wd(self, idx: int) -> None:
     self._hightlighte_active_wd()
+    self._set_active_wd_state()
     self._active_wd_idx = idx
     self._hightlighte_active_wd(True)
+    self._set_active_wd_state(True)
     self._set_button_io_state(idx)
     return
+
+  def _set_active_wd_state(self, active: bool = False) -> None:
+    state = DISABLED
+    if active:
+      state = NORMAL
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    for descr in descriptors:
+      widget = descr.get('wd')
+      widget['state'] = state
+    return
+
+  def _disable_all(self) -> None:
+    for descriptors in self._grid_rows_descr:
+      for descr in descriptors:
+        widget = descr.get('wd')
+        widget['state'] = DISABLED
+    return
+
 
   # UI methods
 
