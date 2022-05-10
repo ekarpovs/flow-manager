@@ -31,7 +31,7 @@ class LinksView(View):
     self._infovar = StringVar()
     self._info_entry = Entry(self, name='flow_info',textvariable=self._infovar, width=35)
     self._info_entry.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+W+E)
-
+    self._info_desr = {'getter': self._infovar.get, 'setter': self._infovar.set, 'wd': self._info_entry}
     # Content will be scrolable
     self._content = ScrolledFrame(self, use_ttk=True, height=int(h/5), width=int((w/2)))
     self._content.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E)
@@ -40,8 +40,8 @@ class LinksView(View):
     return
 
   @property
-  def info(self) -> str:
-    return self._info_entry
+  def info_descr(self) -> str:
+    return self._info_desr
 
   def get_all_link_widgets(self) -> List[Widget]:
     widgets = []
@@ -50,6 +50,18 @@ class LinksView(View):
         widget = descr.get('wd')
         widgets.append(widget)
     return widgets
+
+  # def update_active_item_title(self) -> None:
+  #   if self._active_wd_idx < 0:
+  #     return None
+  #   descriptors = self._grid_rows_descr[self._active_wd_idx]
+  #   for descr in descriptors:
+  #     widget = descr.get('wd')
+  #     t = type(widget)
+  #     if t == Entry:
+  #       getter = descr('getter')
+  #       title = getter()
+  #   return
 
   def get_active_item_link_descriptors(self) -> List[List[Widget]]:
     if self._active_wd_idx < 0:
@@ -93,12 +105,13 @@ class LinksView(View):
     title = f'{idx}-{item.name}'
     item_label = Label(container, name='item_name', text=title)
     item_label.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
+    item_links_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
     infovar = StringVar()
     infovar.set(item.title)
     info_entry = Entry(container, textvariable=infovar, width=38)
     info_entry.grid(row=0, column=1, padx=PADX_S, pady=PADY_S, sticky=E)
+    item_links_descr.append({'name': info_entry.winfo_name(), 'getter': infovar.get, 'setter': None, 'wd': info_entry})
 
-    item_links_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
 
     inrefs_def = item.inrefs_def
     outrefs_def = item.outrefs_def
@@ -149,18 +162,14 @@ class LinksView(View):
     descriptors = self._grid_rows_descr[self._active_wd_idx]
     for descr in descriptors:
       widget = descr.get('wd')
-      t = type(widget)
-      if t == Combobox:
-        widget['state'] = state
+      widget['state'] = state
     return
 
   def _disable_all(self) -> None:
     for descriptors in self._grid_rows_descr:
       for descr in descriptors:
         widget = descr.get('wd')
-        t = type(widget)
-        if t == Combobox:
-          widget['state'] = DISABLED
+        widget['state'] = DISABLED
     return
 
   # UI methods

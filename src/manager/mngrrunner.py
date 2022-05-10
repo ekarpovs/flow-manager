@@ -35,6 +35,10 @@ class MngrRunner():
     return self.runner.state_idx
 
   @property
+  def state_id(self) -> str:
+    return self.runner.state_id
+
+  @property
   def output_from_state(self) -> str:
     return self.runner._output_from_state
 

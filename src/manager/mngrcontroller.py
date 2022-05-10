@@ -105,7 +105,7 @@ class MngrController():
     self._rebuild_runner()
     return
 
-  def _unbind_params_widgets(self) -> None:
+  def _unbind_item_params_widgets(self) -> None:
     widgets = self._view.params.get_active_item_params_widgets()
     for widget in widgets:
       t = type(widget) 
@@ -118,12 +118,12 @@ class MngrController():
       elif t == Combobox:
         widget.unbind("<<ComboboxSelected>>")
       elif t == Entry:
-        widget.unbind("<Key>")
+        widget.unbind("<Return>")
       else:
         pass
     return
 
-  def _bind_params_widgets(self) -> None:
+  def _bind_item_params_widgets(self) -> None:
     widgets = self._view.params.get_active_item_params_widgets()
     for widget in widgets:
       t = type(widget) 
@@ -136,29 +136,29 @@ class MngrController():
       elif t == Combobox:
         widget.bind("<<ComboboxSelected>>", self._apply)
       elif t == Entry:
-        widget.bind("<Key>", self._key_pressed)
+        widget.bind("<Return>", self._params_return_pressed)
       else:
         pass
     return
 
-  def _activate_params(self, idx: int = 0) -> None:
-    self._unbind_params_widgets()
+  def _activate_item_params(self, idx: int = 0) -> None:
+    self._unbind_item_params_widgets()
     self._view.params.set_active_wd(idx)
-    self._bind_params_widgets()
+    self._bind_item_params_widgets()
     return
 
-  def _activate_links(self, idx: int = 0) -> None:
-    self._unbind_links_widgets()
+  def _activate_item_links(self, idx: int = 0) -> None:
+    self._unbind_item_links_widgets()
     self._view.links.set_active_wd(idx)
-    self._bind_links_widgets()
+    self._bind_item_links_widgets()
     return
 
   def _tree_selection_changed(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     if self._model.flow.flow is not None:
       # self._create_links_view(idx, name)
-      self._activate_params(idx)
-      self._activate_links(idx)
+      self._activate_item_params(idx)
+      self._activate_item_links(idx)
     return
 
   def _assign_operation_definitions(self, name: str, item: FlowItemModel) -> None:
@@ -325,16 +325,32 @@ class MngrController():
     return
 
 # Links view
-  def _unbind_links_widgets(self) -> None:
+  def _flow_title_return_pressed(self, getter: Callable) -> None:
+    self._model.flow.flow.info = getter()
+    return
+
+  
+  def _links_return_pressed(self, getter: Callable) -> None:
+    idx, _ = self._view.flow.get_current_selection_tree()
+    flow_item = self._model.flow.get_item(idx)
+    flow_item.title = getter()
+    return
+
+
+  def _unbind_item_links_widgets(self) -> None:
     descriptors = self._view.links.get_active_item_link_descriptors()
     for descr in descriptors:
       widget = descr.get('wd')
       t = type(widget)
       if t == Combobox:
         widget.unbind("<<ComboboxSelected>>")
+      elif t == Entry:
+        widget.unbind("<Return>")
+      else:
+        pass
     return
 
-  def _bind_links_widgets(self) -> None:
+  def _bind_item_links_widgets(self) -> None:
     descriptors = self._view.links.get_active_item_link_descriptors()
     for descr in descriptors:
       widget = descr.get('wd')
@@ -343,23 +359,28 @@ class MngrController():
         name = descr.get('name')
         getter = descr.get('getter')
         widget.bind("<<ComboboxSelected>>", lambda e: self._assign_link(name, getter))
+      elif t == Entry:
+        getter = descr.get('getter')
+        widget.bind("<Return>", lambda e: self._links_return_pressed(getter))
+      else:
+        pass
     return
 
   def _assign_link(self, name: str, getter: Callable) -> None:
     idx, flow_item_name = self._view.flow.get_current_selection_tree()
+    # set active 
+    # self._apply_step_links(idx)
     flow_item = self._model.flow.get_item(idx)
     ext_ref = getter()
     flow_item.links[name] = ext_ref
-    item_name = flow_item_name.split('.')[1]
-    state_id = f'{idx}-{item_name}'
-    storage_in_ref = self._runner.storage.get_state_input_ext_ref(state_id, name)
+    # Update sorage
+    storage_in_ref = self._runner.storage.get_state_input_ext_ref(self._runner.state_id, name)
     storage_in_ref.ext_ref = ext_ref
     self._apply()
     return
 
-  def _key_pressed(self, event) -> None:
-    if event.keycode == 13:
-      self._apply()
+  def _params_return_pressed(self, event) -> None:
+    self._apply()
     return
 
   def _apply(self, event=None) -> None:
@@ -389,10 +410,14 @@ class MngrController():
     if self._model.flow:
       self._view.params.clear()
       self._view.params.build(self._model.flow.flow)
-      self._activate_params()
+      self._activate_item_params()
       self._view.links.clear()
       self._view.links.build(self._model.flow.flow)
-      self._activate_links()      
+      info_descr = self._view.links.info_descr
+      widget = info_descr.get('wd')
+      getter = info_descr.get('getter')
+      widget.bind("<Return>", lambda e: self._flow_title_return_pressed(getter))
+      self._activate_item_links()      
       self._runner.build(self._model.flow.flow)
       # for plotting
       self._view.data.storage = self._runner.storage
