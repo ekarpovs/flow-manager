@@ -93,19 +93,6 @@ class MngrController():
     self._view.ws_title = self._model.flow.flow.info
     return
 
-  # def _init_flow_output_refs(self, names: List[str]) -> None:
-  #   self._flow_output_refs: List[List[str]] = [[]]
-  #   for i, name in enumerate(names):
-  #     operation = self._model.module.get_operation_by_name(name)
-  #     ref_names = [ref.get('name') for ref in operation.outrefs]
-  #     refs = []
-  #     for ref in operation.outrefs:
-  #       rname = ref.get('name')
-  #       out_ref = f'{i}-{name}-{rname}'
-  #       refs.append(out_ref)
-  #     self._flow_output_refs.append(refs)
-  #   return
-
   # When a worksheet item is selected
   def _init_flow_model(self, ws_name: str) -> None:
     (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
@@ -119,7 +106,7 @@ class MngrController():
     return
 
   def _unbind_params_widgets(self) -> None:
-    widgets = self._view.params.get_active_param_widgets()
+    widgets = self._view.params.get_active_item_params_widgets()
     for widget in widgets:
       t = type(widget) 
       if t == Scale: 
@@ -137,7 +124,7 @@ class MngrController():
     return
 
   def _bind_params_widgets(self) -> None:
-    widgets = self._view.params.get_active_param_widgets()
+    widgets = self._view.params.get_active_item_params_widgets()
     for widget in widgets:
       t = type(widget) 
       if t == Scale: 
@@ -161,7 +148,9 @@ class MngrController():
     return
 
   def _activate_links(self, idx: int = 0) -> None:
+    self._unbind_links_widgets()
     self._view.links.set_active_wd(idx)
+    self._bind_links_widgets()
     return
 
   def _tree_selection_changed(self, event) -> None:
@@ -246,10 +235,6 @@ class MngrController():
     self._view.flow.names_combo_box.set(ws_name)
     return
 
-  # def _edit_flow_links(self) -> None:
-  #   self._view.flow.edit_flow_links(self._model.flow, self._update_flow)
-  #   return
-
   def _update_flow(self) -> None:
     names, titles = self._model.flow.get_names()
     self._view.flow.set_flow_item_names(names, titles)   
@@ -258,19 +243,19 @@ class MngrController():
     return 
 
   def _apply_step_params(self, idx: int) -> None:
-    self._view.params.apply_active_params(idx)
+    self._view.params.apply_active_item_params(idx)
     return
 
   def _reset_active_params(self, idx: int) -> None:
-    self._view.params.reset_active_params(idx)
+    self._view.params.reset_active_item_params(idx)
     return
 
   def _default_active_params(self, idx: int) -> None:
-    self._view.params.default_active_params(idx)
+    self._view.params.default_active_item_params(idx)
     return
 
   def _update_active_params(self, idx: int) -> None:
-    self._view.params.update_active_params(idx)
+    self._view.params.update_active_item_params(idx)
     return
 
 # Execution commands
@@ -339,46 +324,34 @@ class MngrController():
       self._current()
     return
 
-# Links subpanel
-  # def _create_links_view(self, idx, name) -> None:
-  #   self._unbind_links_widgets()
-  #   flow_item = self._model.flow.get_item(idx)
-  #   operation = self._model.module.get_operation_by_name(name)
-  #   refs = operation.inrefs
-  #   links = flow_item.links
-  #   possible_refs = []
-  #   last_idx = min(len(self._flow_output_refs)-1, idx+1)
-  #   output_refs = self._flow_output_refs[:last_idx]
-  #   for item_refs in output_refs:
-  #     for ref in item_refs:
-  #       possible_refs.append(ref)
-  #   self._view.flow.create_links_view(refs, links, possible_refs)
-  #   self._bind_links_widgets()
-  #   return
-
+# Links view
   def _unbind_links_widgets(self) -> None:
-    links_widgets = self._view.flow.links_widgets
-    for lw in links_widgets:
-      combo = lw.get('combo')
-      combo.unbind("<<ComboboxSelected>>")
+    descriptors = self._view.links.get_active_item_link_descriptors()
+    for descr in descriptors:
+      widget = descr.get('wd')
+      t = type(widget)
+      if t == Combobox:
+        widget.unbind("<<ComboboxSelected>>")
     return
 
   def _bind_links_widgets(self) -> None:
-    links_widgets = self._view.flow.links_widgets
-    for lw in links_widgets:
-      combo = lw.get('combo')
-      name = lw.get('name')
-      getter = lw.get('getter')
-      combo.bind("<<ComboboxSelected>>", lambda e: self._assign_link(name, getter))
+    descriptors = self._view.links.get_active_item_link_descriptors()
+    for descr in descriptors:
+      widget = descr.get('wd')
+      t = type(widget)
+      if t == Combobox:
+        name = descr.get('name')
+        getter = descr.get('getter')
+        widget.bind("<<ComboboxSelected>>", lambda e: self._assign_link(name, getter))
     return
 
   def _assign_link(self, name: str, getter: Callable) -> None:
-    cur_idx, flow_item_name = self._view.flow.get_current_selection_tree()
-    flow_item = self._model.flow.get_item(cur_idx)
+    idx, flow_item_name = self._view.flow.get_current_selection_tree()
+    flow_item = self._model.flow.get_item(idx)
     ext_ref = getter()
     flow_item.links[name] = ext_ref
     item_name = flow_item_name.split('.')[1]
-    state_id = f'{cur_idx}-{item_name}'
+    state_id = f'{idx}-{item_name}'
     storage_in_ref = self._runner.storage.get_state_input_ext_ref(state_id, name)
     storage_in_ref.ext_ref = ext_ref
     self._apply()

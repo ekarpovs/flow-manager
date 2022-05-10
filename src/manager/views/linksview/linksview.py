@@ -29,8 +29,8 @@ class LinksView(View):
     self.rowconfigure(1, weight=1)
 
     self._infovar = StringVar()
-    info_entry = Entry(self, name='flow_info',textvariable=self._infovar, width=35)
-    info_entry.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+W+E)
+    self._info_entry = Entry(self, name='flow_info',textvariable=self._infovar, width=35)
+    self._info_entry.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+W+E)
 
     # Content will be scrolable
     self._content = ScrolledFrame(self, use_ttk=True, height=int(h/5), width=int((w/2)))
@@ -39,7 +39,26 @@ class LinksView(View):
     self._links_view = self._content.display_widget(Frame)
     return
 
+  @property
+  def info(self) -> str:
+    return self._info_entry
+
+  def get_all_link_widgets(self) -> List[Widget]:
+    widgets = []
+    for descriptors in self._grid_rows_descr:
+      for descr in descriptors:
+        widget = descr.get('wd')
+        widgets.append(widget)
+    return widgets
+
+  def get_active_item_link_descriptors(self) -> List[List[Widget]]:
+    if self._active_wd_idx < 0:
+      return None
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    return descriptors
+
   def clear(self) -> None:     
+    self._infovar.set('')
     for child in self._links_view.winfo_children():
       child.grid_remove()
     self._grid_rows_descr.clear()
@@ -62,7 +81,6 @@ class LinksView(View):
     self._active_wd_idx = 0
     self._hightlighte_active_wd(True)
     return  
-
 
   def _create_item_links_container(self, idx: int) -> Widget:
     item_links_frame = LabelFrame(self._links_view, name=f'--{idx}--')
