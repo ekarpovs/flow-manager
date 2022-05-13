@@ -274,12 +274,6 @@ class MngrController():
     self._view.params.set_item_params(idx, params)
     return
 
-  def _update_step_params(self, idx: int) -> None:
-    flow_item = self._model.flow.get_item(idx)
-    params = flow_item.params
-    self._view.params.set_item_params(idx, params)
-    return
-
 # Execution commands
   def _preview_step_result(self, idx: int) -> None:
     state_id = self._runner.output_from_state
@@ -307,7 +301,7 @@ class MngrController():
       self._view.flow.set_selection_tree(new_idx)
     return
 
-  def _next(self)  -> int:
+  def _next(self)  -> None:
     self._view.data.default()
     idx, _ = self._view.flow.get_current_selection_tree()
     if self._ready() and self._runner.state_idx == idx:
@@ -317,13 +311,13 @@ class MngrController():
       self._set_top_state()
     return 
 
-  def _current(self) -> int:
+  def _current(self) -> None:
     self._step('current')
     idx, _ = self._view.flow.get_current_selection_tree()
     self._preview_step_result(idx)
     return 
 
-  def _prev(self) -> int:
+  def _prev(self) -> None:
     self._step('prev')
     idx = self._runner.state_idx
     self._clear_step_result(idx)
@@ -457,7 +451,7 @@ class MngrController():
 
 # Data commands
   @staticmethod
-  def _set_image_location_to_params(io_obj: str, params: Dict, key: str) -> None:
+  def _set_data_location_to_params(io_obj: str, params: Dict, key: str) -> None:
     if '.' in io_obj: 
       path, name = os.path.split(io_obj)
     else:
@@ -474,11 +468,10 @@ class MngrController():
     flow_item = self._model.flow.get_item(idx)
     params_def = flow_item.params_def   
     params = flow_item.params
-
     p = [p for p in params_def if p.get('name') == 'path' or p.get('name') == 'src' or p.get('name') == 'dest']
     if p is not None:
-      self._set_image_location_to_params(io_obj, params, key)
-    self._update_step_params(idx)
+      self._set_data_location_to_params(io_obj, params, key)
+    self._view.params.set_item_params(idx, params)
     self._apply(None)
     return
   
