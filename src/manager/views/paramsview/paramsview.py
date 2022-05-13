@@ -7,7 +7,6 @@ import copy
 from flow_model import FlowModel, FlowItemModel
 
 from .paramwidgetfactory import ParamWidgetFactory
-from .paramsutils import convert_params_def_to_dict
 from ....uiconst import *
 from ..view import View
 
@@ -50,54 +49,10 @@ class ParamsView(View):
     self._activate_params_buttons()
     return
 
-  def apply_active_item_params(self, idx: int) -> None:
-    '''
-    From active widget to flow item 
-    '''
-    
-    flow_item = self._flow.get_item(idx)
-    params_wd = self._get_active_item_params()
-    for k in params_wd.keys():
-      flow_item.params[k] = params_wd.get(k)
-    return
-
-  def reset_active_item_params(self, idx: int) -> None:
-    '''
-    From ws definition to active widget and flow item 
-    '''
-
-    flow_item = self._flow.get_item(idx)
-    params_ws = copy.deepcopy(flow_item.params_ws)
-    params_def = copy.deepcopy(flow_item.params_def)
-    params_new = {} 
-    for param_def in params_def:
-      k = param_def.get('name')
-      param_new_val = params_ws.get(k)
-      if param_new_val is None:
-        # use default value from def
-        param_new_val = param_def.get('default')
-      flow_item.params[k] = param_new_val
-      params_new[k] = param_new_val
-    self._set_active_item_params(params_new)
-    return
-
-  def default_active_item_params(self, idx: int) -> None:
-    '''
-    From operation params definition to active widget and flow item 
-    '''
-
-    flow_item = self._flow.get_item(idx)
-    params_def = copy.deepcopy(flow_item.params_def)
-    params = convert_params_def_to_dict(params_def)    
-    flow_item.params = params
-    self._set_active_item_params(params)
-    return
-
-  def update_active_item_params(self, idx: int) -> None:
-    flow_item = self._flow.get_item(idx)
-    params = copy.deepcopy(flow_item.params)
-    self._set_active_item_params(params)
-    return
+# API
+  @property
+  def descriptors(self) -> List[Dict]:
+    return self._grid_rows_descr
 
   def get_active_item_params_widgets(self) -> List[Widget]:
     if self._active_wd_idx < 0:
@@ -109,11 +64,19 @@ class ParamsView(View):
       widgets.append(widget)
     return widgets
 
-  def _get_active_item_params(self) -> Dict:
-    if self._active_wd_idx < 0:
-      return None
+  def get_item_name(self, idx: int) -> str:
+    descriptors = self._grid_rows_descr[idx]
+    widget_0 = descriptors[0].get('wd')
+    parent_name = widget_0.winfo_parent()
+    idx_s = parent_name.index('--')
+    p_n:str = parent_name[idx_s+2: len(parent_name)-2]
+    idx_point = p_n.find('-', 3)
+    p_n = p_n[:idx_point] + '.' + p_n[idx_point+1:]
+    return p_n
+
+  def get_item_params(self, idx: int) -> Dict:
     params = {}
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    descriptors = self._grid_rows_descr[idx]
     for descr in descriptors:
       widget = descr.get('wd')
       name = widget.winfo_name()
@@ -124,10 +87,10 @@ class ParamsView(View):
       params[name] =  value 
     return params
 
-  def _set_active_item_params(self, params) -> None:
+  def set_item_params(self, idx: int, params) -> None:
     if self._active_wd_idx < 0:
       return None
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    descriptors = self._grid_rows_descr[idx]
     for descr in descriptors:
       widget = descr.get('wd')
       name = widget.winfo_name()
@@ -146,10 +109,11 @@ class ParamsView(View):
     self._activate_params_buttons()   
     return
 
+# Build
   def build(self, flow: FlowModel) -> None:
     self._flow = flow
     items = copy.deepcopy(flow.items)
-    for i,item in enumerate(items):
+    for i, item in enumerate(items):
       item_params_frame = self._create_item_params_container(i, item)
       item_params_frame.grid(row=i, column=0, padx=PADX, sticky=W + E)
       self._factory.container = item_params_frame
@@ -163,7 +127,9 @@ class ParamsView(View):
     return  
 
   def _create_item_params_container(self, idx: int, item: FlowItemModel) -> Widget:
-    item_params_frame = LabelFrame(self._params_view, name=f'--{idx}--')
+    i_n = item.name.replace('.', '-')
+    name = f'--{idx}-{i_n}--'
+    item_params_frame = LabelFrame(self._params_view, name=name)
     return item_params_frame
 
   def _create_item_params_widgets(self, idx: int, item: FlowItemModel) -> Dict:
@@ -196,10 +162,11 @@ class ParamsView(View):
       item_params_descr.append({'name': param_widget.winfo_name(), 'getter': getter, 'setter': setter, 'wd': param_widget})
     return item_params_descr
 
-
   def set_active_wd(self, idx: int) -> None:
     self._hightlighte_active_wd()
-    self._set_active_wd_state()
+    if self._active_wd_idx > idx:
+      # disable, when move backward
+      self._set_active_wd_state()
     self._active_wd_idx = idx
     self._hightlighte_active_wd(True)
     self._set_active_wd_state(True)
@@ -223,9 +190,7 @@ class ParamsView(View):
         widget['state'] = DISABLED
     return
 
-
   # UI methods
-
   def _hightlighte_active_wd(self, active: bool = False) -> None:
     color = 'SystemButtonFace'
     if active:

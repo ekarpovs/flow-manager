@@ -13,6 +13,7 @@ from .mngrmodel import MngrModel
 from .mngrrunner import MngrRunner 
 from .mngrconverter import MngrConverter  
 from .mngrview import MngrView  
+from .views.paramsview import convert_params_def_to_dict
 from ..configuration import Configuration
 
 class MngrController():
@@ -243,19 +244,40 @@ class MngrController():
     return 
 
   def _apply_step_params(self, idx: int) -> None:
-    self._view.params.apply_active_item_params(idx)
+    flow_item = self._model.flow.get_item(idx)
+    params_wd = self._view.params.get_item_params(idx)
+    for k in params_wd.keys():
+      flow_item.params[k] = params_wd.get(k)
     return
 
-  def _reset_active_params(self, idx: int) -> None:
-    self._view.params.reset_active_item_params(idx)
+  def _reset_step_params(self, idx: int) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    params_ws = flow_item.params_ws
+    params_def = flow_item.params_def
+    params = {} 
+    for param_def in params_def:
+      k = param_def.get('name')
+      param_new_val = params_ws.get(k)
+      if param_new_val is None:
+        # use default value from def
+        param_new_val = param_def.get('default')
+      flow_item.params[k] = param_new_val
+      params[k] = param_new_val
+    self._view.params.set_item_params(idx, params)
     return
 
-  def _default_active_params(self, idx: int) -> None:
-    self._view.params.default_active_item_params(idx)
+  def _default_step_params(self, idx: int) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    params_def = flow_item.params_def
+    params = convert_params_def_to_dict(params_def)    
+    flow_item.params = params
+    self._view.params.set_item_params(idx, params)
     return
 
-  def _update_active_params(self, idx: int) -> None:
-    self._view.params.update_active_item_params(idx)
+  def _update_step_params(self, idx: int) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    params = flow_item.params
+    self._view.params.set_item_params(idx, params)
     return
 
 # Execution commands
@@ -390,13 +412,13 @@ class MngrController():
 
   def _reset(self) -> None:
     idx, _ = self._view.flow.get_current_selection_tree()
-    self._reset_active_params(idx)
+    self._reset_step_params(idx)
     self._run_current(idx)
     return
 
   def _default(self) -> None:
     idx, _ = self._view.flow.get_current_selection_tree()
-    self._default_active_params(idx)
+    self._default_step_params(idx)
     self._run_current(idx)
     return
 
@@ -406,18 +428,26 @@ class MngrController():
     self._view.flow.activate_buttons(activate)
     return activate
 
+  def _create_and_activate_links_view(self) -> None:
+    self._view.links.build(self._model.flow.flow)
+    info_descr = self._view.links.info_descr
+    widget = info_descr.get('wd')
+    getter = info_descr.get('getter')
+    widget.bind("<Return>", lambda e: self._flow_title_return_pressed(getter))
+    self._activate_item_links()      
+    return
+
+  def _create_and_activate_params_view(self) -> None:
+    self._view.params.build(self._model.flow.flow)
+    self._activate_item_params()
+    return
+
   def _rebuild_runner(self) -> None:
+    self._view.params.clear()
+    self._view.links.clear()
     if self._model.flow:
-      self._view.params.clear()
-      self._view.params.build(self._model.flow.flow)
-      self._activate_item_params()
-      self._view.links.clear()
-      self._view.links.build(self._model.flow.flow)
-      info_descr = self._view.links.info_descr
-      widget = info_descr.get('wd')
-      getter = info_descr.get('getter')
-      widget.bind("<Return>", lambda e: self._flow_title_return_pressed(getter))
-      self._activate_item_links()      
+      self._create_and_activate_links_view()
+      self._create_and_activate_params_view()
       self._runner.build(self._model.flow.flow)
       # for plotting
       self._view.data.storage = self._runner.storage
@@ -448,7 +478,7 @@ class MngrController():
     p = [p for p in params_def if p.get('name') == 'path' or p.get('name') == 'src' or p.get('name') == 'dest']
     if p is not None:
       self._set_image_location_to_params(io_obj, params, key)
-    self._update_active_params(idx)
+    self._update_step_params(idx)
     self._apply(None)
     return
   
