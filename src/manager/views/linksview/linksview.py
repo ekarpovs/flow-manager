@@ -40,28 +40,12 @@ class LinksView(View):
     return
 
   @property
+  def descriptors(self) -> List[Dict]:
+    return self._grid_rows_descr
+
+  @property
   def info_descr(self) -> str:
     return self._info_desr
-
-  def get_all_link_widgets(self) -> List[Widget]:
-    widgets = []
-    for descriptors in self._grid_rows_descr:
-      for descr in descriptors:
-        widget = descr.get('wd')
-        widgets.append(widget)
-    return widgets
-
-  # def update_active_item_title(self) -> None:
-  #   if self._active_wd_idx < 0:
-  #     return None
-  #   descriptors = self._grid_rows_descr[self._active_wd_idx]
-  #   for descr in descriptors:
-  #     widget = descr.get('wd')
-  #     t = type(widget)
-  #     if t == Entry:
-  #       getter = descr('getter')
-  #       title = getter()
-  #   return
 
   def get_active_item_link_descriptors(self) -> List[List[Widget]]:
     if self._active_wd_idx < 0:
@@ -83,8 +67,8 @@ class LinksView(View):
     self._flow = flow
     self._infovar.set(flow.info)
     items = copy.deepcopy(flow.items)
-    for i,item in enumerate(items):
-      item_links_frame = self._create_item_links_container(i+1)
+    for i, item in enumerate(items):
+      item_links_frame = self._create_item_links_container(i+1, item)
       item_links_frame.grid(row=i+1, column=0, padx=PADX, sticky=W + E)
       item_links_frame.columnconfigure(0, weight=1)
       item_links_frame.columnconfigure(1, weight=1)
@@ -96,8 +80,10 @@ class LinksView(View):
     self._set_active_wd_state(True)
     return  
 
-  def _create_item_links_container(self, idx: int) -> Widget:
-    item_links_frame = LabelFrame(self._links_view, name=f'--{idx}--')
+  def _create_item_links_container(self, idx: int, item: FlowItemModel) -> Widget:
+    i_n = item.name.replace('.', '-')
+    name = f'--{idx}-{i_n}--'
+    item_links_frame = LabelFrame(self._links_view, name=name)
     return item_links_frame
 
   def _create_item_links_widgets(self, container: LabelFrame, idx: int, item: FlowItemModel) -> Dict:
@@ -138,7 +124,7 @@ class LinksView(View):
     inref_lbl = Label(container, text=text, anchor=W, justify=LEFT, width=10)
     var = StringVar()
     inref_combo = Combobox(container, name=inref_name, justify=LEFT, width=35)
-    inref_combo['values'] = self._possible_input[:len(self._possible_input)-2]
+    inref_combo['values'] = copy.deepcopy(self._possible_input[:len(self._possible_input)-2])
     # Assign current value
     if len(links) > 0:
       link = links.get(inref_name)
