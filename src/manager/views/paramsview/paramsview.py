@@ -133,15 +133,6 @@ class ParamsView(View):
     return item_params_frame
 
   def _create_item_params_widgets(self, idx: int, item: FlowItemModel) -> Dict:
-    # merge curent params with params_ws
-    params = item.params # Dict
-    params_ws = item.params_ws # Dict
-    params_def = item.params_def # List[Dict]
-    for k in params_ws.keys():
-      if k in params:
-        continue
-      params[k] = params_ws.ket(k)
-    # merge create widget, label
     item_params_descr = []
     title = f'{idx}-{item.name}'
     i_n = item.name.replace('.', '-')
@@ -149,6 +140,7 @@ class ParamsView(View):
     item_label = Label(self._factory.container, name=name, text=title)
     item_label.grid(row=0, column=0, columnspan=3, padx=PADX_S, pady=PADY_S, sticky=W)
     item_params_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
+    params, params_def = self._merge_curent_params_with_params_ws(item)
     for i, param_def in enumerate(params_def):
       name = param_def.get('name')
       comment = param_def.get('comment')
@@ -163,6 +155,18 @@ class ParamsView(View):
       param_descr.grid(row=i+1, column=2, padx=PADX_S, pady=PADY_S, sticky=W)
       item_params_descr.append({'name': param_widget.winfo_name(), 'getter': getter, 'setter': setter, 'wd': param_widget})
     return item_params_descr
+
+  @staticmethod
+  def _merge_curent_params_with_params_ws(item: FlowItemModel) -> Tuple[Dict, Dict]:
+    # merge curent params with params_ws
+    params = item.params # Dict
+    params_ws = item.params_ws # Dict
+    params_def = item.params_def # List[Dict]
+    for k in params_ws.keys():
+      if k in params:
+        continue
+      params[k] = params_ws.ket(k)
+    return params, params_def
 
   def set_active_wd(self, idx: int) -> None:
     self._hightlighte_active_wd()

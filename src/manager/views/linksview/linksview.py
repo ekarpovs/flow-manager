@@ -89,7 +89,9 @@ class LinksView(View):
   def _create_item_links_widgets(self, container: LabelFrame, idx: int, item: FlowItemModel) -> Dict:
     item_links_descr = []
     title = f'{idx}-{item.name}'
-    item_label = Label(container, name='item_name', text=title)
+    i_n = item.name.replace('.', '-')
+    name = f'--{idx}-{i_n}--'
+    item_label = Label(container, name=name, text=title)
     item_label.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
     item_links_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
     infovar = StringVar()
@@ -170,7 +172,7 @@ class LinksView(View):
     for descr in descriptors:
       widget = descr.get('wd')
       name = widget.winfo_name()
-      if name == 'item_name':
+      if name.startswith('--'):
         widget['fg'] = fg_color
         widget['bg'] = bg_color
         break   

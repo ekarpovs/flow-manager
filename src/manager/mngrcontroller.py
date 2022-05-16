@@ -148,7 +148,6 @@ class MngrController():
     return
 
   def _activate_item_links(self, idx: int = 0) -> None:
-    self._unbind_item_links_widgets()
     self._view.links.set_active_wd(idx)
     self._bind_item_links_widgets()
     return
@@ -316,6 +315,7 @@ class MngrController():
     return 
 
   def _prev(self) -> None:
+    self._unbind_item_links_widgets()
     self._unbind_item_params_widgets()
     self._step('prev')
     idx = self._runner.state_idx
