@@ -161,14 +161,17 @@ class LinksView(View):
   # UI methods
 
   def _hightlighte_active_wd(self, active: bool = False) -> None:
-    color = 'SystemButtonFace'
+    fg_color = 'black'
+    bg_color = 'SystemButtonFace'
     if active:
-      color = 'azure'
+      fg_color = 'white'
+      bg_color = 'blue'
     descriptors = self._grid_rows_descr[self._active_wd_idx]
     for descr in descriptors:
       widget = descr.get('wd')
       name = widget.winfo_name()
       if name == 'item_name':
-        widget['bg'] = color
+        widget['fg'] = fg_color
+        widget['bg'] = bg_color
         break   
     return
