@@ -143,7 +143,6 @@ class MngrController():
     return
 
   def _activate_item_params(self, idx: int = 0) -> None:
-    self._unbind_item_params_widgets()
     self._view.params.set_active_wd(idx)
     self._bind_item_params_widgets()
     return
@@ -157,7 +156,6 @@ class MngrController():
   def _tree_selection_changed(self, event) -> None:
     idx, name = self._view.flow.get_current_selection_tree()
     if self._model.flow.flow is not None:
-      # self._create_links_view(idx, name)
       self._activate_item_params(idx)
       self._activate_item_links(idx)
     return
@@ -318,6 +316,7 @@ class MngrController():
     return 
 
   def _prev(self) -> None:
+    self._unbind_item_params_widgets()
     self._step('prev')
     idx = self._runner.state_idx
     self._clear_step_result(idx)
@@ -396,11 +395,30 @@ class MngrController():
     return
 
   def _params_return_pressed(self, event) -> None:
-    self._apply()
+    self._apply(event)
     return
 
+  def _get_changed_param_widget_idx(self, event: Event) -> int:
+    idx = 100
+    widget: Widget = getattr(event, 'widget', None)
+    if widget is not None:
+      parent_full_name = widget.winfo_parent()
+      parent_name = parent_full_name[parent_full_name.index('--'):]
+      idx_s = parent_name[2:4]
+      if not idx_s.isnumeric():
+        idx_s = idx_s[0:1]
+      idx = int(idx_s)
+    return idx
+
   def _apply(self, event=None) -> None:
-    idx, name = self._view.flow.get_current_selection_tree()
+    idx, _ = self._view.flow.get_current_selection_tree()
+    par_idx = self._get_changed_param_widget_idx(event)
+    if idx > par_idx:
+      # go backward and forwarrd with new param value
+      for i in range(idx - par_idx):
+        self._prev()
+      for i in range(idx - par_idx):
+        self._next()
     self._run_current(idx)
     return
 

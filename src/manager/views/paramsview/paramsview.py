@@ -80,7 +80,7 @@ class ParamsView(View):
     for descr in descriptors:
       widget = descr.get('wd')
       name = widget.winfo_name()
-      if name == 'item_name':
+      if name.startswith('--'):
         continue
       getter = descr.get('getter')
       value = getter()
@@ -94,7 +94,7 @@ class ParamsView(View):
     for descr in descriptors:
       widget = descr.get('wd')
       name = widget.winfo_name()
-      if name == 'item_name':
+      if name.startswith('--'):
         continue
       setter = descr.get('setter')
       setter(params.get(name))
@@ -144,7 +144,9 @@ class ParamsView(View):
     # merge create widget, label
     item_params_descr = []
     title = f'{idx}-{item.name}'
-    item_label = Label(self._factory.container, name='item_name', text=title)
+    i_n = item.name.replace('.', '-')
+    name = f'--{idx}-{i_n}--'
+    item_label = Label(self._factory.container, name=name, text=title)
     item_label.grid(row=0, column=0, columnspan=3, padx=PADX_S, pady=PADY_S, sticky=W)
     item_params_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
     for i, param_def in enumerate(params_def):
@@ -199,7 +201,7 @@ class ParamsView(View):
     for descr in descriptors:
       widget = descr.get('wd')
       name = widget.winfo_name()
-      if name == 'item_name':
+      if name.startswith('--'):
         widget['bg'] = color
         break   
     return
