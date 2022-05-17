@@ -202,7 +202,7 @@ class ParamsView(View):
     bg_color = 'SystemButtonFace'
     if active:
       fg_color = 'white'
-      bg_color = 'blue'
+      bg_color = 'RoyalBlue'
     descriptors = self._grid_rows_descr[self._active_wd_idx]
     for descr in descriptors:
       widget = descr.get('wd')
