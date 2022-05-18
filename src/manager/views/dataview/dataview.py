@@ -26,22 +26,36 @@ class DataView(View):
     self.grid()
     # self.grid_propagate(False)
 
-    self.rowconfigure(0, weight=20)
-    self.rowconfigure(1, weight=1)
+    self.rowconfigure(0, weight=10)
+    self.rowconfigure(1, weight=8)
+    self.rowconfigure(2, weight=1)
     # self.columnconfigure(0, pad=15)
     self.columnconfigure(0, weight=1)
 
-    # Content will be scrolable
-    self.content = ScrolledFrame(self, use_ttk=True)
+    # Last existing output
+    self._data_last = Frame(self, height=int(h*0.3), highlightbackground='gray', highlightthickness=1)
+    self._data_last.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
+    self._data_last.columnconfigure(0, weight=1)
+    self._data_last.rowconfigure(0, weight=1)
+
+    # Setup canvas inside the frame
+    # self._canvas_data_last = Canvas(self._data_last, bg='green')
+    # self._canvas_data_last.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+
+    #Add PIL image to the Canvas
+    # canvas.create_image(10,10,anchor=NW,image=img)
+
+    # Preview content will be scrolable
+    self.content = ScrolledFrame(self, height=int(h*0.3), use_ttk=True)
     # Bind the arrow keys and scroll wheel
     # self.content.bind_arrow_keys(self)
     # self.content.bind_scroll_wheel(self)
-    self.content.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=W + E + N + S)
+    self.content.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
     # Create the preview frame within the ScrolledFrame
     self.preview_view = self.content.display_widget(Frame)
     
-    self.data_actions = Frame(self, highlightbackground='gray', highlightthickness=1)
-    self.data_actions.grid(row=1, column=0, padx=PADX, pady=PADY, sticky=W + E + S)
+    self.data_actions = Frame(self, height=int(h*0.2), highlightbackground='gray', highlightthickness=1)
+    self.data_actions.grid(row=2, column=0, padx=PADX, pady=PADY_S, sticky=W + E + S)
     self.data_actions.columnconfigure(0, weight=1)
     self.data_actions.columnconfigure(1, weight=1)
     self.data_actions.columnconfigure(2, weight=1)
@@ -134,7 +148,7 @@ class DataView(View):
     pil_image = Image.fromarray(preview)
     photo = ImageTk.PhotoImage(pil_image)
     view = Label(parent, name=name, image=photo)
-    view.image = photo   
+    view.image = photo
     return view
 
   def _preview_object(self, parent, data: any, name: str) -> Widget:
@@ -151,7 +165,7 @@ class DataView(View):
     }
     return views.get(ref_type, self._preview_object)
 
-  def clear_preview(self, idx: int) -> None:
+  def _clear_preview(self, idx: int) -> None:
     if len(self._grid_rows) > 0:
       self._out = None
       # map idx to preview idx
@@ -167,6 +181,11 @@ class DataView(View):
         res.grid_remove()
       except IndexError:
         pass
+    return
+  
+  def update_result(self, idx: int, state_id: str) -> None:
+    self._show_last(state_id)
+    self. _clear_preview(idx)
     return
  
   def _create_row_output_container(self, row_idx: int, title: str) -> Widget:
@@ -212,15 +231,38 @@ class DataView(View):
     row_idx = self._idx_map.get(state_id, WITHOUT_PREVIEW_DATA)
     return row_idx
 
+  @staticmethod
+  def _parse_out_refs(refs) -> Tuple[str, str]:
+    parts =refs[0][0].split('-')
+    state_id = parts[0]
+    title = '-'.join(parts[0:len(parts)-1])
+    return state_id, title
+
+  def _show_last(self, state_id: str) -> None:
+    out_data = self._storage.get_state_output_data(state_id)
+    refs = self._storage.get_state_output_refs(state_id)
+    if out_data is None or refs is None:
+      return
+    out_refs = [(ref.ext_ref, ref.int_ref, ref.data_type) for ref in refs]  
+    if len(out_refs) > 0:
+      ref = out_refs[0]
+      (ref_extr, ref_intr, ref_type) = ref
+      data = out_data.get(ref_intr)
+      pil_image = Image.fromarray(data)
+      photo = ImageTk.PhotoImage(pil_image)
+      view = Label(self._data_last, name='las image', image=photo)
+      view.image = photo   
+      view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+
+      # self._canvas_data_last.create_image(x1=10, y1=10, anchor=NW, image=photo)
+    return
+
   def _preview(self) -> None:   
     if self._out is None:
       return
-
     (out_refs, out_data) = self._out
     if len(out_refs) > 0:
-      parts =out_refs[0][0].split('-')
-      state_id = parts[0]
-      title = '-'.join(parts[0:len(parts)-1])
+      state_id, title = self._parse_out_refs(out_refs)
       row_idx = self._get_row_idx(state_id)
       self._create_preview(row_idx, title, out_data, out_refs)
     return
@@ -236,7 +278,7 @@ class DataView(View):
     self._idx_map[f'{idx}'] = min(idx, preview_row)
     return
 
-  def preview_result(self, idx: int, state_id: str) -> None:
+  def _show_preview(self, idx: int, state_id: str) -> None:
     out_data = self._storage.get_state_output_data(state_id)
     refs = self._storage.get_state_output_refs(state_id)
     if out_data is None or refs is None:
@@ -245,6 +287,11 @@ class DataView(View):
     self._out = (out_refs, out_data)
     self._map_idx_to_row_idx(idx)
     self._preview()
+    return
+
+  def show_result(self, idx: int, state_id: str) -> None:
+    self._show_preview(idx, state_id)
+    self._show_last(state_id)
     return
     
   def _on_click(self, event) -> None:
