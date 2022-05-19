@@ -12,7 +12,7 @@ from ....uiconst import *
 from ..view import View
 from .plotdialog import PlotDialog 
 
-DEFAULT_VIEW_SIZE = 50
+DEFAULT_VIEW_SIZE = 100
 WITHOUT_PREVIEW_DATA = -1
 
 class DataView(View):
@@ -26,9 +26,9 @@ class DataView(View):
     self.grid()
     # self.grid_propagate(False)
 
-    self.rowconfigure(0, weight=10)
-    self.rowconfigure(1, weight=8)
-    self.rowconfigure(2, weight=1)
+    self.rowconfigure(0, weight=1)
+    self.rowconfigure(1, weight=1)
+    # self.rowconfigure(2, weight=1)
     # self.columnconfigure(0, pad=15)
     self.columnconfigure(0, weight=1)
 
@@ -37,6 +37,8 @@ class DataView(View):
     self._data_last.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
     self._data_last.columnconfigure(0, weight=1)
     self._data_last.rowconfigure(0, weight=1)
+    self._data_last.grid_propagate(False)
+    # self._last_view = Label(self._data_last, name='last image')
 
     # Setup canvas inside the frame
     # self._canvas_data_last = Canvas(self._data_last, bg='green')
@@ -54,41 +56,42 @@ class DataView(View):
     # Create the preview frame within the ScrolledFrame
     self.preview_view = self.content.display_widget(Frame)
     
-    self.data_actions = Frame(self, height=int(h*0.2), highlightbackground='gray', highlightthickness=1)
-    self.data_actions.grid(row=2, column=0, padx=PADX, pady=PADY_S, sticky=W + E + S)
-    self.data_actions.columnconfigure(0, weight=1)
-    self.data_actions.columnconfigure(1, weight=1)
-    self.data_actions.columnconfigure(2, weight=1)
-    self.data_actions.columnconfigure(3, weight=1)
-    self.data_actions.columnconfigure(4, weight=1)
+    # self.data_actions = Frame(self, height=int(h*0.2), highlightbackground='gray', highlightthickness=1)
+    # self.data_actions.grid(row=2, column=0, padx=PADX, pady=PADY_S, sticky=W + E + S)
+    # self.data_actions.columnconfigure(0, weight=1)
+    # self.data_actions.columnconfigure(1, weight=1)
+    # self.data_actions.columnconfigure(2, weight=1)
+    # self.data_actions.columnconfigure(3, weight=1)
+    # self.data_actions.columnconfigure(4, weight=1)
     
-    self._preview_height = DEFAULT_VIEW_SIZE
-    self._preview_width = DEFAULT_VIEW_SIZE
+    # self._preview_height = DEFAULT_VIEW_SIZE
+    # self._preview_width = DEFAULT_VIEW_SIZE
 
-    self.scale_frame = LabelFrame(self.data_actions, text='Preview size:')
-    self.scale_frame.grid(row=0, column=0, columnspan=4, padx=PADX_S, pady=PADY_S, sticky=W+E)
-    self.scale_frame.columnconfigure(0, weight=1)
-    self.scale_frame.columnconfigure(1, weight=1)
-    self.scale_frame.columnconfigure(2, weight=1)
-    self.scale_frame.columnconfigure(3, weight=1)
+    # self.scale_frame = LabelFrame(self.data_actions, text='Preview size:')
+    # self.scale_frame.grid(row=0, column=0, columnspan=4, padx=PADX_S, pady=PADY_S, sticky=W+E)
+    # self.scale_frame.columnconfigure(0, weight=1)
+    # self.scale_frame.columnconfigure(1, weight=1)
+    # self.scale_frame.columnconfigure(2, weight=1)
+    # self.scale_frame.columnconfigure(3, weight=1)
 
-    self.var_h = IntVar()
-    self.var_h.set(self._preview_height)
-    self.scale_h = Scale(self.scale_frame, from_=50, to=500, resolution=50, variable=self.var_h, orient=HORIZONTAL, length=400)
-    self.scale_h.grid(row=0, column=0, columnspan=3, padx=PADX_S, pady=PADY_S, sticky=W+E)
-    self.scale_h.bind("<ButtonRelease-1>", self._set_h)
+    # self.var_h = IntVar()
+    # self.var_h.set(self._preview_height)
+    # self.scale_h = Scale(self.scale_frame, from_=50, to=500, resolution=50, variable=self.var_h, orient=HORIZONTAL, length=400)
+    # self.scale_h.grid(row=0, column=0, columnspan=3, padx=PADX_S, pady=PADY_S, sticky=W+E)
+    # self.scale_h.bind("<ButtonRelease-1>", self._set_h)
 
-    self.var_fixed_size = BooleanVar()
-    self.fixed_size = Checkbutton(self.scale_frame, variable=self.var_fixed_size, text='Fixed size', onvalue=True, offvalue=False, command=self._fix_size)
-    self.fixed_size.grid(row=0, column=3, padx=PADX_S, pady=PADY_S, sticky=W+E)
+    # self.var_fixed_size = BooleanVar()
+    # self.fixed_size = Checkbutton(self.scale_frame, variable=self.var_fixed_size, text='Fixed size', onvalue=True, offvalue=False, command=self._fix_size)
+    # self.fixed_size.grid(row=0, column=3, padx=PADX_S, pady=PADY_S, sticky=W+E)
 
-    self.btn_save = Button(self.data_actions, text='Save', width=BTNW_S, command=self._save)
-    self.btn_save.grid(row=0, column=4, padx=PADX, pady=PADY)
+    # self.btn_save = Button(self.data_actions, text='Save', width=BTNW_S, command=self._save)
+    # self.btn_save.grid(row=0, column=4, padx=PADX, pady=PADY)
     
     self._out = None
     self._idx_map :Dict = {}
     self._grid_rows: List[Widget] = []
     self._storage: FlowStorage = None
+    self._last_view = None
     return
 
   @property
@@ -107,14 +110,16 @@ class DataView(View):
       row.grid_remove()  
     self._grid_rows.clear()
     self.content.scroll_to_top()
+    if self._last_view is not None:
+      self._last_view.grid_remove()
     return
 
   def default(self) -> None:
-    if self.var_fixed_size.get():
-      return
+    # if self.var_fixed_size.get():
+    #   return
     self._preview_height = DEFAULT_VIEW_SIZE
     self._preview_width = DEFAULT_VIEW_SIZE
-    self.var_h.set(self._preview_height)
+    # self.var_h.set(self._preview_height)
     self._preview() 
     return
 
@@ -248,12 +253,14 @@ class DataView(View):
       ref = out_refs[0]
       (ref_extr, ref_intr, ref_type) = ref
       data = out_data.get(ref_intr)
-      pil_image = Image.fromarray(data)
-      photo = ImageTk.PhotoImage(pil_image)
-      view = Label(self._data_last, name='las image', image=photo)
-      view.image = photo   
-      view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
-
+      if data.dtype == np.dtype('uint8'):
+        pil_image = Image.fromarray(data)
+        photo = ImageTk.PhotoImage(pil_image)
+        self._last_view = Label(self._data_last, name='last image', image=photo)
+        self._last_view.image = photo 
+        self._last_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+      else:
+        self._last_view.grid_remove()
       # self._canvas_data_last.create_image(x1=10, y1=10, anchor=NW, image=photo)
     return
 
@@ -319,9 +326,9 @@ class DataView(View):
     return
 
   def _fix_size(self) -> None:
-    self.scale_h['state'] = NORMAL
-    if self.var_fixed_size.get() == True:
-      self.scale_h['state'] = DISABLED
+    # self.scale_h['state'] = NORMAL
+    # if self.var_fixed_size.get() == True:
+    #   self.scale_h['state'] = DISABLED
     return
 
   def _save(self) -> None:
