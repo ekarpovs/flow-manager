@@ -38,55 +38,15 @@ class DataView(View):
     self._data_last.columnconfigure(0, weight=1)
     self._data_last.rowconfigure(0, weight=1)
     self._data_last.grid_propagate(False)
-    # self._last_view = Label(self._data_last, name='last image')
-
-    # Setup canvas inside the frame
-    # self._canvas_data_last = Canvas(self._data_last, bg='green')
-    # self._canvas_data_last.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
-
-    #Add PIL image to the Canvas
-    # canvas.create_image(10,10,anchor=NW,image=img)
 
     # Preview content will be scrolable
     self.content = ScrolledFrame(self, height=int(h*0.3), use_ttk=True)
-    # Bind the arrow keys and scroll wheel
-    # self.content.bind_arrow_keys(self)
-    # self.content.bind_scroll_wheel(self)
     self.content.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
     # Create the preview frame within the ScrolledFrame
     self.preview_view = self.content.display_widget(Frame)
-    
-    # self.data_actions = Frame(self, height=int(h*0.2), highlightbackground='gray', highlightthickness=1)
-    # self.data_actions.grid(row=2, column=0, padx=PADX, pady=PADY_S, sticky=W + E + S)
-    # self.data_actions.columnconfigure(0, weight=1)
-    # self.data_actions.columnconfigure(1, weight=1)
-    # self.data_actions.columnconfigure(2, weight=1)
-    # self.data_actions.columnconfigure(3, weight=1)
-    # self.data_actions.columnconfigure(4, weight=1)
-    
-    # self._preview_height = DEFAULT_VIEW_SIZE
-    # self._preview_width = DEFAULT_VIEW_SIZE
-
-    # self.scale_frame = LabelFrame(self.data_actions, text='Preview size:')
-    # self.scale_frame.grid(row=0, column=0, columnspan=4, padx=PADX_S, pady=PADY_S, sticky=W+E)
-    # self.scale_frame.columnconfigure(0, weight=1)
-    # self.scale_frame.columnconfigure(1, weight=1)
-    # self.scale_frame.columnconfigure(2, weight=1)
-    # self.scale_frame.columnconfigure(3, weight=1)
-
-    # self.var_h = IntVar()
-    # self.var_h.set(self._preview_height)
-    # self.scale_h = Scale(self.scale_frame, from_=50, to=500, resolution=50, variable=self.var_h, orient=HORIZONTAL, length=400)
-    # self.scale_h.grid(row=0, column=0, columnspan=3, padx=PADX_S, pady=PADY_S, sticky=W+E)
-    # self.scale_h.bind("<ButtonRelease-1>", self._set_h)
-
-    # self.var_fixed_size = BooleanVar()
-    # self.fixed_size = Checkbutton(self.scale_frame, variable=self.var_fixed_size, text='Fixed size', onvalue=True, offvalue=False, command=self._fix_size)
-    # self.fixed_size.grid(row=0, column=3, padx=PADX_S, pady=PADY_S, sticky=W+E)
-
-    # self.btn_save = Button(self.data_actions, text='Save', width=BTNW_S, command=self._save)
-    # self.btn_save.grid(row=0, column=4, padx=PADX, pady=PADY)
-    
+   
+    self._preview_height = DEFAULT_VIEW_SIZE
+    self._preview_width = DEFAULT_VIEW_SIZE
     self._out = None
     self._idx_map :Dict = {}
     self._grid_rows: List[Widget] = []
@@ -115,11 +75,8 @@ class DataView(View):
     return
 
   def default(self) -> None:
-    # if self.var_fixed_size.get():
-    #   return
     self._preview_height = DEFAULT_VIEW_SIZE
     self._preview_width = DEFAULT_VIEW_SIZE
-    # self.var_h.set(self._preview_height)
     self._preview() 
     return
 
