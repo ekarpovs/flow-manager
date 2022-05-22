@@ -68,7 +68,7 @@ class LinksView(View):
     self._infovar.set(flow.info)
     items = copy.deepcopy(flow.items)
     for i, item in enumerate(items):
-      item_links_frame = self._create_item_links_container(i+1, item)
+      item_links_frame = self._create_item_links_container(i, item)
       item_links_frame.grid(row=i+1, column=0, padx=PADX, sticky=W + E)
       item_links_frame.columnconfigure(0, weight=1)
       item_links_frame.columnconfigure(1, weight=1)
@@ -141,6 +141,9 @@ class LinksView(View):
     self._active_wd_idx = idx
     self._hightlighte_active_wd(True)
     self._set_active_wd_state(True)
+    # scroll, when scroll bar was used
+    if idx == 0:
+      self._content.scroll_to_top()
     return
   
   def _set_active_wd_state(self, active: bool = False) -> None:
@@ -149,8 +152,14 @@ class LinksView(View):
       state = NORMAL
     descriptors = self._grid_rows_descr[self._active_wd_idx]
     for descr in descriptors:
-      widget = descr.get('wd')
+      widget: Widget = descr.get('wd')
       widget['state'] = state
+      # h = widget.master.winfo_reqheight()
+    # if self._active_wd_idx > 0:
+    #   # self.update_idletasks()
+    #   # h = h//40
+    #   self._content.focus_set()
+    #   self._content.yview(SCROLL, h, UNITS)
     return
 
   def _disable_all(self) -> None:

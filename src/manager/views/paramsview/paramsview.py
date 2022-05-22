@@ -177,6 +177,9 @@ class ParamsView(View):
     self._hightlighte_active_wd(True)
     self._set_active_wd_state(True)
     self._set_button_io_state(idx)
+    # scroll, when scroll bar was used
+    if idx == 0:
+      self._content.scroll_to_top()
     return
 
   def _set_active_wd_state(self, active: bool = False) -> None:
