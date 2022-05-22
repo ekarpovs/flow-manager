@@ -149,6 +149,8 @@ class FlowView(View):
     self.clear_flow_tree_view()
     for i, name in enumerate(flow_names):
       idx_s = f'{i:02}'
+      if flow_titles[i] == '':
+        flow_titles[i] = idx_s
       self.flow_tree_view.insert(parent='', index='end', iid=i, text=idx_s, values=[name, flow_titles[i]])
     # self.set_selection_tree(idx)  
     return
