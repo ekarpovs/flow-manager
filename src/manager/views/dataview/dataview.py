@@ -211,14 +211,20 @@ class DataView(View):
       (ref_extr, ref_intr, ref_type) = ref
       data = out_data.get(ref_intr)
       t = type(data)
-      if t == np.ndarray and data.dtype == np.dtype('uint8'):
-        pil_image = Image.fromarray(data)
-        photo = ImageTk.PhotoImage(pil_image)
-        self._last_view = Label(self._data_last, name='last image', image=photo)
-        self._last_view.image = photo 
-        self._last_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+      if t == np.ndarray:
+        if data.dtype == np.dtype('uint8'):
+          pil_image = Image.fromarray(data)
+          photo = ImageTk.PhotoImage(pil_image)
+          self._last_view = Label(self._data_last, name='last data', image=photo)
+          self._last_view.image = photo 
+          self._last_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+        else:
+          self._last_view.grid_remove()
       else:
-        self._last_view.grid_remove()
+        self._last_view = Label(self._data_last, name='last data', text = data)
+        self._last_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+    else:
+      self._last_view.grid_remove()
       # self._canvas_data_last.create_image(x1=10, y1=10, anchor=NW, image=photo)
     return
 
