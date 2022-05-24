@@ -210,7 +210,8 @@ class DataView(View):
       ref = out_refs[0]
       (ref_extr, ref_intr, ref_type) = ref
       data = out_data.get(ref_intr)
-      if data.dtype == np.dtype('uint8'):
+      t = type(data)
+      if t == np.ndarray and data.dtype == np.dtype('uint8'):
         pil_image = Image.fromarray(data)
         photo = ImageTk.PhotoImage(pil_image)
         self._last_view = Label(self._data_last, name='last image', image=photo)
