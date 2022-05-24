@@ -18,6 +18,7 @@ from ..configuration import Configuration
 
 class MngrController():
   def __init__(self, parent):
+    self._parent = parent
     self._cfg = Configuration()
     self._model = MngrModel(self._cfg)
     self._runner = MngrRunner(self._cfg)
@@ -96,6 +97,7 @@ class MngrController():
 
   # When a worksheet item is selected
   def _init_flow_model(self, ws_name: str) -> None:
+    self._clear_logs()
     (ws_path, ws_name) = self._converter.split_ws_name(ws_name)
     # Create current flow model regarding ws defintion
     self._model.init_flow_model(ws_path, ws_name)
@@ -104,6 +106,12 @@ class MngrController():
     self._update_flow_by_operations_definitions(names)
     # self._init_flow_output_refs(names) 
     self._rebuild_runner()
+    return
+
+  def _clear_logs(self) -> None:
+    children = self._parent.master.children
+    actions_frame = children['!mainactions']
+    actions_frame.clear()
     return
 
   def _unbind_item_params_widgets(self) -> None:
@@ -222,7 +230,7 @@ class MngrController():
     self._init_flow_model(ws_name)
     self._current()
     return
-
+  
   def _store_flow_model_as_ws(self) -> None:
     flow_name = self._view.flow.names_combo_box.get()
     path, name = self._converter.flow.split_ws_name(flow_name)

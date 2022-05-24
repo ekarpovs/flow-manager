@@ -8,13 +8,13 @@ class MainWindow():
   def __init__(self, root):
     self.root = root
    
-    self.main_frame = Frame(self.root, bg='bisque')
+    self.main_frame = Frame(self.root, bg='bisque', name='mainframe')
     self.main_frame.grid()
 
     # create all of the main containers
     self.actions_frame = MainActions(self.main_frame)
 
-    self.flow_frame = Frame(self.main_frame)
+    self.flow_frame = Frame(self.main_frame, name='flowframe')
     self.fit_flow_frame_size()
     self.flow_controller = MngrController(self.flow_frame)
 
