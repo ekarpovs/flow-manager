@@ -139,19 +139,19 @@ class LinksView(View):
     self._hightlighte_active_wd()
     self._set_active_wd_state()
     prev_idx = self._active_wd_idx
+    forward = self._active_wd_idx < idx
     self._active_wd_idx = idx
     self._hightlighte_active_wd(True)
     self._set_active_wd_state(True)
     # scroll, when scroll bar was used
-    self._stay_active_wd_visible(prev_idx)
+    self._stay_active_wd_visible(forward)
     if idx == 0:
       self._content.scroll_to_top()
     return
   
-  def _stay_active_wd_visible(self, prev_idx) -> None:
+  def _stay_active_wd_visible(self, forward: bool) -> None:
     descriptors = self._grid_rows_descr[self._active_wd_idx]
     container = descriptors[0].get('wd').master
-    forward = prev_idx < self._active_wd_idx
     self._scroll_to_visible(container, forward)
     return
 
