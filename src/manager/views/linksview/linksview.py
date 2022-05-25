@@ -35,7 +35,7 @@ class LinksView(View):
     # Content will be scrolable
     self._content = ScrolledFrame(self, use_ttk=True, height=int(h/5), width=int((w/2)))
     self._content.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E)
-    # Create the params frame within the ScrolledFrame
+    # Create the links frame within the ScrolledFrame
     self._links_view = self._content.display_widget(Frame)
     return
 
@@ -138,14 +138,38 @@ class LinksView(View):
   def set_active_wd(self, idx: int) -> None:
     self._hightlighte_active_wd()
     self._set_active_wd_state()
+    prev_idx = self._active_wd_idx
     self._active_wd_idx = idx
     self._hightlighte_active_wd(True)
     self._set_active_wd_state(True)
     # scroll, when scroll bar was used
+    self._stay_active_wd_visible(prev_idx)
     if idx == 0:
       self._content.scroll_to_top()
     return
   
+  def _stay_active_wd_visible(self, prev_idx) -> None:
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    container = descriptors[0].get('wd').master
+    forward = prev_idx < self._active_wd_idx
+    self._scroll_to_visible(container, forward)
+    return
+
+  def _scroll_to_visible(self, container: Widget, forward: bool) -> None:
+    container_upper_y = container.winfo_rooty()
+    container_bottom_y = container_upper_y + container.winfo_reqheight()
+    content_upper_y = self._content.winfo_rooty()
+    content_bottom_y = content_upper_y + self._content.winfo_reqheight()
+    if forward:
+      if container_bottom_y > content_bottom_y:
+        step = 7
+        self._content.yview(SCROLL, step, UNITS)
+    else:
+      if container_bottom_y < content_bottom_y:
+        step =-4
+        self._content.yview(SCROLL, step, UNITS)
+    return
+
   def _set_active_wd_state(self, active: bool = False) -> None:
     state = DISABLED
     if active:
@@ -154,12 +178,6 @@ class LinksView(View):
     for descr in descriptors:
       widget: Widget = descr.get('wd')
       widget['state'] = state
-      # h = widget.master.winfo_reqheight()
-    # if self._active_wd_idx > 0:
-    #   # self.update_idletasks()
-    #   # h = h//40
-    #   self._content.focus_set()
-    #   self._content.yview(SCROLL, h, UNITS)
     return
 
   def _disable_all(self) -> None:
