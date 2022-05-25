@@ -219,12 +219,14 @@ class DataView(View):
           self._last_view.image = photo 
           self._last_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
         else:
-          self._last_view.grid_remove()
+          if self._last_view is not None:
+            self._last_view.grid_remove()
       else:
         self._last_view = Label(self._data_last, name='last data', text = data)
         self._last_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
     else:
-      self._last_view.grid_remove()
+      if self._last_view is not None:
+        self._last_view.grid_remove()
       # self._canvas_data_last.create_image(x1=10, y1=10, anchor=NW, image=photo)
     return
 
