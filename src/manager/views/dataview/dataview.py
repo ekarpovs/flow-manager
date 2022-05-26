@@ -264,7 +264,8 @@ class DataView(View):
     return
 
   def show_result(self, idx: int, state_id: str) -> None:
-    self._show_preview(idx, state_id)
+    if idx > -1:
+      self._show_preview(idx, state_id)
     self._show_last(state_id)
     return
     
