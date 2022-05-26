@@ -137,9 +137,10 @@ class DataView(View):
       row_idx = max(len(self._idx_map)-1, self._get_row_idx(f'{idx}'))
       try:
         # remove idx mapping for the idx
-        self._idx_map.pop(f'{row_idx}')
+        if f'{row_idx}' in self._idx_map:
+          self._idx_map.pop(f'{row_idx}')
         # remove existing preview item with the idx
-        res = self._grid_rows.pop(row_idx)
+        res = self._grid_rows.pop(row_idx, )
         res.grid_remove()
       except IndexError:
         pass
