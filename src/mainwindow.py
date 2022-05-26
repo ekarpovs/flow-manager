@@ -14,27 +14,27 @@ class MainWindow():
     # create all of the main containers
     self.actions_frame = MainActions(self.main_frame)
 
-    self.flow_frame = Frame(self.main_frame, name='flowframe')
-    self.fit_flow_frame_size()
-    self.flow_controller = MngrController(self.flow_frame)
+    self.manager_frame = Frame(self.main_frame, name='managerframe')
+    self.fit_manager_frame_size()
+    self.flow_controller = MngrController(self.manager_frame)
 
-    self.flow_frame.grid(row=0, column=0, sticky=E+W)
+    self.manager_frame.grid(row=0, column=0, sticky=E+W)
     self.actions_frame.grid(row=1, column=0, sticky=E+W)
 
     # Bind to actions panel
     self.actions_frame.btn_exit.bind("<Button>", self.exit)
 
 
-  def fit_flow_frame_size(self):
+  def fit_manager_frame_size(self):
     self.root.update()
     h = self.root.winfo_reqheight()
     w = self.root.winfo_width()
     flow_height = calculate_reminder_height(self.root, [self.actions_frame])
-    self.flow_frame['height'] = flow_height
-    self.flow_frame['width'] = w
+    self.manager_frame['height'] = flow_height
+    self.manager_frame['width'] = w
     
     # do not resize the flow frame after a widget will be added
-    self.flow_frame.grid_propagate(0)
+    self.manager_frame.grid_propagate(False)
 
   def exit(self, event):
     exit(0)
