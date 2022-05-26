@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple, Callable
 from tkinter import *
+from tkinter import font
 from tkinter.ttk import Button, LabelFrame
 from tkscrolledframe import ScrolledFrame
 import copy
@@ -9,6 +10,7 @@ from flow_model import FlowModel, FlowItemModel
 from .paramwidgetfactory import ParamWidgetFactory
 from ....uiconst import *
 from ..view import View
+
 
 DEFAULT_VIEW_SIZE = 50
 WITHOUT_PREVIEW_DATA = -1
@@ -129,7 +131,7 @@ class ParamsView(View):
   def _create_item_params_container(self, idx: int, item: FlowItemModel) -> Widget:
     i_n = item.name.replace('.', '-')
     name = f'--{idx}-{i_n}--'
-    item_params_frame = LabelFrame(self._params_view, name=name)
+    item_params_frame = Frame(self._params_view, name=name)
     return item_params_frame
 
   def _create_item_params_widgets(self, idx: int, item: FlowItemModel) -> Dict:
@@ -173,11 +175,13 @@ class ParamsView(View):
     if self._active_wd_idx > idx:
       # disable, when move backward
       self._set_active_wd_state()
+    direction = idx - self._active_wd_idx
     self._active_wd_idx = idx
     self._hightlighte_active_wd(True)
     self._set_active_wd_state(True)
     self._set_button_io_state(idx)
     # scroll, when scroll bar was used
+    self._stay_active_wd_visible(direction)
     if idx == 0:
       self._content.scroll_to_top()
     return
@@ -191,6 +195,44 @@ class ParamsView(View):
       widget = descr.get('wd')
       widget['state'] = state
     return
+
+  def _stay_active_wd_visible(self, direction: int) -> None:
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    container = descriptors[0].get('wd').master
+    if direction == 0:
+      # stay at the same position
+      return
+    forward = direction > 0
+    self._scroll_to_visible(container, forward)
+    return
+  
+  def _scroll_to_visible(self, container: Widget, forward: bool) -> None:
+    container_upper_y = container.winfo_rooty()
+    container_bottom_y = container_upper_y + container.winfo_reqheight()
+    content_upper_y = self._content.winfo_rooty()
+    content_bottom_y = content_upper_y + self._content.winfo_reqheight()
+    default_font = font.nametofont("TkDefaultFont")
+    fdescr = default_font.configure()
+    if forward:
+      if container_bottom_y > content_bottom_y:
+        step = (container_bottom_y - content_bottom_y)//fdescr.get('size')
+        self._content.yview(SCROLL, step, UNITS)
+    else:
+      if container_upper_y < content_upper_y:
+        step = (container_upper_y - content_upper_y)//fdescr.get('size')
+        self._content.yview(SCROLL, step, UNITS)
+    return
+
+  def _set_active_wd_state(self, active: bool = False) -> None:
+    state = DISABLED
+    if active:
+      state = NORMAL
+    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    for descr in descriptors:
+      widget: Widget = descr.get('wd')
+      widget['state'] = state
+    return
+
 
   def _disable_all(self) -> None:
     for descriptors in self._grid_rows_descr:
