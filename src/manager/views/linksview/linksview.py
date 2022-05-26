@@ -5,16 +5,19 @@ from tkinter import *
 from tkinter.ttk import Combobox, LabelFrame
 from tkscrolledframe import ScrolledFrame
 import copy
+from tkinter import font
 
 from flow_model import FlowModel, FlowItemModel
 
 from ....uiconst import *
 from ..view import View
 
+
 class LinksView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self['text'] = 'Links'
+
     self.update_idletasks()
     h = self.parent.winfo_reqheight()
     w = self.parent.winfo_reqwidth()
@@ -29,8 +32,8 @@ class LinksView(View):
     self.rowconfigure(1, weight=1)
 
     self._infovar = StringVar()
-    self._info_entry = Entry(self, name='flow_info',textvariable=self._infovar, width=35)
-    self._info_entry.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+W+E)
+    self._info_entry = Entry(self, name='flow_info',textvariable=self._infovar, width=71)
+    self._info_entry.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+W)
     self._info_desr = {'getter': self._infovar.get, 'setter': self._infovar.set, 'wd': self._info_entry}
     # Content will be scrolable
     self._content = ScrolledFrame(self, use_ttk=True, height=int(h/5), width=int((w/2)))
@@ -82,16 +85,16 @@ class LinksView(View):
 
   def _create_item_links_container(self, idx: int, item: FlowItemModel) -> Widget:
     i_n = item.name.replace('.', '-')
-    name = f'--{idx}-{i_n}--'
-    item_links_frame = LabelFrame(self._links_view, name=name)
+    name = f'container--{idx}-{i_n}--'
+    item_links_frame = Frame(self._links_view, name=name)
     return item_links_frame
 
-  def _create_item_links_widgets(self, container: LabelFrame, idx: int, item: FlowItemModel) -> Dict:
+  def _create_item_links_widgets(self, container: Frame, idx: int, item: FlowItemModel) -> Dict:
     item_links_descr = []
     title = f'{idx}-{item.name}'
     i_n = item.name.replace('.', '-')
     name = f'--{idx}-{i_n}--'
-    item_label = Label(container, name=name, text=title)
+    item_label = Label(container, name=name, text=title, anchor=W, justify=LEFT, width=18)
     item_label.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
     item_links_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
     infovar = StringVar()
@@ -118,12 +121,12 @@ class LinksView(View):
         item_links_descr.append({'name': inref_name, 'getter': getter, 'setter': None, 'wd': inref_combo})
     return item_links_descr
 
-  def _create_link_widget(self, container: LabelFrame, inref_name: str, links: Dict[str, str]) -> Tuple[Callable, Widget, Widget]:
+  def _create_link_widget(self, container: Frame, inref_name: str, links: Dict[str, str]) -> Tuple[Callable, Widget, Widget]:
     def get():
       return inref_combo.get()
 
     text = f'{inref_name}:'
-    inref_lbl = Label(container, text=text, anchor=W, justify=LEFT, width=10)
+    inref_lbl = Label(container, text=text, anchor=W, justify=LEFT, width=18)
     var = StringVar()
     inref_combo = Combobox(container, name=inref_name, justify=LEFT, width=35)
     inref_combo['values'] = copy.deepcopy(self._possible_input[:len(self._possible_input)-2])
@@ -138,35 +141,40 @@ class LinksView(View):
   def set_active_wd(self, idx: int) -> None:
     self._hightlighte_active_wd()
     self._set_active_wd_state()
-    prev_idx = self._active_wd_idx
-    forward = self._active_wd_idx < idx
+    direction = idx - self._active_wd_idx
     self._active_wd_idx = idx
     self._hightlighte_active_wd(True)
     self._set_active_wd_state(True)
     # scroll, when scroll bar was used
-    self._stay_active_wd_visible(forward)
+    self._stay_active_wd_visible(direction)
     if idx == 0:
       self._content.scroll_to_top()
     return
   
-  def _stay_active_wd_visible(self, forward: bool) -> None:
+  def _stay_active_wd_visible(self, direction: int) -> None:
     descriptors = self._grid_rows_descr[self._active_wd_idx]
     container = descriptors[0].get('wd').master
+    if direction == 0:
+      # stay at the same position
+      return
+    forward = direction > 0
     self._scroll_to_visible(container, forward)
     return
-
+  
   def _scroll_to_visible(self, container: Widget, forward: bool) -> None:
     container_upper_y = container.winfo_rooty()
     container_bottom_y = container_upper_y + container.winfo_reqheight()
     content_upper_y = self._content.winfo_rooty()
     content_bottom_y = content_upper_y + self._content.winfo_reqheight()
+    default_font = font.nametofont("TkDefaultFont")
+    fdescr = default_font.configure()
     if forward:
       if container_bottom_y > content_bottom_y:
-        step = 7
+        step = (container_bottom_y - content_bottom_y)//fdescr.get('size')
         self._content.yview(SCROLL, step, UNITS)
     else:
-      if container_bottom_y < content_bottom_y:
-        step =-4
+      if container_upper_y < content_upper_y:
+        step = (container_upper_y - content_upper_y)//fdescr.get('size')
         self._content.yview(SCROLL, step, UNITS)
     return
 
