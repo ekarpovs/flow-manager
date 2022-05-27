@@ -228,8 +228,6 @@ class DataView(View):
         if data.dtype == np.dtype('uint8'):
           pil_image = Image.fromarray(data)
           photo = ImageTk.PhotoImage(pil_image)
-          if self._active_view is not None:
-            self._active_view.destroy()
           self._active_view = Canvas(self._data_active, width = 500, height = 500, name=name)
           id = self._active_view.create_image((10, 10), anchor=NW, image=photo)
           self._active_view.image = photo 
