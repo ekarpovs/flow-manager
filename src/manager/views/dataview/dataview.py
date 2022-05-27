@@ -54,6 +54,7 @@ class DataView(View):
     self._last_view = None
     return
 
+# API
   @property
   def storage(self) -> FlowStorage:
     return self._storage
@@ -80,6 +81,21 @@ class DataView(View):
     self._preview() 
     return
 
+  def update_result(self, idx: int, state_id: str) -> None:
+    self._show_last(state_id)
+    self. _clear_preview(idx)
+    return
+
+  def show_preview_result(self, state_id: str, idx: int) -> None:
+    self._show_preview(state_id, idx)
+    self._show_last(state_id)
+    return
+
+  def show_result(self, state_id: str) -> None:
+    self._show_last(state_id)
+    return
+
+  # Locals
   def _preview_size(self, image) -> Tuple[int,int]:
     (h, w) = image.shape[:2]
     ratio = w/h
@@ -146,11 +162,6 @@ class DataView(View):
         pass
     return
   
-  def update_result(self, idx: int, state_id: str) -> None:
-    self._show_last(state_id)
-    self. _clear_preview(idx)
-    return
- 
   def _create_row_output_container(self, row_idx: int, title: str) -> Widget:
     state_frame = LabelFrame(self.preview_view, name=f'--{row_idx}--', text=title)
     state_frame.grid(row=row_idx, column=0, sticky=W)
@@ -252,7 +263,7 @@ class DataView(View):
     self._idx_map[f'{idx}'] = min(idx, preview_row)
     return
 
-  def _show_preview(self, idx: int, state_id: str) -> None:
+  def _show_preview(self, state_id: str, idx: int) -> None:
     out_data = self._storage.get_state_output_data(state_id)
     refs = self._storage.get_state_output_refs(state_id)
     if out_data is None or refs is None:
@@ -263,12 +274,6 @@ class DataView(View):
     self._preview()
     return
 
-  def show_result(self, idx: int, state_id: str) -> None:
-    if idx > -1:
-      self._show_preview(idx, state_id)
-    self._show_last(state_id)
-    return
-    
   def _on_click(self, event) -> None:
     event.widget.focus_set()
     active_widget_name = event.widget._name

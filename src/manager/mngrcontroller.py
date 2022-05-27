@@ -280,10 +280,16 @@ class MngrController():
     return
 
 # Execution commands
-  def _show_step_result(self, idx: int= -1) -> None:
+  def _show_step_result(self, idx: int) -> None:
     state_id = self._runner.output_from_state
-    self._view.data.show_result(idx, state_id)
+    self._view.data.show_preview_result(state_id, idx)
     return
+
+  def _show_run_result(self) -> None:
+    state_id = self._runner.output_from_state   
+    self._view.data.show_result(state_id)
+    return
+
 
   def _clear_step_result(self, idx: int) -> None:
     state_id = self._runner.state_id
@@ -296,7 +302,7 @@ class MngrController():
       self._runner.run_all(self._model.flow.flow)
       idx = self._runner.state_idx
       self._view.flow.set_selection_tree(idx)
-      self._show_step_result()
+      self._show_run_result()
     return
 
   def _step(self, event_name: str) -> None:
