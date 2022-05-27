@@ -33,11 +33,11 @@ class DataView(View):
     self.columnconfigure(0, weight=1)
 
     # Last existing output
-    self._data_last = Frame(self, height=int(h*0.3), highlightbackground='gray', highlightthickness=1)
-    self._data_last.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
-    self._data_last.columnconfigure(0, weight=1)
-    self._data_last.rowconfigure(0, weight=1)
-    self._data_last.grid_propagate(False)
+    self._data_active = Frame(self, height=int(h*0.3), highlightbackground='gray', highlightthickness=1)
+    self._data_active.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
+    self._data_active.columnconfigure(0, weight=1)
+    self._data_active.rowconfigure(0, weight=1)
+    self._data_active.grid_propagate(False)
 
     # Preview content will be scrolable
     self.content = ScrolledFrame(self, height=int(h*0.3), use_ttk=True)
@@ -51,7 +51,7 @@ class DataView(View):
     self._idx_map :Dict = {}
     self._grid_rows: List[Widget] = []
     self._storage: FlowStorage = None
-    self._last_view = None
+    self._active_view = None
     return
 
 # API
@@ -71,8 +71,8 @@ class DataView(View):
       row.grid_remove()  
     self._grid_rows.clear()
     self.content.scroll_to_top()
-    if self._last_view is not None:
-      self._last_view.grid_remove()
+    if self._active_view is not None:
+      self._active_view.grid_remove()
     return
 
   def default(self) -> None:
@@ -82,17 +82,17 @@ class DataView(View):
     return
 
   def update_result(self, idx: int, state_id: str) -> None:
-    self._show_last(state_id)
+    self._show_active(state_id)
     self. _clear_preview(idx)
     return
 
   def show_preview_result(self, state_id: str, idx: int) -> None:
     self._show_preview(state_id, idx)
-    self._show_last(state_id)
+    self._show_active(state_id)
     return
 
   def show_result(self, state_id: str) -> None:
-    self._show_last(state_id)
+    self._show_active(state_id)
     return
 
   # Locals
@@ -212,13 +212,14 @@ class DataView(View):
     title = '-'.join(parts[0:len(parts)-1])
     return state_id, title
 
-  def _show_last(self, state_id: str) -> None:
+  def _show_active(self, state_id: str) -> None:
     out_data = self._storage.get_state_output_data(state_id)
     refs = self._storage.get_state_output_refs(state_id)
     if out_data is None or refs is None:
       return
     out_refs = [(ref.ext_ref, ref.int_ref, ref.data_type) for ref in refs]  
     if len(out_refs) > 0:
+      name='active data'
       ref = out_refs[0]
       (ref_extr, ref_intr, ref_type) = ref
       data = out_data.get(ref_intr)
@@ -227,19 +228,21 @@ class DataView(View):
         if data.dtype == np.dtype('uint8'):
           pil_image = Image.fromarray(data)
           photo = ImageTk.PhotoImage(pil_image)
-          self._last_view = Label(self._data_last, name='last data', image=photo)
-          self._last_view.image = photo 
-          self._last_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+          if self._active_view is not None:
+            self._active_view.destroy()
+          self._active_view = Canvas(self._data_active, width = 500, height = 500, name=name)
+          id = self._active_view.create_image((10, 10), anchor=NW, image=photo)
+          self._active_view.image = photo 
+          self._active_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
         else:
-          if self._last_view is not None:
-            self._last_view.grid_remove()
+          if self._active_view is not None:
+            self._active_view.grid_remove()
       else:
-        self._last_view = Label(self._data_last, name='last data', text = data)
-        self._last_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+        self._active_view = Label(self._data_active, name=name, text = data)
+        self._active_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
     else:
-      if self._last_view is not None:
-        self._last_view.grid_remove()
-      # self._canvas_data_last.create_image(x1=10, y1=10, anchor=NW, image=photo)
+      if self._active_view is not None:
+        self._active_view.grid_remove()
     return
 
   def _preview(self) -> None:   
