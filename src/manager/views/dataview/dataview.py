@@ -1,8 +1,10 @@
+from ctypes import alignment
 import cv2
 import numpy as np 
 from typing import List, Dict, Tuple, Callable
 from tkinter import *
 from tkinter.ttk import Button 
+from tkinter import font
 from tkscrolledframe import ScrolledFrame
 from PIL import Image, ImageTk
 
@@ -12,8 +14,10 @@ from ....uiconst import *
 from ..view import View
 from .plotdialog import PlotDialog 
 
-DEFAULT_VIEW_SIZE = 100
+DEFAULT_PREVIEW_SIZE = 100
 WITHOUT_PREVIEW_DATA = -1
+DEFAULT_VIEW_SIZE = 500
+
 
 class DataView(View):
   def __init__(self, parent):
@@ -36,8 +40,9 @@ class DataView(View):
     self._data_active = Frame(self, height=int(h*0.3), highlightbackground='gray', highlightthickness=1)
     self._data_active.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
     self._data_active.columnconfigure(0, weight=1)
+    self._data_active.columnconfigure(1, weight=1)
     self._data_active.rowconfigure(0, weight=1)
-    self._data_active.grid_propagate(False)
+    # self._data_active.grid_propagate(False)
 
     # Preview content will be scrolable
     self.content = ScrolledFrame(self, height=int(h*0.3), use_ttk=True)
@@ -45,13 +50,14 @@ class DataView(View):
     # Create the preview frame within the ScrolledFrame
     self.preview_view = self.content.display_widget(Frame)
    
-    self._preview_height = DEFAULT_VIEW_SIZE
-    self._preview_width = DEFAULT_VIEW_SIZE
+    self._preview_height = DEFAULT_PREVIEW_SIZE
+    self._preview_width = DEFAULT_PREVIEW_SIZE
     self._out = None
     self._idx_map :Dict = {}
     self._grid_rows: List[Widget] = []
     self._storage: FlowStorage = None
     self._active_view = None
+    self._active_view_info = None
     return
 
 # API
@@ -76,8 +82,8 @@ class DataView(View):
     return
 
   def default(self) -> None:
-    self._preview_height = DEFAULT_VIEW_SIZE
-    self._preview_width = DEFAULT_VIEW_SIZE
+    self._preview_height = DEFAULT_PREVIEW_SIZE
+    self._preview_width = DEFAULT_PREVIEW_SIZE
     self._preview() 
     return
 
@@ -112,7 +118,7 @@ class DataView(View):
       pass
     return (w, h)
 
-  def _fit_image(self, image):  
+  def _fit_image_for_preview(self, image):  
     dim = self._preview_size(image)
     image = cv2.resize(image, dim, interpolation=cv2.INTER_NEAREST)
     return image
@@ -122,7 +128,7 @@ class DataView(View):
     return self._preview_image(parent, image, name)
 
   def _preview_image(self, parent, image: np.ndarray, name: str) -> Widget:
-    preview = self._fit_image(image)
+    preview = self._fit_image_for_preview(image)
     pil_image = Image.fromarray(preview)
     photo = ImageTk.PhotoImage(pil_image)
     view = Label(parent, name=name, image=photo)
@@ -212,6 +218,27 @@ class DataView(View):
     title = '-'.join(parts[0:len(parts)-1])
     return state_id, title
 
+  def _fit_image_for_view(self, data: np.ndarray) -> np.ndarray:
+    (resized, w, h) = self._view_size(data)
+    if resized:
+      data = cv2.resize(data, (w,h), interpolation=cv2.INTER_NEAREST)
+    return data
+
+  def _view_size(self, image) -> Tuple[int,int]:
+    resized = True
+    (h, w) = image.shape[:2]
+    ratio = w/h
+    if h > DEFAULT_VIEW_SIZE:
+      h = DEFAULT_VIEW_SIZE
+      w = int(h*ratio)
+    elif w > DEFAULT_VIEW_SIZE:    
+      w = DEFAULT_VIEW_SIZE
+      h = int(w/ratio)
+    else:
+      resized = False
+    return (resized, w, h)
+
+
   def _show_active(self, state_id: str) -> None:
     out_data = self._storage.get_state_output_data(state_id)
     refs = self._storage.get_state_output_refs(state_id)
@@ -226,11 +253,9 @@ class DataView(View):
       t = type(data)
       if t == np.ndarray:
         if data.dtype == np.dtype('uint8'):
-          pil_image = Image.fromarray(data)
-          photo = ImageTk.PhotoImage(pil_image)
-          self._active_view = Canvas(self._data_active, width = 500, height = 500, name=name)
-          id = self._active_view.create_image((10, 10), anchor=NW, image=photo)
-          self._active_view.image = photo 
+          (h, w) = data.shape[:2]
+          data = self._fit_image_for_view(data)
+          self._view_image(name, data)
           self._active_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
         else:
           if self._active_view is not None:
@@ -241,6 +266,26 @@ class DataView(View):
     else:
       if self._active_view is not None:
         self._active_view.grid_remove()
+    return
+
+  def _view_image(self, name: str, data: np.ndarray) -> None:
+    pil_image = Image.fromarray(data)
+    photo = ImageTk.PhotoImage(pil_image)
+    self._active_view = Canvas(self._data_active,width = DEFAULT_VIEW_SIZE, height = DEFAULT_VIEW_SIZE, name=name)
+    id = self._active_view.create_image((10, 10), anchor=NW, image=photo)
+    self._active_view.image = photo 
+    return
+
+  def _view_info(self, title:str, h:int, w:int) -> None:
+    wactive = self._data_active.winfo_width()
+    # title = ref_extr
+    text = f'{title},\n width = {w},\n height = {h}'
+    default_font = font.nametofont("TkDefaultFont")
+    fdescr = default_font.configure()
+    size = fdescr.get('size')
+    winfo = width=(wactive - DEFAULT_VIEW_SIZE)//size
+    self._active_view_info = Label(self._data_active, width=winfo, anchor=NW, justify='left',name='active view info', text = text)
+    self._active_view_info.grid(row=0, column=1, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
     return
 
   def _preview(self) -> None:   
