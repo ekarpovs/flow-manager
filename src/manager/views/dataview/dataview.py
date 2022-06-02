@@ -22,30 +22,27 @@ DEFAULT_VIEW_SIZE = 500
 class DataView(View):
   def __init__(self, parent):
     super().__init__(parent)
-    self['text'] = 'Data'
     # self['bg'] = 'green'
+    self['text'] = 'Data'
 
     h = self.parent.winfo_reqheight()
     w = self.parent.winfo_reqwidth()
     self.grid()
-    # self.grid_propagate(False)
 
     self.rowconfigure(0, weight=1)
     self.rowconfigure(1, weight=1)
-    # self.rowconfigure(2, weight=1)
-    # self.columnconfigure(0, pad=15)
     self.columnconfigure(0, weight=1)
 
     # Last existing output
-    self._data_active = Frame(self, height=int(h*0.3), highlightbackground='gray', highlightthickness=1)
+    self._data_active = Frame(self, height=int(h*0.5), highlightbackground='gray', highlightthickness=1)
     self._data_active.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
     self._data_active.columnconfigure(0, weight=1)
     self._data_active.columnconfigure(1, weight=1)
     self._data_active.rowconfigure(0, weight=1)
-    # self._data_active.grid_propagate(False)
+    self._data_active.grid_propagate(False)
 
     # Preview content will be scrolable
-    self.content = ScrolledFrame(self, height=int(h*0.3), use_ttk=True)
+    self.content = ScrolledFrame(self, height=int(h*0.2), use_ttk=True)
     self.content.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
     # Create the preview frame within the ScrolledFrame
     self.preview_view = self.content.display_widget(Frame)
@@ -73,12 +70,22 @@ class DataView(View):
   def clear_view(self) -> None:
     self._out = None
     self._idx_map = {}
+
+    self._clear_active_view()
+    self._clear_all_preview()
+    return
+
+  def _clear_active_view(self) -> None:
+    if self._active_view is not None:
+      for child in self._active_view.winfo_children():
+        child.grid_remove()
+    return
+
+  def _clear_all_preview(self) -> None:
     for row in self._grid_rows:
       row.grid_remove()  
     self._grid_rows.clear()
     self.content.scroll_to_top()
-    if self._active_view is not None:
-      self._active_view.grid_remove()
     return
 
   def default(self) -> None:
@@ -92,16 +99,49 @@ class DataView(View):
     self. _clear_preview(idx)
     return
 
+  def show_result(self, state_id: str) -> None:
+    self._show_active(state_id)
+    return
+
   def show_preview_result(self, state_id: str, idx: int) -> None:
     self._show_preview(state_id, idx)
     self._show_active(state_id)
     return
 
-  def show_result(self, state_id: str) -> None:
-    self._show_active(state_id)
+  # Locals
+  # Preview results
+  def _preview(self) -> None:   
+    if self._out is None:
+      return
+    (out_refs, out_data) = self._out
+    if len(out_refs) > 0:
+      state_id, title = self._parse_out_refs(out_refs)
+      row_idx = self._get_row_idx(state_id)
+      self._create_preview(row_idx, title, out_data, out_refs)
     return
 
-  # Locals
+  def _map_idx_to_row_idx(self, idx: int) -> None:
+    preview_row = len(self._idx_map)
+    (out_refs, out_data) = self._out
+    if len(out_refs) == 0 and len(out_data) == 0:
+      # No data for preview
+      self._idx_map[f'{idx}'] = WITHOUT_PREVIEW_DATA
+      return
+    # map idx to row_idx
+    self._idx_map[f'{idx}'] = min(idx, preview_row)
+    return
+
+  def _show_preview(self, state_id: str, idx: int) -> None:
+    out_data = self._storage.get_state_output_data(state_id)
+    refs = self._storage.get_state_output_refs(state_id)
+    if out_data is None or refs is None:
+      return
+    out_refs = [(ref.ext_ref, ref.int_ref, ref.data_type) for ref in refs]  
+    self._out = (out_refs, out_data)
+    self._map_idx_to_row_idx(idx)
+    self._preview()
+    return
+
   def _preview_size(self, image) -> Tuple[int,int]:
     (h, w) = image.shape[:2]
     ratio = w/h
@@ -135,20 +175,6 @@ class DataView(View):
     view.image = photo
     return view
 
-  def _preview_object(self, parent, data: any, name: str) -> Widget:
-    view = Label(parent, name=name, border=1)
-    # text = json.dumps(data, indent = 3)
-    # df = pd.DataFrame(data)
-    view.config(text = data)
-    return view
-
-  def _get_preview(self, ref_type: FlowDataType) -> Callable:
-    views = {
-      FlowDataType.NP_ARRAY: self._preview_image,
-      FlowDataType.LIST_NP_ARRAYS: self._preview_image_list
-    }
-    return views.get(ref_type, self._preview_object)
-
   def _clear_preview(self, idx: int) -> None:
     if len(self._grid_rows) > 0:
       self._out = None
@@ -170,7 +196,7 @@ class DataView(View):
   
   def _create_row_output_container(self, row_idx: int, title: str) -> Widget:
     state_frame = LabelFrame(self.preview_view, name=f'--{row_idx}--', text=title)
-    state_frame.grid(row=row_idx, column=0, sticky=W)
+    state_frame.grid(row=row_idx, column=0, sticky=W+E)
     state_frame.rowconfigure(0, pad=15)
     state_frame.columnconfigure(0, weight=1)
     state_frame.columnconfigure(0, pad=15)
@@ -186,12 +212,14 @@ class DataView(View):
       data = out_data.get(ref_intr)
       if data is None:
         continue
-      preview = self._get_preview(ref_type)
-      # convert to a conventional format (without '.')
-      name = ref_extr.replace('.', '-')
-      widget = preview(preview_frame, data, name)
-      widget.grid(row=i, column=0, sticky=W)
-      widget.bind('<Button-1>', self._on_click)
+      t = type(data)
+      if t == np.ndarray:
+        if data.dtype == np.dtype('uint8'):
+          # convert to a conventional format (without '.')
+          name = ref_extr.replace('.', '-')
+          widget = self._preview_image(preview_frame, data, name)
+          widget.grid(row=0, column=0, sticky=W)
+          widget.bind('<Button-1>', self._on_click)
     try:
       # remove existing item with the row_idx
       self._grid_rows.pop(row_idx)
@@ -218,6 +246,7 @@ class DataView(View):
     title = '-'.join(parts[0:len(parts)-1])
     return state_id, title
 
+# Show active result
   def _fit_image_for_view(self, data: np.ndarray) -> np.ndarray:
     (resized, w, h) = self._view_size(data)
     if resized:
@@ -238,7 +267,6 @@ class DataView(View):
       resized = False
     return (resized, w, h)
 
-
   def _show_active(self, state_id: str) -> None:
     out_data = self._storage.get_state_output_data(state_id)
     refs = self._storage.get_state_output_refs(state_id)
@@ -246,7 +274,6 @@ class DataView(View):
       return
     out_refs = [(ref.ext_ref, ref.int_ref, ref.data_type) for ref in refs]  
     if len(out_refs) > 0:
-      name='active data'
       ref = out_refs[0]
       (ref_extr, ref_intr, ref_type) = ref
       data = out_data.get(ref_intr)
@@ -254,72 +281,45 @@ class DataView(View):
       if t == np.ndarray:
         if data.dtype == np.dtype('uint8'):
           (h, w) = data.shape[:2]
+          self._active_view = Frame(self._data_active, name='active data')
           data = self._fit_image_for_view(data)
-          self._view_image(name, data)
+          self._create_active_title(ref_extr)
+          self._create_active_image(data)
+          self._create_active_info(h, w)
           self._active_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
         else:
           if self._active_view is not None:
             self._active_view.grid_remove()
       else:
-        self._active_view = Label(self._data_active, name=name, text = data)
+        self._active_view = Label(self._data_active, name='active data', text = data)
         self._active_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
     else:
       if self._active_view is not None:
         self._active_view.grid_remove()
     return
 
-  def _view_image(self, name: str, data: np.ndarray) -> None:
+  def _create_active_title(self, title:str) -> None:
+    active_view_title = Label(self._active_view, anchor=NW, justify='left',name='active view title', text = title)
+    active_view_title.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+    return
+
+  def _create_active_image(self, data: np.ndarray) -> None:
     pil_image = Image.fromarray(data)
     photo = ImageTk.PhotoImage(pil_image)
-    self._active_view = Canvas(self._data_active,width = DEFAULT_VIEW_SIZE, height = DEFAULT_VIEW_SIZE, name=name)
-    id = self._active_view.create_image((10, 10), anchor=NW, image=photo)
-    self._active_view.image = photo 
+    active_view_canvas = Canvas(self._active_view,width = DEFAULT_VIEW_SIZE, height = DEFAULT_VIEW_SIZE, name='active view canvas')
+    active_view_canvas.create_image((10, 10), anchor=NW, image=photo)
+    active_view_canvas.image = photo 
+    active_view_canvas.grid(row=1, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
     return
 
-  def _view_info(self, title:str, h:int, w:int) -> None:
-    wactive = self._data_active.winfo_width()
-    # title = ref_extr
-    text = f'{title},\n width = {w},\n height = {h}'
-    default_font = font.nametofont("TkDefaultFont")
-    fdescr = default_font.configure()
-    size = fdescr.get('size')
-    winfo = width=(wactive - DEFAULT_VIEW_SIZE)//size
-    self._active_view_info = Label(self._data_active, width=winfo, anchor=NW, justify='left',name='active view info', text = text)
-    self._active_view_info.grid(row=0, column=1, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+  def _create_active_info(self, h:int, w:int) -> None:
+    text = f'width = {w}, height = {h}'
+    active_view_info = Label(self._active_view, anchor=NW, justify='left',name='active view info', text = text)
+    active_view_info.grid(row=2, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
     return
 
-  def _preview(self) -> None:   
-    if self._out is None:
-      return
-    (out_refs, out_data) = self._out
-    if len(out_refs) > 0:
-      state_id, title = self._parse_out_refs(out_refs)
-      row_idx = self._get_row_idx(state_id)
-      self._create_preview(row_idx, title, out_data, out_refs)
-    return
 
-  def _map_idx_to_row_idx(self, idx: int) -> None:
-    preview_row = len(self._idx_map)
-    (out_refs, out_data) = self._out
-    if len(out_refs) == 0 and len(out_data) == 0:
-      # No data for preview
-      self._idx_map[f'{idx}'] = WITHOUT_PREVIEW_DATA
-      return
-    # map idx to row_idx
-    self._idx_map[f'{idx}'] = min(idx, preview_row)
-    return
-
-  def _show_preview(self, state_id: str, idx: int) -> None:
-    out_data = self._storage.get_state_output_data(state_id)
-    refs = self._storage.get_state_output_refs(state_id)
-    if out_data is None or refs is None:
-      return
-    out_refs = [(ref.ext_ref, ref.int_ref, ref.data_type) for ref in refs]  
-    self._out = (out_refs, out_data)
-    self._map_idx_to_row_idx(idx)
-    self._preview()
-    return
-
+# Plot
   def _on_click(self, event) -> None:
     event.widget.focus_set()
     active_widget_name = event.widget._name
@@ -339,20 +339,6 @@ class DataView(View):
     plot_dlg = PlotDialog(self, name, data)
     return
 
-  def _set_h(self, event) -> None:
-    self._preview_height = self.scale_h.get()
-    self._preview()
-    return
-
-  def _fix_size(self) -> None:
-    # self.scale_h['state'] = NORMAL
-    # if self.var_fixed_size.get() == True:
-    #   self.scale_h['state'] = DISABLED
-    return
-
-  def _save(self) -> None:
-    print('save')
-    return
 
   # TODO:
   # https://stackoverflow.com/questions/28005591/how-to-create-a-scrollable-canvas-that-scrolls-without-a-scroll-bar-in-python
