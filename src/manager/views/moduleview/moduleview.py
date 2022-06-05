@@ -24,10 +24,9 @@ class ModuleView(View):
     self['text'] = 'Modules'
 
     self.grid()
-    self.rowconfigure(0, weight=20)
-    self.rowconfigure(1, weight=5)
+    self.rowconfigure(0, weight=10)
+    self.rowconfigure(1, weight=8)
     self.columnconfigure(0, weight=1)
-    self.columnconfigure(1, weight=1)
     
     # Setup Treeview
     self.tree_view = ttk.Treeview(self, columns=("index", "description"), selectmode="browse")
@@ -46,11 +45,6 @@ class ModuleView(View):
     self.tree_view.configure(xscrollcommand=self.tree_view_scrollbar_x.set)
     self.tree_view.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=S + W + E + N)
 
-    # # Opreation doc content will be scrolable
-    # self.content = ScrolledFrame(self, use_ttk=True)
-    # self.content.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E + N + S)
-    # # Create the doc frame within the ScrolledFrame
-    # self.doc_view = self.content.display_widget(Frame)
     # Doc label
     self._doc_label_var = StringVar()
     self._doc_label = Label(self, textvariable=self._doc_label_var, justify=LEFT, anchor='nw')
