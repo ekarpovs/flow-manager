@@ -79,6 +79,7 @@ class DataView(View):
     if self._active_view is not None:
       for child in self._active_view.winfo_children():
         child.grid_remove()
+      self._active_view.grid_remove()
     return
 
   def _clear_all_preview(self) -> None:
