@@ -24,9 +24,10 @@ class ModuleView(View):
     self['text'] = 'Modules'
 
     self.grid()
-    self.rowconfigure(0, weight=10)
+    self.rowconfigure(0, weight=20)
+    self.rowconfigure(1, weight=5)
     self.columnconfigure(0, weight=1)
-    self.rowconfigure(1, weight=8)
+    self.columnconfigure(1, weight=1)
     
     # Setup Treeview
     self.tree_view = ttk.Treeview(self, columns=("index", "description"), selectmode="browse")
