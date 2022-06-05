@@ -207,6 +207,7 @@ class FlowView(View):
     self.btn_curr['state']=state
     self.btn_next['state']=state
     self.btn_prev['state']=state
+    self.btn_top['state']=state
     return
 
   def activate_buttons(self, activate=False) -> None:

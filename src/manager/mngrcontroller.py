@@ -195,6 +195,7 @@ class MngrController():
       self._view.ws_title = ''
       self._view.params.clear()
       self._view.links.clear()
+      self._view.flow.activate_buttons()
     return
 
   def _add_operation_to_flow_model(self) -> None:
