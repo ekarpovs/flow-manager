@@ -21,7 +21,7 @@ class ModuleView(View):
     super().__init__(parent)
     self.parent = parent 
 
-    self['bg'] = "light yellow"
+    # self['bg'] = "light yellow"
     self['text'] = 'Modules'
 
     self.grid()
