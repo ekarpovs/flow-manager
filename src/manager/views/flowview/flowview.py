@@ -12,14 +12,19 @@ from ..view import View
 
 class FlowView(View):
   def __init__(self, parent):
-    super().__init__(parent)
-    self.parent = parent 
+    View.__init__(self, parent)
     self['text'] = 'Flows'
+    # self['bg'] = 'green'
 
-    self.update_idletasks()
-    self._h = self.parent.winfo_height()
+    h = int(self._manager_container_h * 0.7)
+    w = int((self._manager_container_w / 4) * 0.95)
+    self['height'] = h
+    self['width'] = w
+
+    self._h = h
 
     # Setup the view
+    self.grid_propagate(False)
     self._setup_view()
     
     # Set the buttons initial state
@@ -43,16 +48,18 @@ class FlowView(View):
     self.rowconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
     self.rowconfigure(3, weight=1)
-    self.columnconfigure(0, weight=10)
+    self.columnconfigure(0, weight=1)
     self.columnconfigure(1, weight=1)
     return
 
   def _setup_flow_names_view(self) -> None:
     # Setup flow names list view
-    self._flow_names_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    fr_h = int(self._h*0.1)
+    self._flow_names_frame = Frame(self, height=fr_h,highlightbackground='gray', highlightthickness=1)
     self._flow_names_frame.rowconfigure(0, weight=1)
     self._flow_names_frame.columnconfigure(0, weight=5)
     self._flow_names_frame.columnconfigure(1, weight=1)
+    self._flow_names_frame.grid_propagate(False)
     # setup combo box
     self._namesvar = StringVar()
     self.names_combo_box = Combobox(self._flow_names_frame, textvariable=self._namesvar, font=("TkDefaultFont"))
@@ -61,20 +68,19 @@ class FlowView(View):
     self.btn_reload = Button(self._flow_names_frame, text='Reload', width=BTNW_S)
     self.names_combo_box.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W+E)
     self.btn_reload.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=E)
-    # # setup title label
-    # self._title_label = Label(self._flow_names_frame)
-    # self._title_label.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W)
     return
 
   def _setup_flow_items_view(self) -> None:
     # Setup flow items view
-    self._flow_items_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
-    self._flow_items_frame.columnconfigure(0, weight=5)
+    fr_h = int(self._h*0.85)
+    self._flow_items_frame = Frame(self, height=fr_h, highlightbackground='gray', highlightthickness=1)
+    self._flow_items_frame.columnconfigure(0, weight=1)
     self._flow_items_frame.columnconfigure(1, weight=1)
-    self._flow_items_frame.rowconfigure(0, weight=5)
+    self._flow_items_frame.rowconfigure(0, weight=1)
     self._flow_items_frame.rowconfigure(1, weight=1)
+    self._flow_items_frame.grid_propagate(False)
     # setup Treeview
-    self.flow_tree_view = Treeview(self._flow_items_frame, columns=['#0','#1','#2'], selectmode="browse", height=int(self._h*0.07))
+    self.flow_tree_view = Treeview(self._flow_items_frame, columns=['#0','#1','#2'], selectmode="browse")
     # setup the treview heading
     self.flow_tree_view.heading('#0', text='Index', anchor=CENTER)
     self.flow_tree_view.heading('#1', text='Exec/Statement', anchor=W)
@@ -82,25 +88,27 @@ class FlowView(View):
     self.flow_tree_view.column('#0', minwidth=30, width=40)
     self.flow_tree_view.column('#1', minwidth=120, width=140)
     self.flow_tree_view.column('#2', minwidth=250, width=400)
-    self.flow_tree_view.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY_S,sticky=W+E+S+N)   
+    self.flow_tree_view.grid(row=0, column=0, rowspan=2, columnspan=2, pady=PADY_S,sticky=W+E+S+N)   
     # setup scrollbars
     self.tree_view_scrollbar_y = Scrollbar(self._flow_items_frame, orient=VERTICAL, command=self.flow_tree_view.yview)
-    self.tree_view_scrollbar_y.grid(row=0, column=1, sticky=N+S+E)
+    self.tree_view_scrollbar_y.grid(row=0, column=1, rowspan=2, sticky=N+S+E)
     self.flow_tree_view.configure(yscrollcommand=self.tree_view_scrollbar_y.set)   
     self.tree_view_scrollbar_x = Scrollbar(self._flow_items_frame, orient=HORIZONTAL, command=self.flow_tree_view.xview)
-    self.tree_view_scrollbar_x.grid(row=1, column=0, columnspan=3, sticky=S+W+E)
+    self.tree_view_scrollbar_x.grid(row=1, column=0, columnspan=2, sticky=S+W+E)
     self.flow_tree_view.configure(xscrollcommand=self.tree_view_scrollbar_x.set)
     return
 
   def _setup_flow_items_actions_view(self) -> None:
     # Setup flow items actions view
-    self._oper_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    fr_h = int(self._h*0.1)
+    self._oper_actions_frame = Frame(self, height=fr_h, highlightbackground='gray', highlightthickness=1)
     self._oper_actions_frame.columnconfigure(0, weight=1)
     self._oper_actions_frame.columnconfigure(1, weight=1)
     self._oper_actions_frame.columnconfigure(2, weight=1)
     self._oper_actions_frame.columnconfigure(3, weight=1)
     self._oper_actions_frame.columnconfigure(4, weight=1)
-    
+    self._oper_actions_frame.grid_propagate(False)
+ 
     self.btn_add = Button(self._oper_actions_frame, text='Add', width=BTNW_S)
     self.btn_remove = Button(self._oper_actions_frame, text='Remove', width=BTNW_S)
     self.btn_reset = Button(self._oper_actions_frame, text='Reset', width=BTNW_S)
@@ -116,7 +124,9 @@ class FlowView(View):
 
   def  _setup_flow_actions_view(self) -> None:
     # Setup flow actions view
-    self._flow_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
+    fr_h = int(self._h*0.1)
+    self._flow_actions_frame = Frame(self, height=fr_h, highlightbackground='gray', highlightthickness=1)
+    self._flow_actions_frame.grid_propagate(False)
     self.btn_run = Button(self._flow_actions_frame, text='Run', width=BTNW_S)
     self.btn_curr = Button(self._flow_actions_frame, text='Current', width=BTNW_S)
     self.btn_next = Button(self._flow_actions_frame, text='Next', width=BTNW_S)
@@ -132,10 +142,10 @@ class FlowView(View):
 
   def _setup_views_layout(self) -> None:
     # Setup widgets groups layout
-    self._flow_names_frame.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N)
-    self._flow_items_frame.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N)   
-    self._oper_actions_frame.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N)
-    self._flow_actions_frame.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N)
+    self._flow_names_frame.grid(row=0, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N+S)
+    self._flow_items_frame.grid(row=1, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N+S)   
+    self._oper_actions_frame.grid(row=2, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N+S)
+    self._flow_actions_frame.grid(row=3, column=0, columnspan=2, padx=PADX, pady=PADY_S, sticky=W+E+N+S)
     return
 
 # Interfaces
