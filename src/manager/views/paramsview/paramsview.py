@@ -21,8 +21,13 @@ class ParamsView(View):
     self['text'] = 'Parameters'
     self._factory = ParamWidgetFactory()
 
-    self.update_idletasks()
-    h = self.parent.winfo_reqheight()
+    # setup the module view geometry
+    h = self._manager_container_h
+    w = int(self._manager_container_w/4.54)
+    self['height'] = h
+    self['width'] = w
+    # do not resize the params frame after a widget will be added
+    self.grid_propagate(False)
 
     self._flow = None
     self._grid_rows_descr: List[Dict] = []
@@ -33,7 +38,7 @@ class ParamsView(View):
     self.rowconfigure(1, weight=1)
 
     # Content will be scrolable
-    self._content = ScrolledFrame(self, use_ttk=True, height=int(h*0.65))
+    self._content = ScrolledFrame(self, use_ttk=True, height=int(h*0.9))
     self._content.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N + S + W + E)
     # Create the params frame within the ScrolledFrame
     self._params_view = self._content.display_widget(Frame)

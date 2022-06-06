@@ -30,9 +30,6 @@ class DataView(View):
     w = int(self._manager_container_w/2.92)
     self['height'] = h
     self['width'] = w
-    mod_view_h = int(h*0.65)
-    view_w = w-PADX
-    doc_view_h = int(h - mod_view_h)
     # do not resize the module frame after a widget will be added
     self.grid_propagate(False)
 
