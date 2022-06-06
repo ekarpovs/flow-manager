@@ -25,7 +25,6 @@ class MngrController():
     self._converter = MngrConverter()
     self._view = MngrView(parent)
     # Bind to modules panel
-    self._view.module.tree_view.bind('<<TreeviewOpen>>', self._open_all)
     self._view.module.tree_view.bind('<<TreeviewSelect>>', self._module_tree_selection_changed)
     # Bind to flows panel
     self.flows_view_idx = 0  
@@ -64,6 +63,7 @@ class MngrController():
   def _update_module_view(self) -> None:   
     module_defs = self._converter.modulelist_to_module_defs(self._model.module)
     self._view.module_defs = module_defs
+    self._open_all()
     return
 
   def _update_worksheet_list(self) -> None:
@@ -75,7 +75,7 @@ class MngrController():
 
 
 # Modules panel' events
-  def _open_all(self, event) -> None:
+  def _open_all(self) -> None:
     self._view.module.open_all()
     return
 
