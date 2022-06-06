@@ -12,6 +12,7 @@ class MngrView(Frame):
     super().__init__(parent)
     self.parent = parent
 
+    self.grid_propagate(False)
     self.grid()
     self.rowconfigure(0, weight=1)
     self.rowconfigure(1, weight=1)

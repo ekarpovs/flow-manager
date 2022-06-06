@@ -15,31 +15,50 @@ from ..view import View
 
 class LinksView(View):
   def __init__(self, parent):
-    super().__init__(parent)
+    View.__init__(self, parent)
     self['text'] = 'Links'
-
-    self.update_idletasks()
-    h = self.parent.winfo_reqheight()
-    w = self.parent.winfo_reqwidth()
+    # self['bg'] = 'red'
+    
+    h = int(self._manager_container_h * 0.22)
+    w = int((self._manager_container_w / 4) * 0.95)
+    self['height'] = h
+    self['width'] = w
 
     self._flow = None
     self._grid_rows_descr: List[Dict] = []
     self._possible_input: List[str] = []
     self._active_wd_idx = -1
 
+    self.grid_propagate(False)
     self.grid()
-    self.rowconfigure(0, weight=1)
-    self.rowconfigure(1, weight=1)
 
+    # setup modules/operation view
+    self._links_view = Frame(self, height=h, width=w, name='limksview')
+    self._links_view.grid(row=0, column=0, sticky=N + W + E+ S)
+    self._links_view.rowconfigure(0, weight=1)
+    self._links_view.rowconfigure(1, weight=1)
+    self._links_view.columnconfigure(0, weight=1)
+    self._links_view.grid_propagate(False)
+
+    self._info_farme = Frame(self._links_view, height=int(h*0.2), name='limksviewinfo')
+    self._info_farme.grid(row=0, column=0, padx=PADX, sticky=N + W + E+ S)
+    self._info_farme.rowconfigure(0, weight=1)
+    self._info_farme.columnconfigure(0, weight=1)
     self._infovar = StringVar()
-    self._info_entry = Entry(self, name='flow_info',textvariable=self._infovar, width=71)
-    self._info_entry.grid(row=0, column=0, padx=PADX, pady=PADY, sticky=N+W)
+    self._info_entry = Entry(self._info_farme, name='flow_info',textvariable=self._infovar, width=71)
+    self._info_entry.grid(row=0, column=0, pady=PADY, sticky=N+W)
     self._info_desr = {'getter': self._infovar.get, 'setter': self._infovar.set, 'wd': self._info_entry}
+
+    self._links_farme = Frame(self._links_view, height=int(h*0.8), name='limksviewframe')
+    self._links_farme.grid(row=1, column=0, padx=PADX, sticky=N + W + E+ S)
+    self._links_farme.rowconfigure(0, weight=1)
+    self._links_farme.columnconfigure(0, weight=1)
+    self._links_farme.grid_propagate(False)
     # Content will be scrolable
-    self._content = ScrolledFrame(self, use_ttk=True, height=int(h/5), width=int((w/2)))
-    self._content.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E)
+    self._content = ScrolledFrame(self._links_farme, use_ttk=True, height=int(h*0.8)-PADY*2)
+    self._content.grid(row=0, column=0, pady=PADY_S, sticky=W+E)
     # Create the links frame within the ScrolledFrame
-    self._links_view = self._content.display_widget(Frame)
+    self._links = self._content.display_widget(Frame)
     return
 
   @property
@@ -58,7 +77,7 @@ class LinksView(View):
 
   def clear(self) -> None:     
     self._infovar.set('')
-    for child in self._links_view.winfo_children():
+    for child in self._links.winfo_children():
       child.grid_remove()
     self._grid_rows_descr.clear()
     self._content.scroll_to_top()
@@ -86,7 +105,7 @@ class LinksView(View):
   def _create_item_links_container(self, idx: int, item: FlowItemModel) -> Widget:
     i_n = item.name.replace('.', '-')
     name = f'container--{idx}-{i_n}--'
-    item_links_frame = Frame(self._links_view, name=name)
+    item_links_frame = Frame(self._links, name=name)
     return item_links_frame
 
   def _create_item_links_widgets(self, container: Frame, idx: int, item: FlowItemModel) -> Dict:
