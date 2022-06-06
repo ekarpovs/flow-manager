@@ -6,35 +6,51 @@ from .manager import MngrController
 
 class MainWindow():
   def __init__(self, root):
-    self.root = root
-   
-    self.main_frame = Frame(self.root, bg='bisque', name='mainframe')
-    self.main_frame.grid()
+    self._root = root
 
-    # create all of the main containers
-    self.actions_frame = MainActions(self.main_frame)
+    # setup application geometry
+    sw = root.winfo_screenwidth()
+    sh = root.winfo_screenheight()
+    root.geometry("{}x{}+{}+{}".format(sw, sh-SCREEN_FREE_AREA, 0,0))
+    root.resizable(0, 0) 
 
-    self.manager_frame = Frame(self.main_frame, name='managerframe')
-    self.fit_manager_frame_size()
-    self.flow_controller = MngrController(self.manager_frame)
+    h = root.winfo_height()
+    self._root.rowconfigure(0, weight=1)
+    self._root.columnconfigure(0, weight=1)
 
-    self.manager_frame.grid(row=0, column=0, sticky=E+W)
-    self.actions_frame.grid(row=1, column=0, sticky=E+W)
+    # setup main container
+    self.main_container = Frame(self._root, height=h, name='mainframe')
+    self.main_container.grid(row=0, column=0, sticky=N+S+E+W)
+    self.main_container.rowconfigure(0, weight=1)
+    self.main_container.columnconfigure(0, weight=1)
+
+    # setup mainactions container
+    self.actions_container = MainActions(self.main_container)
+
+    # setup all manager's views container
+    self.manager_container = Frame(self.main_container, name='managerframe', bg='bisque')
+    self.fit_manager_container_size()
+
+    self.manager_container.grid(row=0, column=0, sticky=E+W)
+    self.actions_container.grid(row=1, column=0, sticky=E+W)
+
+    # create main controller
+    self.flow_controller = MngrController(self.manager_container)
 
     # Bind to actions panel
-    self.actions_frame.btn_exit.bind("<Button>", self.exit)
+    self.actions_container.btn_exit.bind("<Button>", self.exit)
 
 
-  def fit_manager_frame_size(self):
-    self.root.update()
-    h = self.root.winfo_reqheight()
-    w = self.root.winfo_width()
-    flow_height = calculate_reminder_height(self.root, [self.actions_frame])
-    self.manager_frame['height'] = flow_height
-    self.manager_frame['width'] = w
+  def fit_manager_container_size(self):
+    self._root.update()
+    h = self._root.winfo_reqheight()
+    w = self._root.winfo_width()
+    flow_height = calculate_reminder_height(self._root, [self.actions_container])
+    self.manager_container['height'] = flow_height
+    self.manager_container['width'] = w
     
     # do not resize the flow frame after a widget will be added
-    self.manager_frame.grid_propagate(False)
+    self.manager_container.grid_propagate(False)
 
   def exit(self, event):
     exit(0)
