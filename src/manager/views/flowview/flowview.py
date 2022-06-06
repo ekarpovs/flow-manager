@@ -54,7 +54,7 @@ class FlowView(View):
 
   def _setup_flow_names_view(self) -> None:
     # Setup flow names list view
-    fr_h = int(self._h*0.1)
+    fr_h = int(self._h*0.12)
     self._flow_names_frame = Frame(self, height=fr_h,highlightbackground='gray', highlightthickness=1)
     self._flow_names_frame.rowconfigure(0, weight=1)
     self._flow_names_frame.columnconfigure(0, weight=5)
@@ -72,7 +72,7 @@ class FlowView(View):
 
   def _setup_flow_items_view(self) -> None:
     # Setup flow items view
-    fr_h = int(self._h*0.85)
+    fr_h = int(self._h*0.82)
     self._flow_items_frame = Frame(self, height=fr_h, highlightbackground='gray', highlightthickness=1)
     self._flow_items_frame.columnconfigure(0, weight=1)
     self._flow_items_frame.columnconfigure(1, weight=1)
@@ -100,7 +100,7 @@ class FlowView(View):
 
   def _setup_flow_items_actions_view(self) -> None:
     # Setup flow items actions view
-    fr_h = int(self._h*0.1)
+    fr_h = int(self._h*0.11)
     self._oper_actions_frame = Frame(self, height=fr_h, highlightbackground='gray', highlightthickness=1)
     self._oper_actions_frame.columnconfigure(0, weight=1)
     self._oper_actions_frame.columnconfigure(1, weight=1)
@@ -124,7 +124,7 @@ class FlowView(View):
 
   def  _setup_flow_actions_view(self) -> None:
     # Setup flow actions view
-    fr_h = int(self._h*0.1)
+    fr_h = int(self._h*0.11)
     self._flow_actions_frame = Frame(self, height=fr_h, highlightbackground='gray', highlightthickness=1)
     self._flow_actions_frame.grid_propagate(False)
     self.btn_run = Button(self._flow_actions_frame, text='Run', width=BTNW_S)
