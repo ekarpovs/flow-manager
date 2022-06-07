@@ -253,26 +253,6 @@ class DataView(View):
     return state_id, title
 
 # Show active result
-  def _fit_image_for_view(self, data: np.ndarray) -> np.ndarray:
-    (resized, w, h) = self._view_size(data)
-    if resized:
-      data = cv2.resize(data, (w,h), interpolation=cv2.INTER_NEAREST)
-    return data
-
-  def _view_size(self, image) -> Tuple[int,int]:
-    resized = True
-    (h, w) = image.shape[:2]
-    ratio = w/h
-    if h > DEFAULT_VIEW_SIZE:
-      h = DEFAULT_VIEW_SIZE
-      w = int(h*ratio)
-    elif w > DEFAULT_VIEW_SIZE:    
-      w = DEFAULT_VIEW_SIZE
-      h = int(w/ratio)
-    else:
-      resized = False
-    return (resized, w, h)
-
   def _show_active(self, state_id: str) -> None:
     out_data = self._storage.get_state_output_data(state_id)
     refs = self._storage.get_state_output_refs(state_id)
@@ -286,12 +266,14 @@ class DataView(View):
       t = type(data)
       if t == np.ndarray:
         if data.dtype == np.dtype('uint8'):
-          (h, w) = data.shape[:2]
           self._active_view = Frame(self._data_active, name='active data')
-          data = self._fit_image_for_view(data)
+          self._active_view.rowconfigure(0, weight=1)
+          self._active_view.rowconfigure(1, weight=1)
+          self._active_view.rowconfigure(2, weight=1)
+          self._active_view.rowconfigure(3, weight=1)
           self._create_active_title(ref_extr)
           self._create_active_image(data)
-          self._create_active_info(h, w)
+          self._create_active_info(data)
           self._active_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
         else:
           if self._active_view is not None:
@@ -309,19 +291,34 @@ class DataView(View):
     active_view_title.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
     return
 
-  def _create_active_image(self, data: np.ndarray) -> None:
+  def _create_active_image(self, data: np.ndarray) -> None:   
+    scrollbar_x = Scrollbar(self._active_view, orient=HORIZONTAL)
+    scrollbar_x.grid(row=2, column=0, columnspan=2, sticky=W + E)
+
+    scrollbar_y = Scrollbar(self._active_view, orient=VERTICAL)
+    scrollbar_y.grid(row=1, column=1, sticky=N + S)
+
     pil_image = Image.fromarray(data)
     photo = ImageTk.PhotoImage(pil_image)
-    active_view_canvas = Canvas(self._active_view,width = DEFAULT_VIEW_SIZE, height = DEFAULT_VIEW_SIZE, name='active view canvas')
-    active_view_canvas.create_image((10, 10), anchor=NW, image=photo)
-    active_view_canvas.image = photo 
+    active_view_canvas = Canvas(self._active_view, width = DEFAULT_VIEW_SIZE, height = DEFAULT_VIEW_SIZE, name='active view canvas')
     active_view_canvas.grid(row=1, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+    active_view_canvas.create_image((0, 0), anchor=NW, image=photo)
+    active_view_canvas.image = photo
+    # set the scrollbars to the canvas
+    active_view_canvas.config( xscrollcommand=scrollbar_x.set)    
+    active_view_canvas.config( yscrollcommand=scrollbar_y.set)    
+    # set canvas view to the scrollbars
+    scrollbar_x.config(command = active_view_canvas.xview)
+    scrollbar_y.config(command = active_view_canvas.yview)
+    # assign the region to be scrolled 
+    active_view_canvas.config(scrollregion=active_view_canvas.bbox(ALL))
     return
 
-  def _create_active_info(self, h:int, w:int) -> None:
+  def _create_active_info(self, data: np.ndarray) -> None:
+    (h, w) = data.shape[:2]
     text = f'width = {w}, height = {h}'
     active_view_info = Label(self._active_view, anchor=NW, justify='left',name='active view info', text = text)
-    active_view_info.grid(row=2, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
+    active_view_info.grid(row=3, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
     return
 
 
