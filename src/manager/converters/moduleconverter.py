@@ -19,7 +19,7 @@ class ModuleConverter():
       iid = f'p{i}'
       list_def = ModuleConverter.list_level_item(iid, path)
       definitions.append(list_def)
-      mlist = modulelist.get_models_by_path(path)
+      mlist = modulelist.get_modules_by_path(path)
       for j, module in enumerate(mlist):
         module_def = ModuleConverter.module_level_item(iid, str(j), module)
         definitions.append(module_def)

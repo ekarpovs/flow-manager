@@ -124,7 +124,8 @@ class ModuleView(View):
 
   def get_current_selection_tree(self) -> str:
     cur_item = self._tree_view.focus()
-    if '.' not in cur_item:
+    temp = self._tree_view.item(cur_item, 'values')
+    if temp == '':
       cur_item = ''
     return cur_item
 

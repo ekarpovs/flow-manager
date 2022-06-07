@@ -2,7 +2,7 @@
 '''
 
 import os
-from typing import List
+from typing import List, Tuple
 
 from src.manager.models.module.moduleitemmodel import ModuleItemModel
 
@@ -29,26 +29,41 @@ class ModuleModelList():
     self._modulemodellist.append(model)
     return
 
-  def get_models_by_path(self, path: str) -> List[ModuleModel]:
+  def get_modules_by_path(self, path: str) -> List[ModuleModel]:
     models = []
     for model in self.modulemodellist:
       if model.path == path:
         models.append(model)
     return models
 
-  def get_model_by_name(self, name: str) -> ModuleModel:
-    # models = self.get_models_by_path(path)
+  def get_module_or_operation_doc(self, name: str) -> List[str]:
+    doc = ''
+    if name != '':
+      if '.' not in name:
+        module = self.get_module_by_name(name)
+        doc = [module.doc]
+      else:
+        operation = self.get_operation_by_name(name)
+        doc = operation._doc
+    return doc
+
+  @staticmethod
+  def _split_name(name: str) -> Tuple[str, str]:
+    p = name.split('.')
+    mname = p[0]
+    oname = p[1]
+    return (mname, oname)
+
+  def get_module_by_name(self, name: str) -> ModuleModel:
     for model in self.modulemodellist:
       if model.name == name:
         return model
     return None
   
   def get_operation_by_name(self, name: str) -> ModuleItemModel:
-    p = name.split('.')
-    mname = p[0]
-    oname = p[1]
+    (mname, oname) = self._split_name(name)
     oper = None
-    module = self.get_model_by_name(mname)
+    module = self.get_module_by_name(mname)
     oper = module.get_item(oname)
     return oper
 

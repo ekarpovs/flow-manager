@@ -81,10 +81,7 @@ class MngrController():
 
   def _module_tree_selection_changed(self, event) -> None:
     name = self._view.module.get_current_selection_tree()
-    doc = ''
-    if name != '':
-      operation = self._model.module.get_operation_by_name(name)
-      doc = operation._doc
+    doc = self._model.module.get_module_or_operation_doc(name)
     self._view.module.set_operation_doc(doc)
     return
 
