@@ -288,7 +288,6 @@ class MngrController():
     self._view.data.show_result(state_id)
     return
 
-
   def _clear_step_result(self, idx: int) -> None:
     state_id = self._runner.state_id
     self._view.data.update_result(idx, state_id)
@@ -358,13 +357,11 @@ class MngrController():
     self._model.flow.flow.info = copy.copy(getter())
     return
 
-  
   def _links_return_pressed(self, getter: Callable) -> None:
     idx, _ = self._view.flow.get_current_selection_tree()
     flow_item = self._model.flow.get_item(idx)
     flow_item.title = copy.copy(getter())
     return
-
 
   def _unbind_item_links_widgets(self) -> None:
     descriptors = self._view.links.get_active_item_link_descriptors()
