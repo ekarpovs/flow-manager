@@ -14,10 +14,9 @@ class FlowView(View):
   def __init__(self, parent):
     View.__init__(self, parent)
     self['text'] = 'Flows'
-    # self['bg'] = 'green'
 
     h = int(self._manager_container_h * 0.7)
-    w = int((self._manager_container_w / 4) * 0.95)
+    w = int((self._manager_container_w / 4)*0.95)
     self['height'] = h
     self['width'] = w
 

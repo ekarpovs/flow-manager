@@ -20,11 +20,10 @@ class ModuleView(View):
   def __init__(self, parent):
     View.__init__(self, parent)
     self['text'] = 'Modules'
-    # self['bg'] = 'green'
 
     # setup the module view geometry
     h = self._manager_container_h
-    w = int(self._manager_container_w/5)
+    w = int((self._manager_container_w/4)*0.87)
     self['height'] = h
     self['width'] = w
     mod_view_h = int(h*0.65)
@@ -68,9 +67,7 @@ class ModuleView(View):
     self._doc_view = Frame(self, height=doc_view_h, name='modulesdocview', bg='blue')
     self._doc_view.grid(row=1, column=0, sticky=N + W + E+ S)
     self._doc_view.rowconfigure(0, weight=1)
-    # self._doc_view.rowconfigure(0, weight=1)
     self._doc_view.columnconfigure(0, weight=1)
-    # self._doc_view.columnconfigure(0, weight=1)
     self._doc_view.grid_propagate(False)
     # doc view content will be scrolable
     self._content = ScrolledFrame(self._doc_view, use_ttk=True)

@@ -22,12 +22,11 @@ DEFAULT_VIEW_SIZE = 500
 class DataView(View):
   def __init__(self, parent):
     super().__init__(parent)
-    # self['bg'] = 'green'
     self['text'] = 'Data'
 
     # setup the module view geometry
     h = self._manager_container_h
-    w = int(self._manager_container_w/2.92)
+    w = int((self._manager_container_w/4)*1.18)
     self['height'] = h
     self['width'] = w
     # do not resize the module frame after a widget will be added

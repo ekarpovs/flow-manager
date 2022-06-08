@@ -20,7 +20,7 @@ class LinksView(View):
     # self['bg'] = 'red'
     
     h = int(self._manager_container_h * 0.22)
-    w = int((self._manager_container_w / 4) * 0.95)
+    w = int((self._manager_container_w / 4)*0.95)
     self['height'] = h
     self['width'] = w
 

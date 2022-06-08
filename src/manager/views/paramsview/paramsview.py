@@ -1,3 +1,4 @@
+from turtle import width
 from typing import List, Dict, Tuple, Callable
 from tkinter import *
 from tkinter import font
@@ -19,30 +20,25 @@ class ParamsView(View):
   def __init__(self, parent):
     super().__init__(parent)
     self['text'] = 'Parameters'
-    self._factory = ParamWidgetFactory()
 
     # setup the module view geometry
     h = self._manager_container_h
-    w = int(self._manager_container_w/4.54)
+    w = int((self._manager_container_w / 4)*1)
     self['height'] = h
     self['width'] = w
     # do not resize the params frame after a widget will be added
     self.grid_propagate(False)
-
-    self._flow = None
-    self._grid_rows_descr: List[Dict] = []
-    self._active_wd_idx = -1
 
     self.grid()
     self.rowconfigure(0, weight=1)
     self.rowconfigure(1, weight=1)
 
     # Content will be scrolable
-    self._content = ScrolledFrame(self, use_ttk=True, height=int(h*0.9))
+    self._content = ScrolledFrame(self, use_ttk=True, height=int(h*0.9), width=w-PADX*4)
     self._content.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=N + S + W + E)
     # Create the params frame within the ScrolledFrame
     self._params_view = self._content.display_widget(Frame)
-
+    
     # Setup param actions view
     self._params_actions_frame = Frame(self, highlightbackground='gray', highlightthickness=1)
     self.btn_params_reset = Button(self._params_actions_frame, text='Reset', width=BTNW_S)
@@ -52,6 +48,12 @@ class ParamsView(View):
     self.btn_params_default.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W+N)
     self.btn_params_io.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W+N)
     self._params_actions_frame.grid(row=1, column=0, padx=PADX, pady=PADY_S, sticky=W + E + S)
+
+    # data memebers
+    self._flow = None
+    self._grid_rows_descr: List[Dict] = []
+    self._active_wd_idx = -1
+    self._factory = ParamWidgetFactory()
 
     self._activate_params_buttons()
     return
@@ -238,7 +240,7 @@ class ParamsView(View):
       widget['state'] = state
     return
 
-
+  # UI methods
   def _disable_all(self) -> None:
     for descriptors in self._grid_rows_descr:
       for descr in descriptors:
@@ -246,7 +248,6 @@ class ParamsView(View):
         widget['state'] = DISABLED
     return
 
-  # UI methods
   def _hightlighte_active_wd(self, active: bool = False) -> None:
     fg_color = 'black'
     bg_color = 'SystemButtonFace'
@@ -271,7 +272,6 @@ class ParamsView(View):
     self.btn_params_default['state']=state
     self.btn_params_io['state']=state
     return
-
 
   def _set_button_io_state(self, idx: int) -> None:
     flow_item = self._flow.get_item(idx)
