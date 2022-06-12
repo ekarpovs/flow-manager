@@ -85,6 +85,7 @@ class MngrController():
     self._view.module.set_operation_doc(doc)
     return
 
+
 # Flows panel's events
   def _worksheet_selected(self, event) -> None:
     ws_name = self._view.flow.names_combo_box.get()
@@ -109,42 +110,6 @@ class MngrController():
     children = self._parent.master.children
     actions_frame = children['!mainactions']
     actions_frame.clear()
-    return
-
-  def _unbind_item_params_widgets(self) -> None:
-    widgets = self._view.params.get_active_item_params_widgets()
-    for widget in widgets:
-      t = type(widget) 
-      if t == Scale: 
-        widget.unbind("<ButtonRelease-1>")
-      elif t == Spinbox:
-        widget.unbind("<ButtonRelease-1>")
-      elif t == Checkbutton:
-        widget.configure(command=None)
-      elif t == Combobox:
-        widget.unbind("<<ComboboxSelected>>")
-      elif t == Entry:
-        widget.unbind("<Return>")
-      else:
-        pass
-    return
-
-  def _bind_item_params_widgets(self) -> None:
-    widgets = self._view.params.get_active_item_params_widgets()
-    for widget in widgets:
-      t = type(widget) 
-      if t == Scale: 
-        widget.bind("<ButtonRelease-1>", self._apply)
-      elif t == Spinbox:
-        widget.bind("<ButtonRelease-1>", self._apply)
-      elif t == Checkbutton:
-        widget.configure(command=self._apply)
-      elif t == Combobox:
-        widget.bind("<<ComboboxSelected>>", self._apply)
-      elif t == Entry:
-        widget.bind("<Return>", self._params_return_pressed)
-      else:
-        pass
     return
 
   def _activate_item_params(self, idx: int = 0) -> None:
@@ -239,43 +204,6 @@ class MngrController():
     self._view.flow.names_combo_box.set(ws_name)
     return
 
-  def _update_flow(self) -> None:
-    names, titles = self._model.flow.get_names()
-    self._view.flow.set_flow_item_names(names, titles)   
-    self._view.ws_title = self._model.flow.flow.info
-    self._rebuild_runner()
-    return 
-
-  def _apply_step_params(self, idx: int) -> None:
-    flow_item = self._model.flow.get_item(idx)
-    params_wd = self._view.params.get_item_params(idx)
-    for k in params_wd.keys():
-      flow_item.params[k] = params_wd.get(k)
-    return
-
-  def _reset_step_params(self, idx: int) -> None:
-    flow_item = self._model.flow.get_item(idx)
-    params_ws = flow_item.params_ws
-    params_def = flow_item.params_def
-    params = {} 
-    for param_def in params_def:
-      k = param_def.get('name')
-      param_new_val = params_ws.get(k)
-      if param_new_val is None:
-        # use default value from def
-        param_new_val = param_def.get('default')
-      flow_item.params[k] = param_new_val
-      params[k] = param_new_val
-    self._view.params.set_item_params(idx, params)
-    return
-
-  def _default_step_params(self, idx: int) -> None:
-    flow_item = self._model.flow.get_item(idx)
-    params_def = flow_item.params_def
-    params = convert_params_def_to_dict(params_def)    
-    flow_item.params = params
-    self._view.params.set_item_params(idx, params)
-    return
 
 # Execution commands
   def _show_step_result(self, idx: int) -> None:
@@ -283,14 +211,14 @@ class MngrController():
     self._view.data.show_preview_result(state_id, idx)
     return
 
-  def _show_run_result(self) -> None:
-    state_id = self._runner.output_from_state   
-    self._view.data.show_result(state_id)
-    return
-
   def _clear_step_result(self, idx: int) -> None:
     state_id = self._runner.state_id
     self._view.data.update_result(idx, state_id)
+    return
+
+  def _show_run_result(self) -> None:
+    state_id = self._runner.output_from_state   
+    self._view.data.show_result(state_id)
     return
 
   def _run(self) -> None:
@@ -352,7 +280,41 @@ class MngrController():
       self._current()
     return
 
-# Links view
+
+# Runner
+  def _ready(self) -> bool:
+    activate = self._runner.initialized and self._model.flow.loaded
+    self._view.flow.activate_buttons(activate)
+    return activate
+
+  def _create_and_activate_links_view(self) -> None:
+    self._view.links.build(self._model.flow.flow)
+    info_descr = self._view.links.info_descr
+    widget = info_descr.get('wd')
+    getter = info_descr.get('getter')
+    widget.bind("<Return>", lambda e: self._flow_title_return_pressed(getter))
+    self._activate_item_links()      
+    return
+
+  def _create_and_activate_params_view(self) -> None:
+    self._view.params.build(self._model.flow.flow)
+    self._activate_item_params()
+    return
+
+  def _rebuild_runner(self) -> None:
+    self._view.params.clear()
+    self._view.links.clear()
+    if self._model.flow:
+      self._create_and_activate_links_view()
+      self._create_and_activate_params_view()
+      self._runner.build(self._model.flow.flow)
+      # for plotting
+      self._view.data.storage = self._runner.storage
+    self._set_top_state()
+    return
+
+
+# Links command
   def _flow_title_return_pressed(self, getter: Callable) -> None:
     self._model.flow.flow.info = copy.copy(getter())
     return
@@ -404,8 +366,77 @@ class MngrController():
     self._apply()
     return
 
+
+# Params command
+  def _apply_step_params(self, idx: int) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    params_wd = self._view.params.get_item_params(idx)
+    for k in params_wd.keys():
+      flow_item.params[k] = params_wd.get(k)
+    return
+
+  def _reset_step_params(self, idx: int) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    params_ws = flow_item.params_ws
+    params_def = flow_item.params_def
+    params = {} 
+    for param_def in params_def:
+      k = param_def.get('name')
+      param_new_val = params_ws.get(k)
+      if param_new_val is None:
+        # use default value from def
+        param_new_val = param_def.get('default')
+      flow_item.params[k] = param_new_val
+      params[k] = param_new_val
+    self._view.params.set_item_params(idx, params)
+    return
+
+  def _default_step_params(self, idx: int) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    params_def = flow_item.params_def
+    params = convert_params_def_to_dict(params_def)    
+    flow_item.params = params
+    self._view.params.set_item_params(idx, params)
+    return
+
   def _params_return_pressed(self, event) -> None:
     self._apply(event)
+    return
+
+  def _unbind_item_params_widgets(self) -> None:
+    widgets = self._view.params.get_active_item_params_widgets()
+    for widget in widgets:
+      t = type(widget) 
+      if t == Scale: 
+        widget.unbind("<ButtonRelease-1>")
+      elif t == Spinbox:
+        widget.unbind("<ButtonRelease-1>")
+      elif t == Checkbutton:
+        widget.configure(command=None)
+      elif t == Combobox:
+        widget.unbind("<<ComboboxSelected>>")
+      elif t == Entry:
+        widget.unbind("<Return>")
+      else:
+        pass
+    return
+
+  def _bind_item_params_widgets(self) -> None:
+    widgets = self._view.params.get_active_item_params_widgets()
+    for widget in widgets:
+      t = type(widget) 
+      if t == Scale: 
+        widget.bind("<ButtonRelease-1>", self._apply)
+      elif t == Spinbox:
+        widget.bind("<ButtonRelease-1>", self._apply)
+      elif t == Checkbutton:
+        widget.configure(command=self._apply)
+      elif t == Combobox:
+        widget.bind("<<ComboboxSelected>>", self._apply)
+      elif t == Entry:
+        widget.bind("<Return>", self._params_return_pressed)
+      else:
+        pass
     return
 
   def _get_changed_param_widget_idx(self, event: Event) -> int:
@@ -442,38 +473,6 @@ class MngrController():
     idx, _ = self._view.flow.get_current_selection_tree()
     self._default_step_params(idx)
     self._run_current(idx)
-    return
-
-# Runner
-  def _ready(self) -> bool:
-    activate = self._runner.initialized and self._model.flow.loaded
-    self._view.flow.activate_buttons(activate)
-    return activate
-
-  def _create_and_activate_links_view(self) -> None:
-    self._view.links.build(self._model.flow.flow)
-    info_descr = self._view.links.info_descr
-    widget = info_descr.get('wd')
-    getter = info_descr.get('getter')
-    widget.bind("<Return>", lambda e: self._flow_title_return_pressed(getter))
-    self._activate_item_links()      
-    return
-
-  def _create_and_activate_params_view(self) -> None:
-    self._view.params.build(self._model.flow.flow)
-    self._activate_item_params()
-    return
-
-  def _rebuild_runner(self) -> None:
-    self._view.params.clear()
-    self._view.links.clear()
-    if self._model.flow:
-      self._create_and_activate_links_view()
-      self._create_and_activate_params_view()
-      self._runner.build(self._model.flow.flow)
-      # for plotting
-      self._view.data.storage = self._runner.storage
-    self._set_top_state()
     return
 
 
