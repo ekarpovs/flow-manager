@@ -127,22 +127,24 @@ class LinksView(View):
 
     inrefs_def = item.inrefs_def
     outrefs_def = item.outrefs_def
-
+    
+    possible_input_idx = len(self._possible_input)
     for i, outref_def in enumerate(outrefs_def):
       outref_name = outref_def.get('name')
       self._possible_input.append(f'{title}-{outref_name}')
+    last_possible_input_idx = len(self._possible_input) - possible_input_idx
 
     links = item.links
     if len(inrefs_def) > 0:
       for i, inref_def in enumerate(inrefs_def):
         inref_name = inref_def.get('name')
-        getter, inref_lbl, inref_combo = self._create_link_widget(container, inref_name, links)
+        getter, inref_lbl, inref_combo = self._create_link_widget(last_possible_input_idx, container, inref_name, links)
         inref_lbl.grid(row=i+1, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
         inref_combo.grid(row=i+1, column=1, columnspan=2, padx=PADX_S, pady=PADY_S, sticky=E)
         item_links_descr.append({'name': inref_name, 'getter': getter, 'setter': None, 'wd': inref_combo})
     return item_links_descr
 
-  def _create_link_widget(self, container: Frame, inref_name: str, links: Dict[str, str]) -> Tuple[Callable, Widget, Widget]:
+  def _create_link_widget(self, idx: int, container: Frame, inref_name: str, links: Dict[str, str]) -> Tuple[Callable, Widget, Widget]:
     def get():
       return inref_combo.get()
 
@@ -150,7 +152,7 @@ class LinksView(View):
     inref_lbl = Label(container, text=text, anchor=W, justify=LEFT, width=18)
     var = StringVar()
     inref_combo = Combobox(container, name=inref_name, justify=LEFT, width=35)
-    inref_combo['values'] = copy.deepcopy(self._possible_input[:len(self._possible_input)-2])
+    inref_combo['values'] = copy.deepcopy(self._possible_input[:len(self._possible_input)-idx])
     # Assign current value
     if len(links) > 0:
       link = links.get(inref_name)
