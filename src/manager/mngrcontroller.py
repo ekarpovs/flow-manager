@@ -233,6 +233,7 @@ class MngrController():
   def _step(self, event_name: str) -> None:
     if self._ready():
       idx, _ = self._view.flow.get_current_selection_tree()
+      self._apply_step_links(idx)
       self._apply_step_params(idx)
       self._runner.run_one(event_name, idx, self._model.flow.flow)
       new_idx = self._runner.state_idx
@@ -359,12 +360,27 @@ class MngrController():
     # set active 
     flow_item = self._model.flow.get_item(idx)
     ext_ref = copy.copy(getter())
+    # Update flow item refs
     flow_item.links[name] = ext_ref
-    # Update sorage
-    storage_in_ref = self._runner.storage.get_state_input_ext_ref(self._runner.state_id, name)
-    if storage_in_ref is not None:
+
+    state_idx = self._runner.state_idx
+    if state_idx == idx:
+      # Update sorage
+      storage_in_ref = self._runner.storage.get_state_input_ext_ref(self._runner.state_id, name)
+      # if storage_in_ref is not None:
       storage_in_ref.ext_ref = ext_ref
       self._apply()
+    return
+
+  def _apply_step_links(self, idx: int) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    ext_refs = flow_item.links 
+
+    # Update sorage by the step links
+    for name, ext_ref in ext_refs.items():
+      storage_in_ref = self._runner.storage.get_state_input_ext_ref(self._runner.state_id, name)
+      # if storage_in_ref is not None:
+      storage_in_ref.ext_ref = ext_ref
     return
 
 
