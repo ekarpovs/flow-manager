@@ -362,8 +362,9 @@ class MngrController():
     flow_item.links[name] = ext_ref
     # Update sorage
     storage_in_ref = self._runner.storage.get_state_input_ext_ref(self._runner.state_id, name)
-    storage_in_ref.ext_ref = ext_ref
-    self._apply()
+    if storage_in_ref is not None:
+      storage_in_ref.ext_ref = ext_ref
+      self._apply()
     return
 
 
