@@ -128,7 +128,7 @@ class ParamsView(View):
       self._factory.container = item_params_frame
       item_params_descr = self._create_item_params_widgets(i, item)
       self._grid_rows_descr.append(item_params_descr)
-    self._disable_all()
+    self.disable_all()
     self._active_wd_idx = 0
     self._hightlighte_active_wd(True)
     self._set_active_wd_state(True)
@@ -241,7 +241,7 @@ class ParamsView(View):
     return
 
   # UI methods
-  def _disable_all(self) -> None:
+  def disable_all(self) -> None:
     for descriptors in self._grid_rows_descr:
       for descr in descriptors:
         widget = descr.get('wd')

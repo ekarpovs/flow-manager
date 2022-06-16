@@ -271,6 +271,7 @@ class MngrController():
   def _set_top_state(self) -> None:
     self._view.data.clear_view()
     self._view.flow.set_selection_tree()
+    self._view.params.disable_all()
     if self._ready():
       # self._view.flow.set_selection_tree()
       self._runner.reset()
