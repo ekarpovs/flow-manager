@@ -76,7 +76,7 @@ class DataView(View):
     self._idx_map = {}
 
     self._clear_active_view()
-    self._clear_all_preview()
+    self._clear_all_previews()
     return
 
   def _clear_active_view(self) -> None:
@@ -86,12 +86,43 @@ class DataView(View):
       self._active_view.grid_remove()
     return
 
-  def _clear_all_preview(self) -> None:
+  def _clear_all_previews(self) -> None:
     for row in self._grid_rows:
       row.grid_remove()  
     self._grid_rows.clear()
     self.content.scroll_to_top()
     return
+
+  def _clear_preview(self, idx: int) -> None:
+    self._out = None
+    row_idx = self._get_row_idx(f'{idx}')
+    if row_idx == WITHOUT_PREVIEW_DATA:
+      return
+    for i, row in enumerate(self._grid_rows):
+      if i >= row_idx:
+        row.grid_remove()
+    number_rows_for_delete = len(self._grid_rows) - row_idx
+    for i in range(0, number_rows_for_delete):
+      self._grid_rows.pop(len(self._grid_rows)-1)
+    return
+
+  # def _clear_preview(self, idx: int) -> None:
+  #   # map idx to preview idx
+  #   row_idx = self._get_row_idx(f'{idx}')
+  #   if row_idx == WITHOUT_PREVIEW_DATA:
+  #     return
+  #   row_idx = max(len(self._idx_map)-1, self._get_row_idx(f'{idx}'))
+  #   try:
+  #     # remove idx mapping for the idx
+  #     if f'{row_idx}' in self._idx_map:
+  #       self._idx_map.pop(f'{row_idx}')
+  #     # remove existing preview item with the idx
+  #     res = self._grid_rows.pop(row_idx, )
+  #     res.grid_remove()
+  #   except IndexError:
+  #     pass
+  #   return
+
 
   def default(self) -> None:
     self._preview_height = DEFAULT_PREVIEW_SIZE
@@ -180,25 +211,6 @@ class DataView(View):
     view.image = photo
     return view
 
-  def _clear_preview(self, idx: int) -> None:
-    if len(self._grid_rows) > 0:
-      self._out = None
-      # map idx to preview idx
-      row_idx = self._get_row_idx(f'{idx}')
-      if row_idx == WITHOUT_PREVIEW_DATA:
-        return
-      row_idx = max(len(self._idx_map)-1, self._get_row_idx(f'{idx}'))
-      try:
-        # remove idx mapping for the idx
-        if f'{row_idx}' in self._idx_map:
-          self._idx_map.pop(f'{row_idx}')
-        # remove existing preview item with the idx
-        res = self._grid_rows.pop(row_idx, )
-        res.grid_remove()
-      except IndexError:
-        pass
-    return
-  
   def _create_row_output_container(self, row_idx: int, title: str) -> Widget:
     state_frame = LabelFrame(self.preview_view, name=f'--{row_idx}--', text=title)
     state_frame.grid(row=row_idx, column=0, sticky=W+E)
