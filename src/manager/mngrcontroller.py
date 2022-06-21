@@ -380,8 +380,8 @@ class MngrController():
     # Update sorage by the step links
     for name, ext_ref in ext_refs.items():
       storage_in_ref = self._runner.storage.get_state_input_ext_ref(self._runner.state_id, name)
-      # if storage_in_ref is not None:
-      storage_in_ref.ext_ref = ext_ref
+      if storage_in_ref is not None:
+        storage_in_ref.ext_ref = ext_ref
     return
 
 
