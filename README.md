@@ -7,8 +7,12 @@ It is part of the [Image Processing Workshop](https://github.com/ekarpovs/image-
 
 Following packages from the [Image Processing Workshop](https://github.com/ekarpovs/image-processing-workshop) have to be installed locally:
 
+- flow_converter
+- flow_model
 - flow_runner
+- flow_storage
 - operation_loader
+- gfsm
 
 ## Configurate
 
@@ -16,7 +20,8 @@ Edit config.json from . folder:
 
 ```json
 {
-  "modules": [
+"info": "Configuration of flow manager",
+"modules": [
     "path_to<modules>",
     "path_to<modules-common>"
   ],
@@ -24,11 +29,8 @@ Edit config.json from . folder:
     "path_to<worksheets>",
     "path_to<another_set_of_worksheets>"
   ],
-  "images": [
-    "path_to<input>",
-    "path_to<another_folder_with_images>"
-  ],
-  "fsm-cfg": "path_to<fsm-cfg.json>"
+  "fsm-cfg": "path_to<fsm-cfg.json>",
+  "data-root": "path_to<data>"
 }
 ```
 
@@ -57,14 +59,11 @@ Following features are available:
 
 Constarains:
 
-- Only worksheet that defines linear workflow can be processed
-- UI state is not managed (Pretty much UI elements are enabled permanently)
-
 ## Road map
 
 - [x] Implement data link (links) editor
 - [x] Improve operation parameters editor builder (add combo boxes, sliders, etc)
 - [x] Change flow listview to tree view
 - [x] Improve data view with matplotlib
-- [ ] Implement Global Statements (IF, FOR, WHILE...)
-- [ ] Extend Flow Storage by h5py DB
+- [x] Implement Global Statements (IF, FOR, WHILE...)
+- [x] Extend Flow Storage by h5py DB
