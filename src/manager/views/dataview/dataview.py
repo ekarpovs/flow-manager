@@ -106,24 +106,6 @@ class DataView(View):
       self._grid_rows.pop(len(self._grid_rows)-1)
     return
 
-  # def _clear_preview(self, idx: int) -> None:
-  #   # map idx to preview idx
-  #   row_idx = self._get_row_idx(f'{idx}')
-  #   if row_idx == WITHOUT_PREVIEW_DATA:
-  #     return
-  #   row_idx = max(len(self._idx_map)-1, self._get_row_idx(f'{idx}'))
-  #   try:
-  #     # remove idx mapping for the idx
-  #     if f'{row_idx}' in self._idx_map:
-  #       self._idx_map.pop(f'{row_idx}')
-  #     # remove existing preview item with the idx
-  #     res = self._grid_rows.pop(row_idx, )
-  #     res.grid_remove()
-  #   except IndexError:
-  #     pass
-  #   return
-
-
   def default(self) -> None:
     self._preview_height = DEFAULT_PREVIEW_SIZE
     self._preview_width = DEFAULT_PREVIEW_SIZE
@@ -270,31 +252,20 @@ class DataView(View):
     if out_data is None or refs is None:
       return
     out_refs = [(ref.ext_ref, ref.int_ref, ref.data_type) for ref in refs]  
-    if len(out_refs) > 0:
-      ref = out_refs[0]
-      (ref_extr, ref_intr, ref_type) = ref
-      data = out_data.get(ref_intr)
-      t = type(data)
-      if t == np.ndarray:
-        if data.dtype == np.dtype('uint8'):
-          self._active_view = Frame(self._data_active, name='active data')
-          self._active_view.rowconfigure(0, weight=1)
-          self._active_view.rowconfigure(1, weight=1)
-          self._active_view.rowconfigure(2, weight=1)
-          self._active_view.rowconfigure(3, weight=1)
-          self._create_active_title(ref_extr)
-          self._create_active_image(data)
-          self._create_active_info(data)
-          self._active_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
-        else:
-          if self._active_view is not None:
-            self._active_view.grid_remove()
-      else:
-        self._active_view = Label(self._data_active, name='active data', text = data)
+    if len(out_refs) <= 0:
+      return
+    ref = out_refs[0]
+    (ref_extr, ref_intr, ref_type) = ref
+    data = out_data.get(ref_intr)
+    if type(data) == np.ndarray:
+      if data.dtype == np.dtype('uint8'):
+        self._active_view = Frame(self._data_active, name='active data')
+        self._create_active_title(ref_extr)
+        self._create_active_image(data)
+        self._create_active_info(data)
         self._active_view.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W + E + N + S)
     else:
-      if self._active_view is not None:
-        self._active_view.grid_remove()
+      print(ref_extr, data)
     return
 
   def _create_active_title(self, title:str) -> None:
