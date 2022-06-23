@@ -58,7 +58,7 @@ class LinksView(View):
     # Create the links frame within the ScrolledFrame
     self._links = self._content.display_widget(Frame)
     self._flow = None
-    self._grid_rows_descr: List[Dict] = []
+    self._grid_rows_descr: List[List[Dict]] = []
     self._possible_input: List[str] = []
     self._active_wd_idx = -1
     return
@@ -71,11 +71,11 @@ class LinksView(View):
   def info_descr(self) -> str:
     return self._info_desr
 
-  def get_active_item_link_descriptors(self) -> List[List[Widget]]:
+  def get_active_item_descriptors(self) -> List[Dict]:
     if self._active_wd_idx < 0:
       return None
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
-    return descriptors
+    row_descriptors = self._grid_rows_descr[self._active_wd_idx]
+    return row_descriptors
 
   def clear(self) -> None:     
     self._infovar.set('')
@@ -100,8 +100,7 @@ class LinksView(View):
       self._grid_rows_descr.append(item_links_descr)
     self._disable_all()
     self._active_wd_idx = 0
-    self._hightlighte_active_wd(True)
-    self._set_active_wd_state(True)
+    self._set_active_wd_state()
     return  
 
   def _create_item_links_container(self, idx: int, item: FlowItemModel) -> Widget:
@@ -115,7 +114,11 @@ class LinksView(View):
     title = f'{idx}-{item.name}'
     i_n = item.name.replace('.', '-')
     name = f'--{idx}-{i_n}--'
-    item_label = Label(container, name=name, text=title, anchor=W, justify=LEFT, width=18)
+    item_label = Label(container, name=name, text=title, anchor=W, justify=LEFT, width=18,
+                        foreground="white",
+                        background="RoyalBlue",
+                        disabledforeground="black")
+
     item_label.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W)
     item_links_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
     infovar = StringVar()
@@ -162,12 +165,9 @@ class LinksView(View):
     return get, inref_lbl, inref_combo
 
   def set_active_wd(self, idx: int) -> None:
-    self._hightlighte_active_wd()
-    self._set_active_wd_state()
     direction = idx - self._active_wd_idx
     self._active_wd_idx = idx
-    self._hightlighte_active_wd(True)
-    self._set_active_wd_state(True)
+    self._set_active_wd_state()
     # scroll, when scroll bar was used
     self._stay_active_wd_visible(direction)
     if idx == 0:
@@ -175,8 +175,8 @@ class LinksView(View):
     return
   
   def _stay_active_wd_visible(self, direction: int) -> None:
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
-    container = descriptors[0].get('wd').master
+    row_descriptors = self._grid_rows_descr[self._active_wd_idx]
+    container = row_descriptors[0].get('wd').master
     if direction == 0:
       # stay at the same position
       return
@@ -201,37 +201,23 @@ class LinksView(View):
         self._content.yview(SCROLL, step, UNITS)
     return
 
-  def _set_active_wd_state(self, active: bool = False) -> None:
-    state = DISABLED
-    if active:
-      state = NORMAL
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
-    for descr in descriptors:
-      widget: Widget = descr.get('wd')
-      widget['state'] = state
+  def _set_active_wd_state(self) -> None:
+    self._disable_all()
+    row_descriptors = self._grid_rows_descr[self._active_wd_idx]
+    self._set_wd_state(row_descriptors, True)
     return
 
   def _disable_all(self) -> None:
-    for descriptors in self._grid_rows_descr:
-      for descr in descriptors:
-        widget = descr.get('wd')
-        widget['state'] = DISABLED
+    # disable all under the active one
+    for row_descriptors in self._grid_rows_descr:
+      self._set_wd_state(row_descriptors)
     return
 
-  # UI methods
-
-  def _hightlighte_active_wd(self, active: bool = False) -> None:
-    fg_color = 'black'
-    bg_color = 'SystemButtonFace'
+  def _set_wd_state(self, row_descriptors: Dict, active: bool = False) -> None:
+    state = DISABLED
     if active:
-      fg_color = 'white'
-      bg_color = 'RoyalBlue'
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
-    for descr in descriptors:
-      widget = descr.get('wd')
-      name = widget.winfo_name()
-      if name.startswith('--'):
-        widget['fg'] = fg_color
-        widget['bg'] = bg_color
-        break   
+      state = NORMAL
+    for wd_descr in row_descriptors:
+      widget =wd_descr.get('wd')
+      widget['state'] = state
     return

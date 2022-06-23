@@ -1,8 +1,7 @@
-from turtle import width
-from typing import List, Dict, Tuple, Callable
+from typing import List, Dict, Tuple
 from tkinter import *
 from tkinter import font
-from tkinter.ttk import Button, LabelFrame
+from tkinter.ttk import Button
 from tkscrolledframe import ScrolledFrame
 import copy
 
@@ -51,10 +50,9 @@ class ParamsView(View):
 
     # data memebers
     self._flow = None
-    self._grid_rows_descr: List[Dict] = []
+    self._grid_rows_descr: List[List[Dict]] = []
     self._active_wd_idx = -1
     self._factory = ParamWidgetFactory()
-
     self._activate_params_buttons()
     return
 
@@ -63,19 +61,19 @@ class ParamsView(View):
   def descriptors(self) -> List[Dict]:
     return self._grid_rows_descr
 
-  def get_active_item_params_widgets(self) -> List[Widget]:
+  def get_active_item_widgets(self) -> List[Widget]:
     if self._active_wd_idx < 0:
       return None
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
+    row_descriptors = self._grid_rows_descr[self._active_wd_idx]
     widgets = []
-    for descr in descriptors:
-      widget = descr.get('wd')
+    for wd_descr in row_descriptors:
+      widget = wd_descr.get('wd')
       widgets.append(widget)
     return widgets
 
   def get_item_name(self, idx: int) -> str:
-    descriptors = self._grid_rows_descr[idx]
-    widget_0 = descriptors[0].get('wd')
+    row_descriptors = self._grid_rows_descr[idx]
+    widget_0 = row_descriptors[0].get('wd')
     parent_name = widget_0.winfo_parent()
     idx_s = parent_name.index('--')
     p_n:str = parent_name[idx_s+2: len(parent_name)-2]
@@ -85,13 +83,13 @@ class ParamsView(View):
 
   def get_item_params(self, idx: int) -> Dict:
     params = {}
-    descriptors = self._grid_rows_descr[idx]
-    for descr in descriptors:
-      widget = descr.get('wd')
+    row_descriptors = self._grid_rows_descr[idx]
+    for wd_descr in row_descriptors:
+      widget = wd_descr.get('wd')
       name = widget.winfo_name()
-      if name.startswith('--'):
+      if self._is_widget_title(name):
         continue
-      getter = descr.get('getter')
+      getter = wd_descr.get('getter')
       value = getter()
       params[name] =  value 
     return params
@@ -99,13 +97,13 @@ class ParamsView(View):
   def set_item_params(self, idx: int, params) -> None:
     if self._active_wd_idx < 0:
       return None
-    descriptors = self._grid_rows_descr[idx]
-    for descr in descriptors:
-      widget = descr.get('wd')
+    row_descriptors = self._grid_rows_descr[idx]
+    for wd_descr in row_descriptors:
+      widget = wd_descr.get('wd')
       name = widget.winfo_name()
-      if name.startswith('--'):
+      if self._is_widget_title(name):
         continue
-      setter = descr.get('setter')
+      setter = wd_descr.get('setter')
       setter(params.get(name))
     return
 
@@ -128,10 +126,9 @@ class ParamsView(View):
       self._factory.container = item_params_frame
       item_params_descr = self._create_item_params_widgets(i, item)
       self._grid_rows_descr.append(item_params_descr)
-    self.disable_all()
+    self._disable_all()
     self._active_wd_idx = 0
-    self._hightlighte_active_wd(True)
-    self._set_active_wd_state(True)
+    self._set_active_wd_state()
     self._activate_params_buttons(True)   
     return  
 
@@ -146,9 +143,17 @@ class ParamsView(View):
     title = f'{idx}-{item.name}'
     i_n = item.name.replace('.', '-')
     name = f'--{idx}-{i_n}--'
-    item_label = Label(self._factory.container, name=name, text=title)
+
+    item_label = Label(self._factory.container, name=name, text=title, 
+                        anchor=W, 
+                        justify=LEFT, 
+                        width=18, 
+                        foreground="white",
+                        background="RoyalBlue",
+                        disabledforeground="black")
     item_label.grid(row=0, column=0, columnspan=3, padx=PADX_S, pady=PADY_S, sticky=W)
     item_params_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
+    
     params, params_def = self._merge_curent_params_with_params_ws(item)
     for i, param_def in enumerate(params_def):
       name = param_def.get('name')
@@ -178,14 +183,9 @@ class ParamsView(View):
     return params, params_def
 
   def set_active_wd(self, idx: int) -> None:
-    self._hightlighte_active_wd()
-    if self._active_wd_idx > idx:
-      # disable, when move backward
-      self._set_active_wd_state()
     direction = idx - self._active_wd_idx
     self._active_wd_idx = idx
-    self._hightlighte_active_wd(True)
-    self._set_active_wd_state(True)
+    self._set_active_wd_state()
     self._set_button_io_state(idx)
     # scroll, when scroll bar was used
     self._stay_active_wd_visible(direction)
@@ -193,19 +193,9 @@ class ParamsView(View):
       self._content.scroll_to_top()
     return
 
-  def _set_active_wd_state(self, active: bool = False) -> None:
-    state = DISABLED
-    if active:
-      state = NORMAL
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
-    for descr in descriptors:
-      widget = descr.get('wd')
-      widget['state'] = state
-    return
-
   def _stay_active_wd_visible(self, direction: int) -> None:
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
-    container = descriptors[0].get('wd').master
+    row_descriptors = self._grid_rows_descr[self._active_wd_idx]
+    container = row_descriptors[0].get('wd').master
     if direction == 0:
       # stay at the same position
       return
@@ -230,38 +220,30 @@ class ParamsView(View):
         self._content.yview(SCROLL, step, UNITS)
     return
 
-  def _set_active_wd_state(self, active: bool = False) -> None:
+  def _set_active_wd_state(self) -> None:
+    self._disable_all()
+    row_descriptors = self._grid_rows_descr[self._active_wd_idx]
+    self._set_wd_state(row_descriptors, True)
+    return
+  
+  @staticmethod
+  def _is_widget_title(name: str) -> bool:
+    return name.startswith('--')
+
+  # UI methods
+  def _disable_all(self) -> None:
+    # disable all under the active one
+    for row_descriptors in self._grid_rows_descr[self._active_wd_idx:]:
+      self._set_wd_state(row_descriptors)
+    return
+
+  def _set_wd_state(self, row_descriptors: Dict, active: bool = False) -> None:
     state = DISABLED
     if active:
       state = NORMAL
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
-    for descr in descriptors:
-      widget: Widget = descr.get('wd')
+    for wd_descr in row_descriptors:
+      widget =wd_descr.get('wd')
       widget['state'] = state
-    return
-
-  # UI methods
-  def disable_all(self) -> None:
-    for descriptors in self._grid_rows_descr:
-      for descr in descriptors:
-        widget = descr.get('wd')
-        widget['state'] = DISABLED
-    return
-
-  def _hightlighte_active_wd(self, active: bool = False) -> None:
-    fg_color = 'black'
-    bg_color = 'SystemButtonFace'
-    if active:
-      fg_color = 'white'
-      bg_color = 'RoyalBlue'
-    descriptors = self._grid_rows_descr[self._active_wd_idx]
-    for descr in descriptors:
-      widget = descr.get('wd')
-      name = widget.winfo_name()
-      if name.startswith('--'):
-        widget['fg'] = fg_color
-        widget['bg'] = bg_color
-        break   
     return
 
   def _activate_params_buttons(self, activate=False) -> None:

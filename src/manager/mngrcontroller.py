@@ -271,7 +271,6 @@ class MngrController():
   def _set_top_state(self) -> None:
     self._view.data.clear_view()
     self._view.flow.set_selection_tree()
-    self._view.params.disable_all()
     if self._ready():
       # self._view.flow.set_selection_tree()
       self._runner.reset()
@@ -328,7 +327,7 @@ class MngrController():
     return
 
   def _unbind_item_links_widgets(self) -> None:
-    descriptors = self._view.links.get_active_item_link_descriptors()
+    descriptors = self._view.links.get_active_item_descriptors()
     for descr in descriptors:
       widget = descr.get('wd')
       t = type(widget)
@@ -341,7 +340,7 @@ class MngrController():
     return
 
   def _bind_item_links_widgets(self) -> None:
-    descriptors = self._view.links.get_active_item_link_descriptors()
+    descriptors = self._view.links.get_active_item_descriptors()
     for descr in descriptors:
       widget = descr.get('wd')
       t = type(widget)
@@ -422,7 +421,7 @@ class MngrController():
     return
 
   def _unbind_item_params_widgets(self) -> None:
-    widgets = self._view.params.get_active_item_params_widgets()
+    widgets = self._view.params.get_active_item_widgets()
     for widget in widgets:
       t = type(widget) 
       if t == Scale: 
@@ -440,7 +439,7 @@ class MngrController():
     return
 
   def _bind_item_params_widgets(self) -> None:
-    widgets = self._view.params.get_active_item_params_widgets()
+    widgets = self._view.params.get_active_item_widgets()
     for widget in widgets:
       t = type(widget) 
       if t == Scale: 
