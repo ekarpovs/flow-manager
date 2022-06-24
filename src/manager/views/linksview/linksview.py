@@ -116,7 +116,7 @@ class LinksView(View):
     name = f'--{idx}-{i_n}--'
     item_label = Label(container, name=name, text=title, anchor=W, justify=LEFT, width=18,
                         foreground="white",
-                        background="RoyalBlue",
+                        background="DodgerBlue2",
                         disabledforeground="black")
 
     item_label.grid(row=0, column=0, padx=PADX_S, pady=PADY_S, sticky=W)

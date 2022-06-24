@@ -149,7 +149,7 @@ class ParamsView(View):
                         justify=LEFT, 
                         width=18, 
                         foreground="white",
-                        background="RoyalBlue",
+                        background="DodgerBlue2",
                         disabledforeground="black")
     item_label.grid(row=0, column=0, columnspan=3, padx=PADX_S, pady=PADY_S, sticky=W)
     item_params_descr.append({'name': item_label.winfo_name(), 'getter': None, 'setter': None, 'wd': item_label})
