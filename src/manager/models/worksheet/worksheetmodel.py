@@ -2,17 +2,18 @@
 '''
 import json
 import os
+from pathlib import Path
 from tkinter.filedialog import asksaveasfilename
 from typing import Dict, List, Tuple
 
 class WorksheetModel():
   def __init__(self, paths: List[str]) -> None:
-    self._workshetnames: List[str] = []
+    self._worksheetnames: List[str] = []
     self._read_names(paths)
 
   @property
   def workseetnames(self) -> List[str]:
-    return self._workshetnames
+    return self._worksheetnames
 
   def read(self, path, name) -> List[Dict]:
     ffn = f'{path}/{name}.json'
@@ -20,16 +21,29 @@ class WorksheetModel():
       data = json.load(f)
       return data
    
-  @staticmethod
-  def _worksheets_names(path):
-    worksheets_names = [f[:-5] for f in os.listdir(path) if f.endswith('.json')]
-    return worksheets_names
+  def _worksheets_names(self, target_path, level=0):
+    """"
+    This function recursively prints all contents of a pathlib.Path object
+    https://stackoverflow.com/questions/16953842/using-os-walk-to-recursively-traverse-directories-in-python
+    """
+    # def print_indented(folder, level):
+    #   print('\t' * level + folder)
+    
+    # print_indented(target_path.name, level)
+    
+    for file in target_path.iterdir():
+      if file.is_dir():
+        self._worksheets_names(file, level+1)
+      else:
+        # print_indented(file.name, level+1)
+        if file.suffix == '.json':
+          self._worksheetnames.append(f'{file.stem} <{target_path}>')
+    return
 
   def _read_names(self, paths) -> None:
     for path in paths:
-      names = self._worksheets_names(path)
-      for name in names:
-        self._workshetnames.append(f'{name} <{path}>')
+      p = Path(path)
+      self._worksheets_names(p)
     return
 
   # If indent is a non-negative integer, then JSON array elements and object members 
