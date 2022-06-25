@@ -224,7 +224,7 @@ class MngrController():
   def _run(self) -> None:
     idx = self._runner.state_idx
     if self._ready():
-      self._runner.run_all(self._model.flow.flow)
+      self._runner.run_all()
       idx = self._runner.state_idx
       self._view.flow.set_selection_tree(idx)
       self._show_run_result()
@@ -235,7 +235,7 @@ class MngrController():
       idx, _ = self._view.flow.get_current_selection_tree()
       self._apply_step_links(idx)
       self._apply_step_params(idx)
-      self._runner.run_one(event_name, idx, self._model.flow.flow)
+      self._runner.run_one(event_name, idx)
       new_idx = self._runner.state_idx
       self._view.flow.set_selection_tree(new_idx)
     return
