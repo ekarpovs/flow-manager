@@ -35,7 +35,7 @@ class MngrRunner():
     return self._runner._output_from_state
 
   def build(self, model: FlowModel) -> None:
-    self._runner.build(self._cfg, model)
+    self._runner.build(self._cfg.cfg_fsm, model)
     return
 
   def reset(self) -> None:
