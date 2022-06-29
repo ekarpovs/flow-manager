@@ -71,16 +71,6 @@ class ParamsView(View):
       widgets.append(widget)
     return widgets
 
-  def get_item_name(self, idx: int) -> str:
-    row_descriptors = self._grid_rows_descr[idx]
-    widget_0 = row_descriptors[0].get('wd')
-    parent_name = widget_0.winfo_parent()
-    idx_s = parent_name.index('--')
-    p_n:str = parent_name[idx_s+2: len(parent_name)-2]
-    idx_point = p_n.find('-', 3)
-    p_n = p_n[:idx_point] + '.' + p_n[idx_point+1:]
-    return p_n
-
   def get_item_params(self, idx: int) -> Dict:
     params = {}
     row_descriptors = self._grid_rows_descr[idx]
