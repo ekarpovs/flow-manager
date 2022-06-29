@@ -320,16 +320,33 @@ class MngrController():
     self._model.flow.flow.info = copy.copy(getter())
     return
 
-  def _links_return_pressed(self, getter: Callable) -> None:
+  def _links_return_pressed(self, event: Event) -> None:
     idx, _ = self._view.flow.get_current_selection_tree()
     flow_item = self._model.flow.get_item(idx)
-    flow_item.title = copy.copy(getter())
+    widget = event.widget
+    value = widget.get()
+    flow_item.title = value
+    return
+
+  def _apply_step_links(self, idx: int) -> None:
+    flow_item = self._model.flow.get_item(idx)
+    links_wd = self._view.links.get_item_links(idx)
+    for k in links_wd.keys():
+      link = links_wd.get(k)
+      if len(link) > 0:
+        flow_item.links[k] = links_wd.get(k)
+
+    # Update sorage by the step links
+    ext_refs = flow_item.links 
+    for name, ext_ref in ext_refs.items():
+      storage_in_ref = self._runner.storage.get_state_input_ext_ref(self._runner.state_id, name)
+      if storage_in_ref is not None:
+        storage_in_ref.ext_ref = ext_ref
     return
 
   def _unbind_item_links_widgets(self) -> None:
-    descriptors = self._view.links.get_active_item_descriptors()
-    for descr in descriptors:
-      widget = descr.get('wd')
+    widgets = self._view.links.get_active_item_widgets()
+    for widget in widgets:
       t = type(widget)
       if t == Combobox:
         widget.unbind("<<ComboboxSelected>>")
@@ -340,51 +357,23 @@ class MngrController():
     return
 
   def _bind_item_links_widgets(self) -> None:
-    descriptors = self._view.links.get_active_item_descriptors()
-    for descr in descriptors:
-      widget = descr.get('wd')
-      t = type(widget)
+    widgets = self._view.links.get_active_item_widgets()
+    for widget in widgets:
+      t = type(widget) 
       if t == Combobox:
-        name = descr.get('name')
-        cgetter = descr.get('getter')
-        widget.bind("<<ComboboxSelected>>", lambda e: self._assign_link(name, cgetter))
+        widget.bind("<<ComboboxSelected>>", self._apply)
       elif t == Entry:
-        egetter = descr.get('getter')
-        widget.bind("<Return>", lambda e: self._links_return_pressed(egetter))
+        widget.bind("<Return>", self._links_return_pressed)
       else:
         pass
     return
 
-  def _assign_link(self, name: str, getter: Callable) -> None:
-    idx, _ = self._view.flow.get_current_selection_tree()
-    # set active 
-    flow_item = self._model.flow.get_item(idx)
-    ext_ref = copy.copy(getter())
-    # Update flow item refs
-    flow_item.links[name] = ext_ref
-
-    state_idx = self._runner.state_idx
-    if state_idx == idx:
-      # Update sorage
-      storage_in_ref = self._runner.storage.get_state_input_ext_ref(self._runner.state_id, name)
-      # if storage_in_ref is not None:
-      storage_in_ref.ext_ref = ext_ref
-      self._apply()
-    return
-
-  def _apply_step_links(self, idx: int) -> None:
-    flow_item = self._model.flow.get_item(idx)
-    ext_refs = flow_item.links 
-
-    # Update sorage by the step links
-    for name, ext_ref in ext_refs.items():
-      storage_in_ref = self._runner.storage.get_state_input_ext_ref(self._runner.state_id, name)
-      if storage_in_ref is not None:
-        storage_in_ref.ext_ref = ext_ref
-    return
-
 
 # Params command
+  def _params_return_pressed(self, event) -> None:
+    self._apply(event)
+    return
+
   def _apply_step_params(self, idx: int) -> None:
     flow_item = self._model.flow.get_item(idx)
     params_wd = self._view.params.get_item_params(idx)
@@ -414,10 +403,6 @@ class MngrController():
     params = convert_params_def_to_dict(params_def)    
     flow_item.params = params
     self._view.params.set_item_params(idx, params)
-    return
-
-  def _params_return_pressed(self, event) -> None:
-    self._apply(event)
     return
 
   def _unbind_item_params_widgets(self) -> None:

@@ -71,11 +71,32 @@ class LinksView(View):
   def info_descr(self) -> str:
     return self._info_desr
 
-  def get_active_item_descriptors(self) -> List[Dict]:
+  def get_active_item_widgets(self) -> List[Widget]:
     if self._active_wd_idx < 0:
       return None
     row_descriptors = self._grid_rows_descr[self._active_wd_idx]
-    return row_descriptors
+    widgets = []
+    for wd_descr in row_descriptors:
+      widget = wd_descr.get('wd')
+      t = type(widget) 
+      if t is Label:
+        continue
+      widgets.append(widget)
+    return widgets
+
+  def get_item_links(self, idx: int) -> Dict:
+    links = {}
+    row_descriptors = self._grid_rows_descr[idx]
+    for wd_descr in row_descriptors:
+      widget = wd_descr.get('wd')
+      t = type(widget) 
+      if t is Label or t is Entry:
+        continue
+      name = widget.winfo_name()
+      getter = wd_descr.get('getter')
+      value = getter()
+      links[name] =  value 
+    return links
 
   def clear(self) -> None:     
     self._infovar.set('')
