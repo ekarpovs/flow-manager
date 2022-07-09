@@ -1,0 +1,286 @@
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+      <div class="mermaid">
+    
+        classDiagram
+          class Configuration {
+            cfg_fsm
+            cfg_storage
+            input_paths
+            modules_paths
+            result_path
+            worksheets_paths
+          }
+          class ContentView {
+            parent
+            tmp_flow
+            init_content(flow: CurrentFlowModel) None
+            update_flow() None
+          }
+          class CurrentFlowModel {
+            flow
+            flow : NoneType
+            items
+            loaded
+            worksheetnames
+            get_item(idx: int) FlowItemModel
+            get_names() List[str]
+            get_params(idx: int) Dict
+            get_params_def(idx: int) Dict
+            get_params_ws(idx: int) Dict
+            init_flow_model(path: str, name: str) List[Dict]
+            reload() None
+            remove_item(idx) None
+            replace_item(idx: int, item: FlowItemModel) None
+            set_item(idx: int, item: FlowItemModel) None
+            set_params(idx: int, params: Dict) None
+            set_params_def(idx: int, params: Dict) None
+            store_flow_model_as_ws(path, name) Tuple[str, str]
+          }
+          class DataModel {
+            cv2image
+            images_files_list
+            path
+            get_image(image_full_file_name)
+            get_images_file_names_list(path)
+            get_original_image_size()
+            get_selected_file_full_name(idx)
+          }
+          class DataView {
+            content : ScrolledFrame
+            preview_view : NoneType, Frame
+            storage
+            storage : FlowStorage, NoneType
+            clear_view() None
+            default() None
+            show_preview_result(state_id: str, idx: int) None
+            show_result(state_id: str) None
+            update_result(idx: int, state_id: str) None
+          }
+          class FlowConverter {
+            convert_params_def_to_dict(params_def: List[Dict]) Dict
+            merge_operation_params(params_new: Dict, params_def: List[Dict], params: Dict) Dict
+            split_ws_name(ws_name) Tuple[str, str]
+          }
+          class FlowView {
+            btn_add : Button
+            btn_curr : Button
+            btn_empty : Label
+            btn_next : Button
+            btn_prev : Button
+            btn_reload : Button
+            btn_remove : Button
+            btn_reset : Button
+            btn_run : Button
+            btn_save : Button
+            btn_top : Button
+            flow_tree_view : Treeview
+            names_combo_box : Combobox
+            tree_view_scrollbar_x : Scrollbar
+            tree_view_scrollbar_y : Scrollbar
+            ws_names
+            ws_names
+            ws_title
+            activate_buttons(activate) None
+            activate_edit_buttons(activate) None
+            activate_runtime_buttons(activate) None
+            clear_flow_tree_view()
+            get_current_selection_tree() Tuple[int, str]
+            set_flow_item_names(flow_names, flow_titles, idx)
+            set_selection_tree(idx)
+          }
+          class LdActionsFrame {
+            btn_cancel : Button
+            btn_ok : Button
+            parent
+          }
+          class LinksDialog {
+            actions_frame
+            content : ScrolledFrame
+            content_view : NoneType
+            apply() None
+            cancel() None
+          }
+          class LinksView {
+            descriptors
+            info_descr
+            build(flow: FlowModel) None
+            clear() None
+            get_active_item_widgets() List[Widget]
+            get_item_links(idx: int) Dict
+            set_active_wd(idx: int) None
+          }
+          class MainActions {
+            btn_clear : Button
+            btn_exit : Button
+            parent
+            stderr_textbox : ScrolledText
+            stdout_textbox : ScrolledText
+            clear()
+            stderr_redirector(line)
+            stdout_redirector(line)
+          }
+          class MainWindow {
+            actions_container
+            flow_controller
+            main_container : Frame
+            manager_container : Frame
+            exit(event)
+            fit_manager_container_size()
+          }
+          class MngrController {
+            flows_view_idx : int
+          }
+          class MngrConverter {
+            flow
+            module
+            modulelist_to_module_defs(modulemodellist: ModuleModelList) List[str]
+            split_ws_name(ws_name) Tuple[str, str]
+          }
+          class MngrModel {
+            data
+            factory
+            flow
+            input_paths
+            module
+            modulemodellist
+            modules_paths
+            init_flow_model(path: str, name: str) None
+          }
+          class MngrRunner {
+            initialized
+            output_from_state
+            state_id
+            state_idx
+            storage
+            build(model: FlowModel) None
+            reset() None
+            run_all() None
+            run_one(event: str, idx: int) None
+          }
+          class MngrView {
+            data
+            flow
+            links
+            module
+            module_defs
+            module_defs : list
+            params
+            parent
+            ws_names
+            ws_names : list
+            ws_title
+            ws_title : str
+            set(flow_module_name)
+          }
+          class ModuleConverter {
+            list_level_item(iid: str, path: str) Dict
+            module_level_item(parent_iid: str, v1: str, module: ModuleModel) Dict
+            modulelist_to_module_defs(modulelist: ModuleModelList) List[Dict]
+            operation_level_item(parent_iid: str, v1, operation: ModuleItemModel) Dict
+          }
+          class ModuleItemModel {
+            COMMENT_SEPARATOR : str
+            NAME_SEP : str
+            TYPE_SEP : str
+            description
+            inrefs
+            name
+            outrefs
+            params
+          }
+          class ModuleModel {
+            doc
+            doc
+            items
+            loaded
+            name
+            name : str
+            path
+            get_item(name: str) ModuleItemModel
+            load(name: str) None
+          }
+          class ModuleModelList {
+            modulemodellist
+            modulemodellist
+            paths
+            get_module_by_name(name: str) ModuleModel
+            get_module_or_operation_doc(name: str) List[str]
+            get_modules_by_path(path: str) List[ModuleModel]
+            get_operation_by_name(name: str) ModuleItemModel
+          }
+          class ModuleView {
+            module_defs
+            module_defs
+            tree_view
+            tree_view_scrollbar_x : Scrollbar
+            tree_view_scrollbar_y : Scrollbar
+            get_current_selection_tree() str
+            get_selected_item_name()
+            open_all()
+            set_operation_doc(doc)
+          }
+          class ParamWidgetFactory {
+            container
+            container : Frame
+            create(param_def: Dict) Tuple[Callable, Callable, Widget]
+          }
+          class ParamsView {
+            btn_params_default : Button
+            btn_params_io : Button
+            btn_params_reset : Button
+            descriptors
+            build(flow: FlowModel) None
+            clear() None
+            get_active_item_widgets() List[Widget]
+            get_item_params(idx: int) Dict
+            set_active_wd(idx: int) None
+            set_item_params(idx: int, params) None
+          }
+          class PlotDialog {
+            onclick(event)
+          }
+          class View {
+          }
+          class WorksheetModel {
+            workseetnames
+            read(path, name) List[Dict]
+            store(path: str, name: str, ws: List[Dict]) Tuple[str, str]
+          }
+          DataView --|> View
+          FlowView --|> View
+          LinksView --|> View
+          ModuleView --|> View
+          ParamsView --|> View
+          Configuration --* MngrController : _cfg
+          Configuration --* MngrModel : _cfg
+          Configuration --* MngrRunner : _cfg
+          Configuration --* CurrentFlowModel : _cfg
+          MainActions --* MainWindow : actions_container
+          FlowConverter --* MngrConverter : _flow
+          ModuleConverter --* MngrConverter : _module
+          ContentView --* LinksDialog : content_view
+          LdActionsFrame --* LinksDialog : actions_frame
+          MngrController --* MainWindow : flow_controller
+          MngrConverter --* MngrController : _converter
+          MngrModel --* MngrController : _model
+          MngrRunner --* MngrController : _runner
+          MngrView --* MngrController : _view
+          DataModel --* MngrModel : _data
+          CurrentFlowModel --* LinksDialog : _flow
+          CurrentFlowModel --* MngrModel : _flow
+          ModuleModel --* ModuleModelList : modulemodellist
+          ModuleModelList --* MngrModel : _module
+          WorksheetModel --* CurrentFlowModel : _ws_model
+          WorksheetModel --* CurrentFlowModel : _ws_model
+          DataView --* MngrView : _data
+          FlowView --* MngrView : _flow
+          LinksView --* MngrView : _links
+          ModuleView --* MngrView : _module
+          ParamsView --* MngrView : _params
+          ParamWidgetFactory --* ParamsView : _factory
+  
+       </div>
+  </body>
+</html>

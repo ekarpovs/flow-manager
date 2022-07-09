@@ -1,0 +1,163 @@
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+      <div class="mermaid">
+    
+        classDiagram
+          class src {
+          }
+          class configuration {
+          }
+          class configuration {
+          }
+          class mainactions {
+          }
+          class mainwindow {
+          }
+          class manager {
+          }
+          class converters {
+          }
+          class flowconverter {
+          }
+          class moduleconverter {
+          }
+          class linksdialog {
+          }
+          class contentview {
+          }
+          class ldactionsframe {
+          }
+          class linksdialog {
+          }
+          class mngrcontroller {
+          }
+          class mngrconverter {
+          }
+          class mngrmodel {
+          }
+          class mngrrunner {
+          }
+          class mngrview {
+          }
+          class models {
+          }
+          class data {
+          }
+          class datamodel {
+          }
+          class flow {
+          }
+          class currentflowmodel {
+          }
+          class module {
+          }
+          class moduleitemmodel {
+          }
+          class modulemodel {
+          }
+          class modulemodellist {
+          }
+          class worksheet {
+          }
+          class worksheetmodel {
+          }
+          class utils {
+          }
+          class fsutils {
+          }
+          class views {
+          }
+          class dataview {
+          }
+          class dataview {
+          }
+          class plotdialog {
+          }
+          class flowview {
+          }
+          class flowview {
+          }
+          class linksview {
+          }
+          class linksview {
+          }
+          class moduleview {
+          }
+          class moduleview {
+          }
+          class paramsview {
+          }
+          class paramsutils {
+          }
+          class paramsview {
+          }
+          class paramwidgetfactory {
+          }
+          class view {
+          }
+          class uiconst {
+          }
+          src --> mainwindow
+          src --> uiconst
+          configuration --> configuration
+          mainactions --> uiconst
+          mainwindow --> mainactions
+          mainwindow --> manager
+          mainwindow --> uiconst
+          manager --> mngrcontroller
+          manager --> mngrmodel
+          manager --> mngrview
+          converters --> flowconverter
+          converters --> moduleconverter
+          flowconverter --> currentflowmodel
+          linksdialog --> linksdialog
+          contentview --> currentflowmodel
+          contentview --> uiconst
+          linksdialog --> ldactionsframe
+          mngrcontroller --> mngrconverter
+          mngrcontroller --> mngrmodel
+          mngrcontroller --> mngrrunner
+          mngrcontroller --> mngrview
+          mngrcontroller --> paramsview
+          mngrconverter --> converters
+          mngrconverter --> models
+          mngrmodel --> models
+          mngrview --> views
+          models --> data
+          models --> flow
+          models --> module
+          models --> worksheet
+          data --> datamodel
+          flow --> currentflowmodel
+          currentflowmodel --> configuration
+          currentflowmodel --> worksheetmodel
+          module --> moduleitemmodel
+          module --> modulemodel
+          module --> modulemodellist
+          modulemodel --> moduleitemmodel
+          modulemodellist --> moduleitemmodel
+          modulemodellist --> modulemodel
+          worksheet --> worksheetmodel
+          utils --> fsutils
+          views --> dataview
+          views --> flowview
+          views --> linksview
+          views --> moduleview
+          views --> paramsview
+          views --> paramsutils
+          dataview --> dataview
+          dataview --> plotdialog
+          flowview --> flowview
+          flowview --> linksdialog
+          flowview --> currentflowmodel
+          linksview --> linksview
+          moduleview --> moduleview
+          paramsview --> paramsutils
+          paramsview --> paramsview
+          paramsview --> paramwidgetfactory
+          paramwidgetfactory --> paramsutils
+  
+       </div>
+  </body>
+</html>
