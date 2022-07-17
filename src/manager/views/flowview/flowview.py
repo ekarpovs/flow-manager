@@ -125,6 +125,11 @@ class FlowView(View):
     # Setup flow actions view
     fr_h = int(self._h*0.11)
     self._flow_actions_frame = Frame(self, height=fr_h, highlightbackground='gray', highlightthickness=1)
+    self._flow_actions_frame.columnconfigure(0, weight=1)
+    self._flow_actions_frame.columnconfigure(1, weight=1)
+    self._flow_actions_frame.columnconfigure(2, weight=1)
+    self._flow_actions_frame.columnconfigure(3, weight=1)
+    self._flow_actions_frame.columnconfigure(4, weight=1)
     self._flow_actions_frame.grid_propagate(False)
     self.btn_run = Button(self._flow_actions_frame, text='Run', width=BTNW_S)
     self.btn_curr = Button(self._flow_actions_frame, text='Current', width=BTNW_S)
@@ -132,11 +137,11 @@ class FlowView(View):
     self.btn_prev = Button(self._flow_actions_frame, text='Prev', width=BTNW_S)
     self.btn_top = Button(self._flow_actions_frame, text='Top', width=BTNW_S)
 
-    self.btn_run.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W + N)
-    self.btn_curr.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W + N)
-    self.btn_next.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W + N)
-    self.btn_prev.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=E + N)
-    self.btn_top.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=E + N)
+    self.btn_run.grid(row=0, column=0, padx=PADX, pady=PADY_S, sticky=W)
+    self.btn_curr.grid(row=0, column=1, padx=PADX, pady=PADY_S, sticky=W)
+    self.btn_next.grid(row=0, column=2, padx=PADX, pady=PADY_S, sticky=W)
+    self.btn_prev.grid(row=0, column=3, padx=PADX, pady=PADY_S, sticky=W)
+    self.btn_top.grid(row=0, column=4, padx=PADX, pady=PADY_S, sticky=W)
     return
 
   def _setup_views_layout(self) -> None:
