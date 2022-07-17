@@ -1,12 +1,12 @@
   {
     "info": "Configuration of flow runner",
     "user-actions-paths": [
-      "./frfsm",
+      "../flow_runner",
       "../modules-and-worksheets/modules",
       "../modules-and-worksheets/modules-common"
     ],
-    "user-action-wrapper-path": "../flow_runner/frfsm",
-    "user-action-wrapper-name": "frfsm-actions.flow_runner_action",
+    "user-action-wrapper-path": "../flow_runner",
+    "user-action-wrapper-name": "flow_runner.actions_wrapper",
     "events": [
       "next",
       "prev",
