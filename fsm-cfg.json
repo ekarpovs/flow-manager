@@ -1,11 +1,11 @@
-  {
+ 
+ {
     "info": "Configuration of flow runner",
     "user-actions-paths": [
-      "../flow_runner",
       "../modules-and-worksheets/modules",
       "../modules-and-worksheets/modules-common"
     ],
-    "user-action-wrapper-path": "../flow_runner",
+    "user-action-wrapper-path": ".",
     "user-action-wrapper-name": "flow_runner.actions_wrapper",
     "events": [
       "next",
