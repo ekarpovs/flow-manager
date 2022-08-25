@@ -272,7 +272,6 @@ class MngrController():
     self._view.data.clear_view()
     self._view.flow.set_selection_tree()
     if self._ready():
-      # self._view.flow.set_selection_tree()
       self._runner.reset()
     return
 
@@ -284,9 +283,9 @@ class MngrController():
 
 # Runner
   def _ready(self) -> bool:
-    activate = self._runner.initialized and self._model.flow.loaded
-    self._view.flow.activate_buttons(activate)
-    return activate
+    ready = self._runner.initialized and self._model.flow.loaded
+    self._view.flow.activate_buttons(ready)
+    return ready
 
   def _create_and_activate_links_view(self) -> None:
     self._view.links.build(self._model.flow.flow)
